@@ -54,6 +54,10 @@ class UniversalChunk(BaseModel):
         None,
         description="Name of the enclosing class scope if applicable",
     )
+    decorators: list[str] = Field(
+        default_factory=list,
+        description="Decorator names applied to the symbol (e.g. dataclass, property)",
+    )
     dependencies: list[str] = Field(
         default_factory=list,
         description="Extracted import or calling dependency references",

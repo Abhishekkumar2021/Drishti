@@ -20,12 +20,12 @@ This file is the living source of truth for the current build status of Drishti.
 | Component | Total Points | Completed | Progress % | Status |
 |-----------|--------------|-----------|------------|--------|
 | **Phase 1: Foundation** | 55 | 55 | 100.0% | 🟩 Completed |
-| **Phase 2: Ingestion** | 131 | 5 | 3.8% | 🟨 In Progress |
+| **Phase 2: Ingestion** | 131 | 13 | 9.9% | 🟨 In Progress |
 | **Phase 3: Core Search & RAG** | 131 | 0 | 0.0% | 🔮 Planned |
 | **Phase 4: Advanced Features** | 89 | 0 | 0.0% | 🔮 Planned |
 | **Phase 5: Evaluation** | 34 | 0 | 0.0% | 🔮 Planned |
 | **Phase 6: Release** | 21 | 0 | 0.0% | 🔮 Planned |
-| **Total Project** | **461** | **60** | **13.0%** | **🟨 In Progress** |
+| **Total Project** | **461** | **68** | **14.7%** | **🟨 In Progress** |
 
 ---
 
@@ -71,10 +71,10 @@ Phase 6: Release        [░░░░░░░░░░░░░░░░░░�
 ### Phase 2: Ingestion & Storage (Epics 03–05)
 
 #### EPIC-03: Code Ingestion Pipeline (Priority: P0)
-* **Points**: 55 | **Status**: 🟨 In Progress (9.1%)
+* **Points**: 55 | **Status**: 🟨 In Progress (23.6%)
 * **Stories**:
   * [x] **US-03.01**: File walk and programming language detection
-  * [ ] **US-03.02**: Python Tree-sitter integration
+  * [x] **US-03.02**: Python Tree-sitter integration
   * [ ] **US-03.03**: Java Tree-sitter integration
   * [ ] **US-03.04**: JavaScript/TypeScript Tree-sitter integration
   * [ ] **US-03.05**: Go Tree-sitter integration
@@ -194,3 +194,4 @@ Once a User Story is implemented, the corresponding code files must be registere
 | US-02.06 | [IMPLEMENTATION_STATUS.md](file:///Users/abhishek/Dev/Drishti/docs/IMPLEMENTATION_STATUS.md) | 🟩 Completed | - |
 | US-02.07 | [RELEASE-PLAN.md](file:///Users/abhishek/Dev/Drishti/docs/product/releases/RELEASE-PLAN.md) | 🟩 Completed | - |
 | US-03.01 | [walker.py](file:///Users/abhishek/Dev/Drishti/src/drishti/ingestion/walker.py), [language.py](file:///Users/abhishek/Dev/Drishti/src/drishti/utils/language.py), [gitignore.py](file:///Users/abhishek/Dev/Drishti/src/drishti/ingestion/gitignore.py), [base.py](file:///Users/abhishek/Dev/Drishti/src/drishti/ingestion/base.py), [schemas.py](file:///Users/abhishek/Dev/Drishti/src/drishti/api/schemas.py) | 🟩 Completed | [test_walker.py](file:///Users/abhishek/Dev/Drishti/tests/unit/test_walker.py), [test_language.py](file:///Users/abhishek/Dev/Drishti/tests/unit/test_language.py), [test_gitignore.py](file:///Users/abhishek/Dev/Drishti/tests/unit/test_gitignore.py) |
+| US-03.02 | [ast/base.py](file:///Users/abhishek/Dev/Drishti/src/drishti/ingestion/ast/base.py), [ast/python.py](file:///Users/abhishek/Dev/Drishti/src/drishti/ingestion/ast/python.py), [ast/registry.py](file:///Users/abhishek/Dev/Drishti/src/drishti/ingestion/ast/registry.py), [queries/python.scm](file:///Users/abhishek/Dev/Drishti/src/drishti/ingestion/queries/python.scm) | 🟩 Completed | [test_python_parser.py](file:///Users/abhishek/Dev/Drishti/tests/unit/test_python_parser.py) |
