@@ -1,5 +1,8 @@
 # ADR-007: PyMuPDF for PDF Layout Parsing
 
+## Status
+Approved
+
 ## Context & Problem Statement
 Repositories include unstructured PDF documents (requirements, specs, manuals). We need a parser that reads PDFs while preserving semantic sections, headers, and tables, rather than outputting a single unorganized stream of text.
 

@@ -266,9 +266,9 @@ Drishti/
 ## Project Status
 
 ```
-Documentation (architecture, ADRs, product, LLD)  ░░░░░░░░░░░░░░░░░░░░   0%
+Documentation (architecture, ADRs, product, LLD)  ████████████████████ 100%
 Engineering foundation (pyproject, CI, Docker)     ████████████████████ 100%
-Core pipeline (ingestion → embedding → search)     ░░░░░░░░░░░░░░░░░░░░   0%
+Core pipeline (ingestion → embedding → search)     ██░░░░░░░░░░░░░░░░░░  ~9%
 RAG generation (context → LLM → citations)         ░░░░░░░░░░░░░░░░░░░░   0%
 Frontend UI (Next.js + Monaco)                     ░░░░░░░░░░░░░░░░░░░░   0%
 Evaluation & benchmarks                            ░░░░░░░░░░░░░░░░░░░░   0%

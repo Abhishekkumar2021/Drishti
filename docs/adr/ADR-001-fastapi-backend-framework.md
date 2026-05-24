@@ -1,5 +1,8 @@
 # ADR-001: FastAPI Backend Framework
 
+## Status
+Approved
+
 ## Context & Problem Statement
 We need a high-performance, asynchronous web framework for Python to expose the ingestion, search, and streaming Q&A endpoints. The framework must support input validation, generate OpenAPI documentation automatically, and handle concurrent connections (especially for long-running streaming Server-Sent Events).
 

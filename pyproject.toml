@@ -73,8 +73,11 @@ dev = [
     "pytest-asyncio>=0.24.0",
     "pytest-cov>=6.0.0",
     "pytest-xdist>=3.5.0",
+    "httpx>=0.27.0",
     "ruff>=0.8.0",
     "mypy>=1.13.0",
+    "bandit[toml]>=1.8.0",
+    "pip-audit>=2.7.0",
     "pre-commit>=4.0.0",
     "ipykernel>=6.29.0",
     "jupyter>=1.1.0",
@@ -98,6 +101,9 @@ drishti = "drishti.main:main"
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/drishti"]
 
 # ──────────────────────────────────────────────
 # Tool Configuration
@@ -128,6 +134,16 @@ ignore = [
     "ANN101", # Missing type annotation for self
     "ANN102", # Missing type annotation for cls
 ]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**/*.py" = ["D101", "D102", "D103", "TC001", "TC003"]
+"src/drishti/api/schemas.py" = ["TC003", "D102"]
+"src/drishti/config.py" = ["D102"]
+"src/drishti/exceptions.py" = ["D107"]
+"src/drishti/main.py" = ["TC002", "TC003"]
+"src/drishti/middleware/*.py" = ["TC002", "TC003", "D102", "D107"]
+"src/drishti/services/health.py" = ["TC001"]
+"scripts/**/*.py" = ["D103", "ANN201"]
 
 [tool.ruff.lint.pydocstyle]
 convention = "google"
@@ -186,6 +202,10 @@ filterwarnings = [
 [tool.coverage.run]
 source = ["src/drishti"]
 omit = ["tests/*", "benchmarks/*"]
+
+[tool.bandit]
+exclude_dirs = ["tests", "benchmarks", "notebooks", "playground"]
+skips = ["B101", "B104"]
 
 [tool.coverage.report]
 exclude_lines = [

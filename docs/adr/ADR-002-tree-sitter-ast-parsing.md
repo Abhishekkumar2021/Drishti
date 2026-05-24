@@ -1,5 +1,8 @@
 # ADR-002: Tree-sitter AST Parsing
 
+## Status
+Approved
+
 ## Context & Problem Statement
 To build an AST-aware RAG system, we need to parse source code files into semantic components (classes, interfaces, methods) rather than chunking them by line counts. The parser must support multiple programming languages (Python, Java, TS, Go) and execute quickly.
 

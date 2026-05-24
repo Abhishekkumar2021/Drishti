@@ -1,5 +1,8 @@
 # ADR-003: OpenAI text-embedding-3-small
 
+## Status
+Approved
+
 ## Context & Problem Statement
 We need an embedding model to convert code blocks and documentation text into dense vector representations. The model must perform well on code understanding tasks, keep dimensionality manageable to reduce storage costs, and have high throughput.
 

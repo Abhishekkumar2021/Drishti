@@ -1,5 +1,8 @@
 # ADR-009: Redis Caching
 
+## Status
+Approved
+
 ## Context & Problem Statement
 Running LLM Q&A calls on every query is costly and time-consuming (~2-5 seconds). Recurring questions (e.g. on repository onboarding, standard setup queries) should be resolved instantly without hitting APIs. Additionally, we need to protect our FastAPI gateway from API spam.
 

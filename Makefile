@@ -39,8 +39,9 @@ setup: ## First-time project setup
 dev: ## Start FastAPI development server with hot reload
 	uv run uvicorn drishti.main:app --reload --host 0.0.0.0 --port 8000
 
-dev-web: ## Start Next.js frontend dev server
-	cd web && npm run dev
+dev-web: ## Start Next.js frontend dev server (EPIC-10 — not yet implemented)
+	@echo "Frontend (web/) is planned in EPIC-10 and is not available yet."
+	@exit 1
 
 # ═══════════════════════════════════════
 # Testing
@@ -103,8 +104,9 @@ docker-clean: ## Stop infrastructure and delete volumes
 seed: ## Index sample codebase for demo
 	uv run python scripts/seed.py
 
-benchmark: ## Run RAG evaluation benchmarks
-	uv run python -m pytest benchmarks/ -v --tb=short
+benchmark: ## Run RAG evaluation benchmarks (EPIC-11 — not yet implemented)
+	@echo "Benchmark scripts are planned in EPIC-11. See benchmarks/README.md."
+	@exit 1
 
 # ═══════════════════════════════════════
 # Pre-Commit Workflow
