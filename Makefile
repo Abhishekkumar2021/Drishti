@@ -12,7 +12,7 @@
 # ──────────────────────────────────────────────────────────
 
 .PHONY: help setup dev test test-unit test-integration test-e2e lint lint-fix type-check \
-        docker-up docker-down docker-logs seed benchmark clean pre-commit
+        docker-up docker-down docker-logs seed benchmark clean pre-commit ci-precheck
 
 .DEFAULT_GOAL := help
 
@@ -65,12 +65,12 @@ test-e2e: ## Run end-to-end tests (full pipeline)
 # ═══════════════════════════════════════
 
 lint: ## Check code style and quality
-	uv run ruff check src/ tests/
-	uv run ruff format --check src/ tests/
+	uv run ruff check src/ tests/ scripts/
+	uv run ruff format --check src/ tests/ scripts/
 
 lint-fix: ## Auto-fix lint issues and format code
-	uv run ruff check --fix src/ tests/
-	uv run ruff format src/ tests/
+	uv run ruff check --fix src/ tests/ scripts/
+	uv run ruff format src/ tests/ scripts/
 
 type-check: ## Run mypy type checking
 	uv run mypy src/
@@ -113,12 +113,15 @@ benchmark: ## Run RAG evaluation benchmarks (EPIC-11 — not yet implemented)
 # Pre-Commit Workflow
 # ═══════════════════════════════════════
 
-pre-commit: lint type-check test-unit ## Full quality check (lint + types + unit tests)
+pre-commit: lint type-check test-unit ## Fast check before commit (no Docker)
 	@echo ""
 	@echo "══════════════════════════════════════"
 	@echo "  ✅ All pre-commit checks passed!"
-	@echo "  Safe to commit."
+	@echo "  Before a PR, run: make ci-precheck"
 	@echo "══════════════════════════════════════"
+
+ci-precheck: ## Full CI parity (lint, tests, security, Docker, integration)
+	@bash scripts/ci-precheck.sh
 
 # ═══════════════════════════════════════
 # Cleanup

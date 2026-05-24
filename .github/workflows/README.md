@@ -29,9 +29,11 @@ Remove stale entries such as `Code Quality`, `Tests`, or `Docker Build` from old
 ## Local parity
 
 ```bash
-make pre-commit          # lint + types + unit tests
+make pre-commit          # fast: lint + types + unit tests (no Docker)
+make ci-precheck         # full GitHub Actions parity before opening a PR
 make docker-up           # start Qdrant + Redis locally
-make test-integration    # integration tests (waits for services)
+make test-integration    # integration tests only (waits for services)
 # or
 ./scripts/pre-commit.sh
+./scripts/ci-precheck.sh
 ```

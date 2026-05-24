@@ -155,6 +155,13 @@ make test-integration
 
 CI runs them in `.github/workflows/integration-ci.yml` with service containers. Unit tests (`make pre-commit`) do not start Docker.
 
+Before opening a pull request, run the full CI parity suite:
+
+```bash
+make docker-up    # if integration tests need local services
+make ci-precheck  # lint, mypy, unit tests, bandit, pip-audit, Docker build, integration
+```
+
 ---
 
 ## Documentation
