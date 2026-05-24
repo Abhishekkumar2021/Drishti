@@ -10,6 +10,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Documentation structure (ADRs, epics, LLD, deep-dives)
 - Product vision and release plan
+- Architecture documentation suite: C4 model, as-built ingestion, sequence diagrams, deployment topology
+- Design reference for Universal Chunk schema (field table, ER diagram)
+- Onboarding guide and operations runbook
 
 ---
 

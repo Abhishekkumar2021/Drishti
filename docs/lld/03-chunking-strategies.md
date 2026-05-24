@@ -88,20 +88,65 @@ Drishti provides specific AST query maps for major languages:
 
 ---
 
-## 4. Universal Chunker & Metadata Enrichment
+## 4. Rule Engine & Metadata Enrichment
 
-Once AST nodes are extracted, they are processed by the `UniversalChunker`. Chunks under a minimum line length (default: 3 lines) are merged back into their parent node to prevent context fragmentation.
+### A. Configurable extraction rules (US-03.06 — implemented)
 
-### Metadata Enrichment Rules:
-1. **Docstring Resolution**: Comments immediately preceding a class or method are extracted and attached as `docstring` metadata.
-2. **Context Path**: Each chunk is annotated with its fully qualified structural path, e.g. `src/auth/service.py::AuthService::verify_token`.
-3. **Line Range**: Start and end lines are captured (1-indexed) to align with code navigation UI requests.
+`parser_rules.json` drives per-language settings:
+
+| Setting | Purpose |
+|---------|---------|
+| `query` | Packaged `.scm` filename |
+| `min_chunk_lines` | Skip **nested** symbols shorter than N lines |
+
+```mermaid
+flowchart LR
+    JSON[parser_rules.json] --> LR[load_parser_rules]
+    LR --> PR[ParserRules]
+    PR --> FP[from_rules factory]
+    FP --> TS[TreeSitterParser]
+```
+
+Implementation: `ingestion/ast/rules.py`, `ingestion/ast/catalog.py`.
+
+### B. Minimum chunk filter (implemented)
+
+`TreeSitterParser._should_emit_chunk` drops nested symbols below the threshold while preserving short top-level declarations (type aliases, packages).
+
+### C. Metadata enrichment (US-03.07–03.09)
+
+`ingestion/ast/metadata.py` (see [Universal Chunk Schema](../design/universal-chunk-schema.md)) attaches:
+
+1. **Docstring** — Python body strings; leading comments / Javadoc elsewhere.
+2. **Parameters & return type** — Tree-sitter `parameters` / `return_type` fields.
+3. **Cyclomatic complexity** — McCabe count over symbol body AST.
+4. **Context path** — `file_path::ParentClass::symbol` for retrieval tracing.
+5. **Import symbols** — per-file import lists; `SymbolTable` maps names → defining paths.
+
+### D. Line range
+
+Start and end lines are **1-indexed**; `end_line` is **inclusive** (`TreeSitterParser._inclusive_end_line`).
 
 ---
 
-## 5. Code Implementation Blueprint
+## 5. As-Built Module Map
 
-The following classes define the core AST parsing and chunking interface:
+| Module | Role |
+|--------|------|
+| `ingestion/ast/base.py` | `TreeSitterParser` — queries, chunk build, filters |
+| `ingestion/ast/catalog.py` | `PARSER_CATALOG` production factories |
+| `ingestion/ast/metadata.py` | Enrichment helpers (US-03.07+) |
+| `ingestion/ast/rules.py` | JSON rule loader |
+| `ingestion/symbols.py` | `SymbolTable` cross-file resolution |
+| `ingestion/queries/*.scm` | Tree-sitter capture definitions |
+
+Detailed diagrams: [architecture/as-built-code-ingestion.md](../architecture/as-built-code-ingestion.md).
+
+---
+
+## 6. Code Implementation Blueprint (Reference)
+
+The following classes illustrate the core AST parsing interface (simplified from early design):
 
 ```python
 from typing import List, Dict, Any

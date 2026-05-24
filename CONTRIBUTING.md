@@ -166,21 +166,28 @@ make ci-precheck  # lint, mypy, unit tests, bandit, pip-audit, Docker build, int
 
 ## Documentation
 
+Documentation lives under [`docs/`](docs/README.md). Use **Mermaid** diagrams in Markdown for architecture (renders on GitHub and in Cursor).
+
 When contributing code, also update:
 
 1. **Docstrings** on new public APIs
-2. **IMPLEMENTATION_STATUS.md** if completing a user story
-3. **CHANGELOG.md** under `[Unreleased]`
-4. **ADR** if making an architectural decision
+2. **[IMPLEMENTATION_STATUS.md](docs/IMPLEMENTATION_STATUS.md)** if completing a user story
+3. **[CHANGELOG.md](CHANGELOG.md)** under `[Unreleased]`
+4. **ADR** if making an architectural decision ([adr/](docs/adr/README.md))
 5. **Epic** acceptance criteria (check off completed items)
+6. **Architecture / design** when behavior changes:
+   - [as-built-code-ingestion.md](docs/architecture/as-built-code-ingestion.md) for parser pipeline changes
+   - [universal-chunk-schema.md](docs/design/universal-chunk-schema.md) for new chunk fields
+   - [sequence-diagrams.md](docs/architecture/sequence-diagrams.md) for new API lifecycles
 
 ---
 
 ## Getting Help
 
 - Open a [GitHub Issue](https://github.com/Abhishekkumar2021/Drishti/issues)
+- Start at the [Documentation Hub](docs/README.md)
 - Check existing [ADRs](docs/adr/README.md) for design rationale
-- Read [Deep-Dives](docs/deep-dives/README.md) for technical understanding
+- Read [Architecture](docs/architecture/README.md) and [Deep-Dives](docs/deep-dives/README.md) for technical understanding
 
 ---
 

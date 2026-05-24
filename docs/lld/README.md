@@ -23,3 +23,5 @@ For engineers reviewing this repository for technical interviews, we have ranked
 1. **Production Blueprint**: Provides exact class interfaces and signatures so developers can implement features with zero ambiguity.
 2. **Pedagogical Asset**: Explains not just *what* class structures are used, but *why* they fit standard object-oriented and functional programming paradigms.
 3. **Auditability**: Maps directly back to our approved [ADRs](file:///Users/abhishek/Dev/Drishti/docs/adr/README.md) and [Product Epics](file:///Users/abhishek/Dev/Drishti/docs/product/EPICS-OVERVIEW.md).
+
+**Companion architecture docs:** [C4 model](../architecture/c4-model.md) · [As-built ingestion](../architecture/as-built-code-ingestion.md) · [Universal Chunk schema](../design/universal-chunk-schema.md)

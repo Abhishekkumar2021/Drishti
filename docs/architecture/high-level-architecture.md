@@ -1,5 +1,9 @@
 # High-Level Architecture: Drishti (दृष्टि)
 
+> **Documentation suite:** [Architecture README](README.md) · [C4 Model](c4-model.md) · [As-built ingestion](as-built-code-ingestion.md) · [Sequences](sequence-diagrams.md) · [Deployment](deployment-topology.md)
+
+This document describes the **target** end-state. For implemented EPIC-03 components, see [as-built-code-ingestion.md](as-built-code-ingestion.md) and [IMPLEMENTATION_STATUS.md](../IMPLEMENTATION_STATUS.md).
+
 ---
 
 ## Table of Contents
@@ -126,29 +130,13 @@ The `TreeSitterParser` uses tree queries (S-expressions) to isolate specific syn
 When a query matches, the start/end lines are captured. The raw code content within those coordinates is extracted, and metadata annotations are generated (cyclomatic complexity, parameter names, imports).
 
 ### C. Universal Chunk Schema
-Every parser converts its output into the **Universal Chunk Schema** (modeled in Pydantic):
+Every parser converts its output into the **Universal Chunk Schema** (Pydantic model in `src/drishti/api/schemas.py`).
 
-```python
-class UniversalChunk(BaseModel):
-    id: str                          # UUIDv4
-    source_id: str                   # Git Commit Hash / PDF File Hash
-    content: str                     # Text content or code block
-    content_type: str                # "code", "text", "table", "api_endpoint"
-    file_path: str                   # File location path
-    source_type: str                 # "git_repo", "pdf", "markdown", "image"
-    language: str | None             # "python", "java", "typescript", etc.
-    start_line: int | None           # Starting line number (1-indexed)
-    end_line: int | None             # Ending line number (inclusive)
-    page_number: int | None          # For PDF pages
-    node_type: str | None            # "method_declaration", "class_declaration"
-    name: str | None                 # Name of the symbol (e.g. "AuthService")
-    parent_class: str | None         # Enclosing class context
-    package_name: str | None         # Java package path when applicable
-    decorators: list[str] = []       # Decorator names (e.g. dataclass, property)
-    exports: list[str] = []          # Export modifiers (e.g. export, default)
-    dependencies: list[str] = []     # External symbol imports
-    last_modified: datetime          # Git commit datetime or file datetime
-```
+**Canonical reference:** [design/universal-chunk-schema.md](../design/universal-chunk-schema.md) (field table, examples, implementation status).
+
+Core fields implemented today include: `id`, `source_id`, `content`, `content_type`, `file_path`, `language`, line range, `node_type`, `name`, `parent_class`, `package_name`, `decorators`, `exports`, `dependencies`.
+
+Enrichment fields (`docstring`, `parameters`, `return_type`, `cyclomatic_complexity`, `context_path`, `imported_symbols`, …) are defined in the design spec and roll out under US-03.07–03.09.
 
 ---
 

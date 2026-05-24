@@ -17,6 +17,8 @@ This chapter defines the schemas, payload filters, and graph database structures
 
 Drishti uses Pydantic v2 to enforce strict runtime type safety, serialize API payloads, and validate configuration environments.
 
+> **Universal Chunk:** Full field reference, ER diagram, and implementation status live in [design/universal-chunk-schema.md](../design/universal-chunk-schema.md).
+
 ### Request Payloads
 
 ```python
@@ -76,6 +78,11 @@ We store chunks in a single Qdrant collection named `drishti_chunks`. Points con
     "node_type": "function_definition",
     "name": "calculate_complexity",
     "parent_class": null,
+    "parent_module": "src.utils.metrics",
+    "context_path": "src/utils/metrics.py::calculate_complexity",
+    "parameters": ["node"],
+    "return_type": "int",
+    "cyclomatic_complexity": 4,
     "dependencies": ["tree_sitter"],
     "last_modified": "2026-05-24T12:00:00Z"
   }
