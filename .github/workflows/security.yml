@@ -37,7 +37,7 @@ jobs:
         run: uv sync --frozen --extra dev
 
       - name: Run Bandit
-        run: uv run bandit -r src/drishti
+        run: uv run bandit -r src/drishti -c pyproject.toml
 
   pip-audit:
     name: Security · pip-audit
