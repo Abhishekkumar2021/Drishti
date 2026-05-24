@@ -12,6 +12,7 @@ from typing import ClassVar
 from tree_sitter import Language, Node, Parser, Query, QueryCursor
 
 from drishti.api.schemas import UniversalChunk
+from drishti.ingestion.ast.metadata import collect_imported_symbols, enrich_symbol_metadata
 from drishti.ingestion.base import BaseParser
 
 
@@ -113,6 +114,10 @@ class TreeSitterParser(BaseParser, ABC):
                 )
                 exports_val = symbol_metadata.get("exports", [])
                 dependencies_val = symbol_metadata.get("dependencies", [])
+                imported_symbols_val = symbol_metadata.get("imported_symbols")
+                if not isinstance(imported_symbols_val, list):
+                    file_imports = parse_context.get("imported_symbols", [])
+                    imported_symbols_val = file_imports if isinstance(file_imports, list) else []
                 parent_override = symbol_metadata.get("parent_class")
                 resolved_parent = parent_override if isinstance(parent_override, str) else None
                 start_line = span_node.start_point[0] + 1
@@ -134,6 +139,9 @@ class TreeSitterParser(BaseParser, ABC):
                         parent_class=resolved_parent,
                         exports=exports_val if isinstance(exports_val, list) else [],
                         dependencies=dependencies_val if isinstance(dependencies_val, list) else [],
+                        imported_symbols=(
+                            imported_symbols_val if isinstance(imported_symbols_val, list) else []
+                        ),
                     )
                 )
 
@@ -154,6 +162,7 @@ class TreeSitterParser(BaseParser, ABC):
         parent_class: str | None = None,
         exports: list[str] | None = None,
         dependencies: list[str] | None = None,
+        imported_symbols: list[str] | None = None,
     ) -> UniversalChunk:
         content = self._node_text(file_content, span_node)
         start_line = span_node.start_point[0] + 1
@@ -162,6 +171,15 @@ class TreeSitterParser(BaseParser, ABC):
             parent_class
             if parent_class is not None
             else self._resolve_parent_scope(definition_node, file_content)
+        )
+        enriched = enrich_symbol_metadata(
+            definition_node=definition_node,
+            source=file_content,
+            language=self._language_name,
+            file_path=file_path,
+            symbol_name=symbol_name,
+            package_name=package_name,
+            parent_class=resolved_parent,
         )
 
         return UniversalChunk(
@@ -182,6 +200,14 @@ class TreeSitterParser(BaseParser, ABC):
             decorators=decorators,
             exports=exports or [],
             dependencies=dependencies or [],
+            docstring=enriched.docstring,
+            parameters=list(enriched.parameters),
+            return_type=enriched.return_type,
+            cyclomatic_complexity=enriched.cyclomatic_complexity,
+            parent_module=enriched.parent_module,
+            context_path=enriched.context_path,
+            imported_symbols=imported_symbols or [],
+            definition_file_path=enriched.definition_file_path,
             last_modified=indexed_at,
         )
 
@@ -208,7 +234,9 @@ class TreeSitterParser(BaseParser, ABC):
 
     def _prepare_parse_context(self, root: Node, source: bytes) -> dict[str, object]:
         """Build per-file context shared across symbols (override in language parsers)."""
-        return {}
+        return {
+            "imported_symbols": collect_imported_symbols(root, source, self._language_name),
+        }
 
     def _symbol_chunk_metadata(
         self,

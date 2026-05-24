@@ -23,7 +23,16 @@ class EcmaScriptParser(TreeSitterParser):
     _ENCLOSING_SCOPE_TYPES: ClassVar[tuple[str, ...]] = ("class_declaration",)
 
     def _prepare_parse_context(self, root: Node, source: bytes) -> dict[str, object]:
-        return {_PARSE_CONTEXT_IMPORTS: self._collect_module_imports(root, source)}
+        context = super()._prepare_parse_context(root, source)
+        module_imports = self._collect_module_imports(root, source)
+        file_symbols = context.get("imported_symbols", [])
+        symbol_set = set(file_symbols) if isinstance(file_symbols, list) else set()
+        merged_symbols = sorted(symbol_set | set(module_imports))
+        return {
+            **context,
+            _PARSE_CONTEXT_IMPORTS: module_imports,
+            "imported_symbols": merged_symbols,
+        }
 
     def _symbol_chunk_metadata(
         self,
