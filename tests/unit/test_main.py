@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from unittest.mock import AsyncMock, patch
+from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 from fastapi.testclient import TestClient
@@ -59,11 +59,24 @@ class TestAuthentication:
         assert response.status_code == 401
 
     def test_protected_route_accepts_valid_token(self) -> None:
-        settings = Settings(api_token="prod-secret", debug=True)
-        test_client = TestClient(create_app(settings))
-        response = test_client.post(
-            "/api/v1/search",
-            json={"query": "auth"},
-            headers={"Authorization": "Bearer prod-secret"},
+        settings = Settings(
+            api_token="prod-secret",
+            debug=True,
+            cache_enabled=False,
+            rate_limit_enabled=False,
         )
-        assert response.status_code != 401
+        mock_search = MagicMock()
+        mock_search.search.return_value = []
+        with (
+            patch("drishti.main.create_qdrant_client") as mock_qdrant,
+            patch("drishti.api.deps.create_hybrid_search", return_value=mock_search),
+            patch("drishti.api.deps.create_rag_pipeline", return_value=MagicMock()),
+        ):
+            mock_qdrant.return_value = MagicMock()
+            with TestClient(create_app(settings), raise_server_exceptions=True) as test_client:
+                response = test_client.post(
+                    "/api/v1/search",
+                    json={"query": "auth"},
+                    headers={"Authorization": "Bearer prod-secret"},
+                )
+            assert response.status_code == 200

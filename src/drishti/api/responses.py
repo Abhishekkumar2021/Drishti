@@ -84,3 +84,17 @@ class AskResponse(BaseModel):
     answer: str
     citations: list[CitationItem]
     sources: list[SearchResultItem]
+    cached: bool = False
+
+
+class IngestResponse(BaseModel):
+    """Incremental repository indexing summary."""
+
+    head_commit: str
+    base_commit: str | None = None
+    added: list[str] = Field(default_factory=list)
+    modified: list[str] = Field(default_factory=list)
+    deleted: list[str] = Field(default_factory=list)
+    chunks_indexed: int = 0
+    chunks_removed: int = 0
+    files_parsed: int = 0

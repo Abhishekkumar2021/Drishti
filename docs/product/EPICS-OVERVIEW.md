@@ -70,7 +70,7 @@ The estimation follows standard Fibonacci story points (1, 2, 3, 5, 8, 13) where
 | **[EPIC-05](file:///Users/abhishek/Dev/Drishti/docs/product/epics/EPIC-05.md)** | Embedding & Vector Storage | P0 | 34 | OpenAI & BM25 embeddings, Qdrant | 🟩 Done |
 | **[EPIC-06](file:///Users/abhishek/Dev/Drishti/docs/product/epics/EPIC-06.md)** | Hybrid Search Engine | P0 | 55 | RRF fusion, Cohere re-ranking | 🟩 Done |
 | **[EPIC-07](file:///Users/abhishek/Dev/Drishti/docs/product/epics/EPIC-07.md)** | RAG Pipeline & Generation | P0 | 42 | Context builder, LLM integration, Citations | 🟩 Done |
-| **[EPIC-08](file:///Users/abhishek/Dev/Drishti/docs/product/epics/EPIC-08.md)** | API & Backend Service | P0 | 34 | FastAPI routing, validation schemas | 🔮 Planned |
+| **[EPIC-08](file:///Users/abhishek/Dev/Drishti/docs/product/epics/EPIC-08.md)** | API & Backend Service | P0 | 34 | FastAPI routing, validation schemas | 🟩 Done |
 | **[EPIC-09](file:///Users/abhishek/Dev/Drishti/docs/product/epics/EPIC-09.md)** | Dependency Graph & Impact Analysis | P2 | 34 | Neo4j graph, import extraction | 🔮 Planned |
 | **[EPIC-10](file:///Users/abhishek/Dev/Drishti/docs/product/epics/EPIC-10.md)** | Frontend UI | P1 | 55 | Next.js app, Monaco Editor, citation UI | 🔮 Planned |
 | **[EPIC-11](file:///Users/abhishek/Dev/Drishti/docs/product/epics/EPIC-11.md)** | Evaluation & Benchmarking | P1 | 34 | Golden Q&A, RAGAS execution, benchmarks | 🔮 Planned |
