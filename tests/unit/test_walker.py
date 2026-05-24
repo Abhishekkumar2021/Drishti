@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from datetime import datetime
 from pathlib import Path
 
 import pytest
@@ -14,7 +15,13 @@ pytestmark = pytest.mark.unit
 
 
 class StubParser(BaseParser):
-    def parse(self, file_content: bytes, file_path: str) -> list[UniversalChunk]:
+    def parse(
+        self,
+        file_content: bytes,
+        file_path: str,
+        *,
+        last_modified: datetime | None = None,
+    ) -> list[UniversalChunk]:
         return []
 
 

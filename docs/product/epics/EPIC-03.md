@@ -35,9 +35,9 @@ This epic covers the repository walking, AST parsing using Tree-sitter, language
 **Complexity**: 8 SP | **Priority**: P0
 
 **Acceptance Criteria**
-1. [ ] Py-tree-sitter parses python files.
-2. [ ] Extracts classes, function/method declarations, and decorators.
-3. [ ] Captures correct line bounds (start/end) for each extracted symbol.
+1. [x] Py-tree-sitter parses python files.
+2. [x] Extracts classes, function/method declarations, and decorators.
+3. [x] Captures correct line bounds (start/end) for each extracted symbol.
 
 ---
 
