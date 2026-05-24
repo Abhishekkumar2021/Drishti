@@ -11,6 +11,8 @@ from functools import lru_cache
 from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+from drishti.providers.types import EMBEDDING_PROVIDERS, LLM_PROVIDERS, RERANK_PROVIDERS
+
 
 class Settings(BaseSettings):
     """Application settings loaded from environment variables."""
@@ -27,16 +29,31 @@ class Settings(BaseSettings):
     qdrant_port: int = 6333
     qdrant_collection_name: str = "drishti_chunks"
 
-    # ─── OpenAI (Embeddings) ─────────────────────
+    # ─── Embedding (provider-agnostic) ───────────
+    embedding_provider: str = "openai"
+    embedding_model: str = ""
+    embedding_dimensions: int = 0
+    embedding_api_base: str = ""
+    embedding_api_key: str = ""
+
+    # ─── LLM (provider-agnostic) ───────────────
+    llm_provider: str = "anthropic"
+    llm_model: str = ""
+    llm_api_base: str = ""
+    llm_api_key: str = ""
+
+    # ─── Re-ranking ──────────────────────────────
+    rerank_provider: str = "auto"
+    rerank_model: str = ""
+
+    # ─── Provider API keys (legacy + shared) ─────
     openai_api_key: str = ""
     openai_embedding_model: str = "text-embedding-3-small"
     openai_embedding_dimensions: int = 1536
 
-    # ─── Anthropic (LLM Generation) ──────────────
     anthropic_api_key: str = ""
     anthropic_model: str = "claude-sonnet-4-20250514"
 
-    # ─── Cohere (Re-ranking) ─────────────────────
     cohere_api_key: str = ""
     cohere_rerank_model: str = "rerank-v3.5"
 
@@ -78,6 +95,18 @@ class Settings(BaseSettings):
     llm_max_tokens: int = 4096
     rag_max_context_chars: int = 120_000
 
+    @field_validator(
+        "embedding_provider",
+        "llm_provider",
+        "rerank_provider",
+        mode="before",
+    )
+    @classmethod
+    def normalize_provider_name(cls, value: object) -> str:
+        if value is None:
+            return ""
+        return str(value).strip().lower()
+
     @field_validator("cors_origins", "ingestion_allowed_roots", mode="before")
     @classmethod
     def parse_comma_separated_list(cls, value: object) -> list[str]:
@@ -108,8 +137,190 @@ class Settings(BaseSettings):
         """Return configured ingestion path allowlist (may be empty)."""
         return self.ingestion_allowed_roots
 
+    def resolved_embedding_model(self) -> str:
+        """Return the configured embedding model (explicit or provider default)."""
+        explicit = self.embedding_model.strip()
+        if explicit:
+            return explicit
+        if self.embedding_provider == "cohere":
+            return "embed-english-v3.0"
+        if self.embedding_provider == "ollama":
+            return "nomic-embed-text"
+        return self.openai_embedding_model
+
+    def resolved_embedding_dimensions(self) -> int:
+        """Return vector dimensionality for the active embedding model."""
+        if self.embedding_dimensions > 0:
+            return self.embedding_dimensions
+        return self.openai_embedding_dimensions
+
+    def resolved_llm_model(self) -> str:
+        """Return the configured chat model (explicit or provider default)."""
+        explicit = self.llm_model.strip()
+        if explicit:
+            return explicit
+        if self.llm_provider == "openai":
+            return "gpt-4o-mini"
+        if self.llm_provider == "ollama":
+            return "llama3.2"
+        return self.anthropic_model
+
+    def resolved_rerank_model(self) -> str:
+        """Return the configured rerank model name."""
+        explicit = self.rerank_model.strip()
+        if explicit:
+            return explicit
+        return self.cohere_rerank_model
+
+    def resolved_embedding_api_base(self) -> str:
+        """Return API base URL for embedding HTTP backends."""
+        explicit = self.embedding_api_base.strip()
+        if explicit:
+            return explicit.rstrip("/")
+        if self.embedding_provider == "ollama":
+            return "http://localhost:11434"
+        return ""
+
+    def resolved_llm_api_base(self) -> str:
+        """Return API base URL for chat LLM HTTP backends."""
+        explicit = self.llm_api_base.strip()
+        if explicit:
+            return explicit.rstrip("/")
+        if self.llm_provider == "ollama":
+            return "http://localhost:11434"
+        return ""
+
+    def api_key_for_embedding_provider(self) -> str:
+        """Resolve API key for the active embedding provider."""
+        override = self.embedding_api_key.strip()
+        if override:
+            return override
+        provider = self.embedding_provider
+        if provider in {"openai", "openai_compatible"}:
+            return self.openai_api_key.strip()
+        if provider == "cohere":
+            return self.cohere_api_key.strip()
+        return ""
+
+    def api_key_for_llm_provider(self) -> str:
+        """Resolve API key for the active LLM provider."""
+        override = self.llm_api_key.strip()
+        if override:
+            return override
+        provider = self.llm_provider
+        if provider == "anthropic":
+            return self.anthropic_api_key.strip()
+        if provider in {"openai", "openai_compatible"}:
+            return self.openai_api_key.strip()
+        return ""
+
+    def api_key_for_rerank_provider(self) -> str:
+        """Resolve API key for Cohere reranking."""
+        return self.cohere_api_key.strip()
+
+    def validate_embedding_provider(self) -> None:
+        """Raise if ``embedding_provider`` is not supported."""
+        if self.embedding_provider not in EMBEDDING_PROVIDERS:
+            msg = (
+                f"Unsupported EMBEDDING_PROVIDER={self.embedding_provider!r}. "
+                f"Choose one of: {', '.join(sorted(EMBEDDING_PROVIDERS))}"
+            )
+            raise ValueError(msg)
+
+    def validate_llm_provider(self) -> None:
+        """Raise if ``llm_provider`` is not supported."""
+        if self.llm_provider not in LLM_PROVIDERS:
+            msg = (
+                f"Unsupported LLM_PROVIDER={self.llm_provider!r}. "
+                f"Choose one of: {', '.join(sorted(LLM_PROVIDERS))}"
+            )
+            raise ValueError(msg)
+
+    def validate_rerank_provider(self) -> None:
+        """Raise if ``rerank_provider`` is not supported."""
+        if self.rerank_provider not in RERANK_PROVIDERS:
+            msg = (
+                f"Unsupported RERANK_PROVIDER={self.rerank_provider!r}. "
+                f"Choose one of: {', '.join(sorted(RERANK_PROVIDERS))}"
+            )
+            raise ValueError(msg)
+
+    def validate_runtime_configuration(self, *, strict: bool | None = None) -> None:
+        """Validate provider names and required credentials for the active environment.
+
+        Args:
+            strict: When True, require API keys for cloud providers. Defaults to
+                ``not debug`` (production-like environments require keys).
+        """
+        from drishti.exceptions import ConfigurationError
+
+        require_keys = not self.debug if strict is None else strict
+
+        self.validate_embedding_provider()
+        self.validate_llm_provider()
+        self.validate_rerank_provider()
+
+        if self.resolved_embedding_dimensions() <= 0:
+            msg = "EMBEDDING_DIMENSIONS (or OPENAI_EMBEDDING_DIMENSIONS) must be positive"
+            raise ConfigurationError(msg)
+
+        if (
+            self.embedding_provider == "openai_compatible"
+            and not self.resolved_embedding_api_base()
+        ):
+            msg = "EMBEDDING_API_BASE is required when EMBEDDING_PROVIDER=openai_compatible"
+            raise ConfigurationError(msg)
+
+        if self.llm_provider == "openai_compatible" and not self.resolved_llm_api_base():
+            msg = "LLM_API_BASE is required when LLM_PROVIDER=openai_compatible"
+            raise ConfigurationError(msg)
+
+        if (
+            require_keys
+            and self.embedding_provider not in {"hashing", "ollama"}
+            and not self.api_key_for_embedding_provider()
+        ):
+            msg = (
+                f"API key required for EMBEDDING_PROVIDER={self.embedding_provider!r} "
+                "(set EMBEDDING_API_KEY or the provider-specific key)"
+            )
+            raise ConfigurationError(msg)
+
+        if (
+            require_keys
+            and self.llm_provider not in {"mock", "ollama"}
+            and not self.api_key_for_llm_provider()
+        ):
+            msg = (
+                f"API key required for LLM_PROVIDER={self.llm_provider!r} "
+                "(set LLM_API_KEY or the provider-specific key)"
+            )
+            raise ConfigurationError(msg)
+
+        if (
+            require_keys
+            and self.rerank_provider == "cohere"
+            and not self.api_key_for_rerank_provider()
+        ):
+            msg = "COHERE_API_KEY is required when RERANK_PROVIDER=cohere"
+            raise ConfigurationError(msg)
+
+    def runtime_provider_summary(self) -> dict[str, str]:
+        """Return non-secret provider configuration for logging and health."""
+        return {
+            "embedding_provider": self.embedding_provider,
+            "embedding_model": self.resolved_embedding_model(),
+            "embedding_dimensions": str(self.resolved_embedding_dimensions()),
+            "llm_provider": self.llm_provider,
+            "llm_model": self.resolved_llm_model(),
+            "rerank_provider": self.rerank_provider,
+            "rerank_model": self.resolved_rerank_model(),
+        }
+
 
 @lru_cache
 def get_settings() -> Settings:
     """Return cached application settings."""
-    return Settings()
+    settings = Settings()
+    settings.validate_runtime_configuration(strict=False)
+    return settings

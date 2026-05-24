@@ -13,10 +13,10 @@ This epic covers generating dense and sparse vector embeddings for chunks and in
 
 ## User Stories
 
-### US-05.01: OpenAI dense embedding integration
+### US-05.01: Dense embedding integration (provider-agnostic)
 **As a** Drishti ML Engineer  
-**I want** to generate dense vectors for chunks using OpenAI's `text-embedding-3-small` model  
-**So that** we can capture semantic concepts across code and prose.
+**I want** to generate dense vectors for chunks using a configurable embedding provider (OpenAI default, or Cohere, Ollama, OpenAI-compatible)  
+**So that** we can capture semantic concepts across code and prose with our chosen model.
 
 **Complexity**: 8 SP | **Priority**: P0
 

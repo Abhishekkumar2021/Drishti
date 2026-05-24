@@ -147,7 +147,7 @@ Drishti uses two databases, optimizing for vector search and structured graph qu
 ### 4.1 Qdrant Vector Store
 All chunks are written to Qdrant. The collection is configured to hold two vectors per point:
 
-1. **Dense Vector Field**: 1536 dimensions, using Cosine similarity. Filled by OpenAI `text-embedding-3-small`. Optimized for high-level semantic questions ("How are errors handled in authentication?").
+1. **Dense Vector Field**: Configurable dimensions (default 1536), Cosine similarity. Filled by the active embedding provider (`EMBEDDING_PROVIDER`, default OpenAI `text-embedding-3-small`). Optimized for high-level semantic questions ("How are errors handled in authentication?").
 2. **Sparse Vector Field**: Custom vocabulary tokenizer. Filled using term weights (BM25). Optimized for keyword matching ("jwt_secret", "OAuthException", "v1/users").
 
 #### Payload Indexing & Filters

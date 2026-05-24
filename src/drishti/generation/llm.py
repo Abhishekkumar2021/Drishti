@@ -1,14 +1,19 @@
-"""LLM clients for RAG generation (US-07.02, US-07.03)."""
+"""Provider-agnostic chat LLM clients with streaming (US-07.02, US-07.03)."""
 
 from __future__ import annotations
 
+import json
 import logging
 from collections.abc import Iterator
 from typing import Any, Protocol
 
+import httpx
+
 from drishti.exceptions import GenerationError
 
 logger = logging.getLogger(__name__)
+
+_DEFAULT_TIMEOUT_SECONDS = 60.0
 
 
 class ChatLLM(Protocol):
@@ -50,7 +55,7 @@ class AnthropicChatLLM:
         client: Any | None = None,
     ) -> None:
         if client is None and not api_key.strip():
-            msg = "ANTHROPIC_API_KEY is required for generation"
+            msg = "API key is required for Anthropic LLM"
             raise GenerationError(msg)
         self._model = model
         if client is not None:
@@ -113,10 +118,11 @@ class OpenAIChatLLM:
         *,
         api_key: str,
         model: str,
+        api_base: str = "",
         client: Any | None = None,
     ) -> None:
         if client is None and not api_key.strip():
-            msg = "OPENAI_API_KEY is required for generation"
+            msg = "API key is required for OpenAI LLM"
             raise GenerationError(msg)
         self._model = model
         if client is not None:
@@ -124,7 +130,10 @@ class OpenAIChatLLM:
         else:
             from openai import OpenAI
 
-            self._client = OpenAI(api_key=api_key)
+            if api_base:
+                self._client = OpenAI(api_key=api_key, base_url=api_base)
+            else:
+                self._client = OpenAI(api_key=api_key)
 
     @property
     def model(self) -> str:
@@ -176,10 +185,91 @@ class OpenAIChatLLM:
             raise GenerationError(msg) from exc
 
 
-class MockChatLLM:
-    """Deterministic LLM for unit tests."""
+class OllamaChatLLM:
+    """Ollama local chat API client."""
 
-    def __init__(self, *, model: str = "mock", response: str = "") -> None:
+    def __init__(
+        self,
+        *,
+        model: str,
+        api_base: str,
+        timeout_seconds: float = _DEFAULT_TIMEOUT_SECONDS,
+        client: httpx.Client | None = None,
+    ) -> None:
+        self._model = model
+        self._api_base = api_base.rstrip("/")
+        self._client = client or httpx.Client(timeout=timeout_seconds)
+
+    @property
+    def model(self) -> str:
+        return self._model
+
+    def complete(
+        self,
+        prompt: str,
+        *,
+        system: str | None = None,
+        max_tokens: int = 4096,
+        temperature: float = 0.1,
+    ) -> str:
+        return "".join(
+            self.stream(
+                prompt,
+                system=system,
+                max_tokens=max_tokens,
+                temperature=temperature,
+            ),
+        )
+
+    def stream(
+        self,
+        prompt: str,
+        *,
+        system: str | None = None,
+        max_tokens: int = 4096,
+        temperature: float = 0.1,
+    ) -> Iterator[str]:
+        messages: list[dict[str, str]] = [{"role": "user", "content": prompt}]
+        if system:
+            messages = [
+                {"role": "system", "content": system},
+                {"role": "user", "content": prompt},
+            ]
+        payload: dict[str, Any] = {
+            "model": self._model,
+            "messages": messages,
+            "stream": True,
+            "options": {"num_predict": max_tokens, "temperature": temperature},
+        }
+        try:
+            with self._client.stream(
+                "POST",
+                f"{self._api_base}/api/chat",
+                json=payload,
+            ) as response:
+                response.raise_for_status()
+                for line in response.iter_lines():
+                    if not line:
+                        continue
+                    data = json.loads(line)
+                    message = data.get("message") or {}
+                    content = message.get("content")
+                    if content:
+                        yield str(content)
+        except Exception as exc:
+            msg = "Ollama generation request failed"
+            raise GenerationError(msg) from exc
+
+
+class MockChatLLM:
+    """Deterministic LLM stub for unit tests."""
+
+    def __init__(
+        self,
+        *,
+        model: str = "mock",
+        response: str = "",
+    ) -> None:
         self._model = model
         self._response = response or "Answer with citation [src/auth.py:L1-5]."
 

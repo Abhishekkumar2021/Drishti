@@ -2,9 +2,11 @@
 
 This model card details the artificial intelligence models, embeddings, and re-ranking systems incorporated into Drishti.
 
+**Configuration:** Models are not hardcoded. Set `EMBEDDING_PROVIDER`, `LLM_PROVIDER`, and `RERANK_MODEL` per environment — see [Model Providers](design/model-providers.md). The sections below describe **defaults** aligned with our ADRs.
+
 ---
 
-## 1. OpenAI: `text-embedding-3-small`
+## 1. OpenAI: `text-embedding-3-small` (default dense embedder)
 
 ### Model Description
 * **Developer**: OpenAI

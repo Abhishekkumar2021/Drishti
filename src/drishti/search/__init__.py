@@ -3,6 +3,7 @@
 from drishti.search.dense import DenseVectorRetriever
 from drishti.search.expansion import (
     AnthropicQueryExpander,
+    LLMQueryExpander,
     PassthroughQueryExpander,
     StaticQueryExpander,
     combine_expanded_query,
@@ -19,6 +20,7 @@ __all__ = [
     "CohereReranker",
     "DenseVectorRetriever",
     "HybridSearchPipeline",
+    "LLMQueryExpander",
     "LexicalReranker",
     "PassthroughQueryExpander",
     "ReciprocalRankFusion",

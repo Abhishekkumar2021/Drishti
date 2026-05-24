@@ -17,6 +17,7 @@
 | Design patterns in use | [docs/lld/01-design-patterns.md](docs/lld/01-design-patterns.md) |
 | Data models & schemas | [docs/lld/02-data-models.md](docs/lld/02-data-models.md) |
 | API contracts | [docs/design/api-contracts.md](docs/design/api-contracts.md) |
+| Model providers (embedding/LLM) | [docs/design/model-providers.md](docs/design/model-providers.md) |
 | User stories & acceptance criteria | [docs/product/epics/](docs/product/epics/) |
 | Chunking strategies | [docs/lld/03-chunking-strategies.md](docs/lld/03-chunking-strategies.md) |
 | Evaluation methodology | [docs/evaluation/README.md](docs/evaluation/README.md) |
@@ -87,9 +88,11 @@ def search(q, k=10, lang=None):
 
 ### Configuration
 
-- All config via **environment variables** (see `config.py`)
+- All config via **environment variables** (see `config.py` and [model-providers.md](docs/design/model-providers.md))
 - Use **Pydantic BaseSettings** — never read `os.environ` directly
-- Defaults for local development, require explicit values in production
+- **Provider-agnostic models**: `EMBEDDING_PROVIDER`, `LLM_PROVIDER`, `RERANK_PROVIDER` — never hardcode a single vendor in feature code
+- Use factories: `create_dense_embedder()`, `create_chat_llm()`, `build_hybrid_search_pipeline()`
+- Defaults for local development; `validate_runtime_configuration()` enforces keys when `DEBUG=false`
 
 ---
 

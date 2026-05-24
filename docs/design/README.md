@@ -5,6 +5,7 @@ Design documents define **contracts** and **data structures** shared across inge
 | Document | Description |
 |----------|-------------|
 | [API Contracts](api-contracts.md) | REST endpoints, WebSocket streaming, error envelopes |
+| [Model Providers](model-providers.md) | Embedding, LLM, and rerank provider configuration |
 | [Universal Chunk Schema](universal-chunk-schema.md) | Canonical chunk model — fields, types, examples |
 
 ---

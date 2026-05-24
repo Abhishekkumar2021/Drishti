@@ -5,6 +5,7 @@ from __future__ import annotations
 import pytest
 
 from drishti.config import Settings, get_settings
+from drishti.exceptions import ConfigurationError
 
 pytestmark = pytest.mark.unit
 
@@ -29,6 +30,44 @@ class TestSettings:
     def test_collection_name_default(self) -> None:
         settings = Settings()
         assert settings.qdrant_collection_name == "drishti_chunks"
+
+    def test_default_embedding_provider_is_openai(self) -> None:
+        settings = Settings()
+        assert settings.embedding_provider == "openai"
+
+    def test_default_llm_provider_is_anthropic(self) -> None:
+        settings = Settings()
+        assert settings.llm_provider == "anthropic"
+
+    def test_legacy_openai_embedding_model_fallback(self) -> None:
+        settings = Settings(openai_embedding_model="text-embedding-3-large")
+        assert settings.resolved_embedding_model() == "text-embedding-3-large"
+
+    def test_runtime_summary_excludes_secrets(self) -> None:
+        settings = Settings(
+            embedding_provider="openai",
+            openai_api_key="secret",
+        )
+        summary = settings.runtime_provider_summary()
+        assert "secret" not in str(summary.values())
+        assert summary["embedding_provider"] == "openai"
+
+    def test_strict_validation_requires_embedding_key(self) -> None:
+        settings = Settings(
+            embedding_provider="openai",
+            openai_api_key="",
+            debug=False,
+        )
+        with pytest.raises(ConfigurationError, match="API key required"):
+            settings.validate_runtime_configuration(strict=True)
+
+    def test_debug_mode_allows_missing_keys(self) -> None:
+        settings = Settings(
+            embedding_provider="openai",
+            openai_api_key="",
+            debug=True,
+        )
+        settings.validate_runtime_configuration()
 
     def test_get_settings_is_cached(self) -> None:
         get_settings.cache_clear()

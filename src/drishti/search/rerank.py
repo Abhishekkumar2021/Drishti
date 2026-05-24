@@ -35,16 +35,27 @@ class CohereReranker:
 
     def __init__(
         self,
-        settings: Settings,
+        settings: Settings | None = None,
         *,
         min_score: float = 0.0,
+        model: str | None = None,
+        api_key: str | None = None,
         client: Any | None = None,
     ) -> None:
-        """Initialize the Cohere client from settings."""
-        self._model = settings.cohere_rerank_model
+        """Initialize the Cohere client from settings or explicit overrides."""
+        if settings is not None:
+            self._model = model or settings.resolved_rerank_model()
+            resolved_key = (
+                api_key if api_key is not None else settings.api_key_for_rerank_provider()
+            )
+        else:
+            if not model or api_key is None:
+                msg = "CohereReranker requires settings or explicit model and api_key"
+                raise SearchError(msg)
+            self._model = model
+            resolved_key = api_key
         self._min_score = min_score
-        api_key = settings.cohere_api_key.strip()
-        if client is None and not api_key:
+        if client is None and not resolved_key.strip():
             msg = "COHERE_API_KEY is required for Cohere re-ranking"
             raise SearchError(msg)
         if client is not None:
@@ -52,7 +63,7 @@ class CohereReranker:
         else:
             import cohere
 
-            self._client = cohere.Client(api_key=api_key)
+            self._client = cohere.Client(api_key=resolved_key)
 
     def rerank(
         self,
