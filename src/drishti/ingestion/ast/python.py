@@ -8,6 +8,7 @@ from tree_sitter import Language
 from drishti.ingestion.ast.base import TreeSitterParser
 
 _PYTHON_EXTENSIONS = (".py", ".pyi", ".pyw")
+_QUERY_FILE = "python.scm"
 
 
 class PythonParser(TreeSitterParser):
@@ -16,9 +17,8 @@ class PythonParser(TreeSitterParser):
     @classmethod
     def from_package(cls) -> PythonParser:
         """Build a parser using the packaged Python query file."""
-        query_scm, _query_path = cls.load_query("python.scm")
         language = Language(tspython.language())
-        return cls(language, query_scm, language_name="python")
+        return cls(language, cls.load_query(_QUERY_FILE), language_name="python")
 
     @property
     def supported_extensions(self) -> tuple[str, ...]:

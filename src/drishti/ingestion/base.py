@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from datetime import datetime
 
 from drishti.api.schemas import UniversalChunk
 
@@ -10,12 +11,19 @@ class BaseParser(ABC):
     """
 
     @abstractmethod
-    def parse(self, file_content: bytes, file_path: str) -> list[UniversalChunk]:
+    def parse(
+        self,
+        file_content: bytes,
+        file_path: str,
+        *,
+        last_modified: datetime | None = None,
+    ) -> list[UniversalChunk]:
         """Parse raw file bytes into structured universal chunks.
 
         Args:
             file_content: Raw binary contents of the target file.
             file_path: Relative path of the file within the workspace.
+            last_modified: Optional file modification time for chunk metadata.
 
         Returns:
             List of structured universal chunk objects.

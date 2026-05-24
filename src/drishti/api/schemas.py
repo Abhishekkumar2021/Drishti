@@ -6,7 +6,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Literal
 
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field, field_validator, model_validator
 
 from drishti.exceptions import PathValidationError
 from drishti.utils.paths import resolve_repo_path
@@ -36,9 +36,14 @@ class UniversalChunk(BaseModel):
         ..., description="The source mechanism that loaded the file"
     )
     language: str | None = Field(None, description="Programming language name if code")
-    start_line: int | None = Field(None, description="1-indexed starting line in source file")
+    start_line: int | None = Field(
+        None,
+        ge=1,
+        description="1-indexed starting line in source file",
+    )
     end_line: int | None = Field(
         None,
+        ge=1,
         description="1-indexed ending line in source file (inclusive)",
     )
     page_number: int | None = Field(None, description="Page index if extracted from a PDF")
@@ -63,6 +68,17 @@ class UniversalChunk(BaseModel):
         description="Extracted import or calling dependency references",
     )
     last_modified: datetime = Field(..., description="ISO datetime of last modifications")
+
+    @model_validator(mode="after")
+    def validate_line_range(self) -> UniversalChunk:
+        if (
+            self.start_line is not None
+            and self.end_line is not None
+            and self.end_line < self.start_line
+        ):
+            msg = "end_line must be greater than or equal to start_line"
+            raise ValueError(msg)
+        return self
 
 
 class IngestionRequest(BaseModel):

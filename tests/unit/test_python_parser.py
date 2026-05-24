@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from datetime import UTC, datetime
 from pathlib import Path
 
 import pytest
@@ -28,15 +29,23 @@ class TestPythonParser:
         names = {chunk.name for chunk in chunks}
         assert names == {"AuthService", "verify", "is_active", "standalone_helper"}
 
-    def test_line_bounds_are_one_indexed(self, parser: PythonParser) -> None:
+    def test_line_bounds_match_fixture(self, parser: PythonParser) -> None:
         source = FIXTURE.read_bytes()
         chunks = parser.parse(source, FIXTURE.as_posix())
-        auth_class = next(chunk for chunk in chunks if chunk.name == "AuthService")
+        expected = {
+            "AuthService": (6, 15),
+            "verify": (10, 11),
+            "is_active": (13, 15),
+            "standalone_helper": (18, 20),
+        }
+        for chunk in chunks:
+            assert chunk.name in expected
+            assert (chunk.start_line, chunk.end_line) == expected[chunk.name]
 
-        assert auth_class.start_line is not None
-        assert auth_class.end_line is not None
-        assert auth_class.start_line >= 1
-        assert auth_class.end_line >= auth_class.start_line
+    def test_last_modified_kwarg_is_propagated(self, parser: PythonParser) -> None:
+        modified = datetime(2024, 1, 2, 3, 4, 5, tzinfo=UTC)
+        chunks = parser.parse(b"class A:\n    pass\n", "a.py", last_modified=modified)
+        assert chunks[0].last_modified == modified
 
     def test_extracts_decorators_on_class(self, parser: PythonParser) -> None:
         source = b"@dataclass\nclass Foo:\n    pass\n"
@@ -74,6 +83,19 @@ class TestPythonParser:
 
     def test_empty_file_returns_no_chunks(self, parser: PythonParser) -> None:
         assert parser.parse(b"", "empty.py") == []
+
+    def test_async_function_is_extracted(self, parser: PythonParser) -> None:
+        source = b"async def fetch():\n    return None\n"
+        chunks = parser.parse(source, "async.py")
+        assert len(chunks) == 1
+        assert chunks[0].name == "fetch"
+        assert chunks[0].node_type == "function_definition"
+
+    def test_skips_symbols_with_parse_errors(self, parser: PythonParser) -> None:
+        source = b"class Broken:\n    def ok(self):\n        return 1\n    def bad(\n"
+        chunks = parser.parse(source, "broken.py")
+        names = {chunk.name for chunk in chunks}
+        assert names == {"ok"}
 
     def test_chunks_sorted_by_start_line(self, parser: PythonParser) -> None:
         source = FIXTURE.read_bytes()
