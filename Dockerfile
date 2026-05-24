@@ -12,11 +12,11 @@ WORKDIR /app
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /usr/local/bin/uv
 
 # Copy dependency files
-COPY pyproject.toml ./
+COPY pyproject.toml uv.lock ./
 
 # Create venv and install dependencies (cached layer)
 RUN uv venv /app/.venv && \
-    uv pip install --python /app/.venv/bin/python -e "."
+    uv sync --frozen --no-dev --python /app/.venv/bin/python
 
 # Copy source code
 COPY src/ ./src/
