@@ -79,9 +79,9 @@ Phase 6: Release        [░░░░░░░░░░░░░░░░░░�
   * [x] **US-03.04**: JavaScript/TypeScript Tree-sitter integration
   * [x] **US-03.05**: Go Tree-sitter integration
   * [x] **US-03.06**: AST node extraction rule engine
-  * [ ] **US-03.07**: Metadata enrichment (parameters, complexity, docstrings)
-  * [ ] **US-03.08**: Parent/child relationship linking (method → class)
-  * [ ] **US-03.09**: Dependency/import extraction
+  * [x] **US-03.07**: Metadata enrichment (parameters, complexity, docstrings)
+  * [x] **US-03.08**: Parent/child relationship linking (method → class)
+  * [x] **US-03.09**: Dependency/import extraction
   * [ ] **US-03.10**: Repository git walker (incremental indexing via diffs)
 
 #### EPIC-04: Document Ingestion Pipeline (Priority: P1)
@@ -199,3 +199,6 @@ Once a User Story is implemented, the corresponding code files must be registere
 | US-03.04 | [ast/ecmascript.py](file:///Users/abhishek/Dev/Drishti/src/drishti/ingestion/ast/ecmascript.py), [ast/javascript.py](file:///Users/abhishek/Dev/Drishti/src/drishti/ingestion/ast/javascript.py), [ast/typescript.py](file:///Users/abhishek/Dev/Drishti/src/drishti/ingestion/ast/typescript.py), [queries/javascript.scm](file:///Users/abhishek/Dev/Drishti/src/drishti/ingestion/queries/javascript.scm), [queries/typescript.scm](file:///Users/abhishek/Dev/Drishti/src/drishti/ingestion/queries/typescript.scm) | 🟩 Completed | [test_javascript_parser.py](file:///Users/abhishek/Dev/Drishti/tests/unit/test_javascript_parser.py), [test_typescript_parser.py](file:///Users/abhishek/Dev/Drishti/tests/unit/test_typescript_parser.py) |
 | US-03.05 | [ast/go.py](file:///Users/abhishek/Dev/Drishti/src/drishti/ingestion/ast/go.py), [queries/go.scm](file:///Users/abhishek/Dev/Drishti/src/drishti/ingestion/queries/go.scm) | 🟩 Completed | [test_go_parser.py](file:///Users/abhishek/Dev/Drishti/tests/unit/test_go_parser.py) |
 | US-03.06 | [ast/rules.py](file:///Users/abhishek/Dev/Drishti/src/drishti/ingestion/ast/rules.py), [ast/catalog.py](file:///Users/abhishek/Dev/Drishti/src/drishti/ingestion/ast/catalog.py), [queries/parser_rules.json](file:///Users/abhishek/Dev/Drishti/src/drishti/ingestion/queries/parser_rules.json) | 🟩 Completed | [test_parser_rules.py](file:///Users/abhishek/Dev/Drishti/tests/unit/test_parser_rules.py) |
+| US-03.07 | [ast/metadata.py](file:///Users/abhishek/Dev/Drishti/src/drishti/ingestion/ast/metadata.py), [schemas.py](file:///Users/abhishek/Dev/Drishti/src/drishti/api/schemas.py) | 🟩 Completed | [test_metadata_enrichment.py](file:///Users/abhishek/Dev/Drishti/tests/unit/test_metadata_enrichment.py) |
+| US-03.08 | [ast/metadata.py](file:///Users/abhishek/Dev/Drishti/src/drishti/ingestion/ast/metadata.py) | 🟩 Completed | [test_metadata_enrichment.py](file:///Users/abhishek/Dev/Drishti/tests/unit/test_metadata_enrichment.py) |
+| US-03.09 | [symbols.py](file:///Users/abhishek/Dev/Drishti/src/drishti/ingestion/symbols.py), [ast/metadata.py](file:///Users/abhishek/Dev/Drishti/src/drishti/ingestion/ast/metadata.py) | 🟩 Completed | [test_metadata_enrichment.py](file:///Users/abhishek/Dev/Drishti/tests/unit/test_metadata_enrichment.py) |

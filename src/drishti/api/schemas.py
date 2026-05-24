@@ -75,6 +75,39 @@ class UniversalChunk(BaseModel):
         default_factory=list,
         description="Extracted import or calling dependency references",
     )
+    docstring: str | None = Field(
+        None,
+        description="Docstring or leading comment block attached to the symbol",
+    )
+    parameters: list[str] = Field(
+        default_factory=list,
+        description="Formal parameter descriptors for callable symbols",
+    )
+    return_type: str | None = Field(
+        None,
+        description="Declared return type for callable symbols when available",
+    )
+    cyclomatic_complexity: int | None = Field(
+        None,
+        ge=1,
+        description="McCabe cyclomatic complexity for callable symbol bodies",
+    )
+    parent_module: str | None = Field(
+        None,
+        description="Enclosing module or package path for the symbol",
+    )
+    context_path: str | None = Field(
+        None,
+        description="Fully qualified structural path (file::scope::symbol)",
+    )
+    imported_symbols: list[str] = Field(
+        default_factory=list,
+        description="Symbols imported into the file (types, functions, modules)",
+    )
+    definition_file_path: str | None = Field(
+        None,
+        description="File path where this symbol is defined (same file for local defs)",
+    )
     last_modified: datetime = Field(..., description="ISO datetime of last modifications")
 
     @model_validator(mode="after")

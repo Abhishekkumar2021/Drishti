@@ -97,6 +97,14 @@ class TestPythonParser:
         names = {chunk.name for chunk in chunks}
         assert names == {"ok"}
 
+    def test_enriched_metadata_on_fixture(self, parser: PythonParser) -> None:
+        source = FIXTURE.read_bytes()
+        chunks = parser.parse(source, FIXTURE.as_posix())
+        verify = next(chunk for chunk in chunks if chunk.name == "verify")
+
+        assert verify.return_type == "bool"
+        assert verify.cyclomatic_complexity == 1
+
     def test_chunks_sorted_by_start_line(self, parser: PythonParser) -> None:
         source = FIXTURE.read_bytes()
         chunks = parser.parse(source, FIXTURE.as_posix())

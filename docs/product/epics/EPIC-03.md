@@ -103,9 +103,9 @@ This epic covers the repository walking, AST parsing using Tree-sitter, language
 **Complexity**: 5 SP | **Priority**: P0
 
 **Acceptance Criteria**
-1. [ ] Attaches docstrings/comments situated above the AST node.
-2. [ ] Calculates basic cyclomatic complexity for methods.
-3. [ ] Extracts parameter list and return type annotations.
+1. [x] Attaches docstrings/comments situated above the AST node.
+2. [x] Calculates basic cyclomatic complexity for methods.
+3. [x] Extracts parameter list and return type annotations.
 
 ---
 
@@ -117,8 +117,8 @@ This epic covers the repository walking, AST parsing using Tree-sitter, language
 **Complexity**: 3 SP | **Priority**: P0
 
 **Acceptance Criteria**
-1. [ ] Extracted method chunks include a `parent_class` or `parent_module` identifier in their metadata.
-2. [ ] Allows tracing from a child chunk back to its parent context.
+1. [x] Extracted method chunks include a `parent_class` or `parent_module` identifier in their metadata.
+2. [x] Allows tracing from a child chunk back to its parent context.
 
 ---
 
@@ -130,8 +130,8 @@ This epic covers the repository walking, AST parsing using Tree-sitter, language
 **Complexity**: 3 SP | **Priority**: P0
 
 **Acceptance Criteria**
-1. [ ] Extracts imported symbols and external packages from files.
-2. [ ] Maps code symbols to their defining file path.
+1. [x] Extracts imported symbols and external packages from files.
+2. [x] Maps code symbols to their defining file path.
 
 ---
 
