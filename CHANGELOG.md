@@ -13,6 +13,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Architecture documentation suite: C4 model, as-built ingestion, sequence diagrams, deployment topology
 - Design reference for Universal Chunk schema (field table, ER diagram)
 - Onboarding guide and operations runbook
+- EPIC-03 metadata enrichment on `UniversalChunk` (US-03.07–03.09)
+- Git incremental indexer with `IncrementalIndexer` and `ChunkIndex` (US-03.10)
 
 ---
 
