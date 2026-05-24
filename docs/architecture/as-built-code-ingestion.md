@@ -139,8 +139,7 @@ Every parser emits Pydantic-validated [UniversalChunk](../design/universal-chunk
 - Scope: `parent_class`, `package_name`
 - Modifiers: `decorators`, `exports`
 - References: `dependencies` (module-level imports on JS/TS/Go)
-
-Enrichment fields (`docstring`, `parameters`, `cyclomatic_complexity`, etc.) are specified in the design doc and land with US-03.07.
+- Enrichment: `docstring`, `parameters`, `return_type`, `cyclomatic_complexity`, `context_path`, `imported_symbols` (US-03.07–09)
 
 ---
 
@@ -151,20 +150,29 @@ Enrichment fields (`docstring`, `parameters`, `cyclomatic_complexity`, etc.) are
 | Per-language parsers | `tests/unit/test_*_parser.py` |
 | Rules / catalog | `tests/unit/test_parser_rules.py` |
 | Walker + registry | `tests/unit/test_walker.py` |
+| Metadata enrichment | `tests/unit/test_metadata_enrichment.py` |
+| Git incremental index | `tests/unit/test_git_incremental.py` |
 | Full CI parity | `make ci-precheck` |
 
 ---
 
-## 7. Planned Next Step (US-03.10)
+## 7. Git Incremental Indexing (US-03.10)
 
 ```mermaid
-flowchart LR
-    GIT[git diff vs index state] --> DEL[Deleted files]
-    GIT --> MOD[Modified files]
-    GIT --> NEW[New files]
-    DEL --> PURGE[Remove Qdrant points]
-    MOD --> REPARSE[Re-parse + upsert]
-    NEW --> REPARSE
+flowchart TD
+    ST[IndexStateStore.load] --> DIFF[resolve_changes]
+    DIFF --> DEL[delete_by_file_paths]
+    DIFF --> PARSE[parse added + modified]
+    PARSE --> UPSERT[ChunkIndex.upsert]
+    DEL --> SAVE[IndexStateStore.save HEAD]
+    UPSERT --> SAVE
 ```
+
+| Module | Responsibility |
+|--------|----------------|
+| `git_changes.py` | `GitChangeSet`, diff vs indexed commit |
+| `index_state.py` | `.drishti/index-state.json` persistence |
+| `incremental.py` | `IncrementalIndexer.run()` orchestration |
+| `chunk_index.py` | `ChunkIndex` / `InMemoryChunkIndex` (Qdrant in EPIC-05) |
 
 See [sequence-diagrams.md § Incremental indexing](sequence-diagrams.md#incremental-indexing-planned-us-0310).

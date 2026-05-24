@@ -136,7 +136,7 @@ Every parser converts its output into the **Universal Chunk Schema** (Pydantic m
 
 Core fields implemented today include: `id`, `source_id`, `content`, `content_type`, `file_path`, `language`, line range, `node_type`, `name`, `parent_class`, `package_name`, `decorators`, `exports`, `dependencies`.
 
-Enrichment fields (`docstring`, `parameters`, `return_type`, `cyclomatic_complexity`, `context_path`, `imported_symbols`, …) are defined in the design spec and roll out under US-03.07–03.09.
+Enrichment fields (`docstring`, `parameters`, `return_type`, `cyclomatic_complexity`, `context_path`, `imported_symbols`, …) are populated per [universal-chunk-schema.md](../design/universal-chunk-schema.md). Incremental git indexing is implemented via `IncrementalIndexer` (US-03.10).
 
 ---
 

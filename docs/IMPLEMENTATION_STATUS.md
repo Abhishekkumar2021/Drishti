@@ -20,12 +20,12 @@ This file is the living source of truth for the current build status of Drishti.
 | Component | Total Points | Completed | Progress % | Status |
 |-----------|--------------|-----------|------------|--------|
 | **Phase 1: Foundation** | 55 | 55 | 100.0% | 🟩 Completed |
-| **Phase 2: Ingestion** | 131 | 37 | 28.2% | 🟨 In Progress |
+| **Phase 2: Ingestion** | 131 | 55 | 42.0% | 🟨 In Progress |
 | **Phase 3: Core Search & RAG** | 131 | 0 | 0.0% | 🔮 Planned |
 | **Phase 4: Advanced Features** | 89 | 0 | 0.0% | 🔮 Planned |
 | **Phase 5: Evaluation** | 34 | 0 | 0.0% | 🔮 Planned |
 | **Phase 6: Release** | 21 | 0 | 0.0% | 🔮 Planned |
-| **Total Project** | **461** | **92** | **20.0%** | **🟨 In Progress** |
+| **Total Project** | **461** | **110** | **23.9%** | **🟨 In Progress** |
 
 ---
 
@@ -33,7 +33,7 @@ This file is the living source of truth for the current build status of Drishti.
 
 ```
 Phase 1: Foundation     [████████████████████] 100.0% (Completed)
-Phase 2: Ingestion      [█░░░░░░░░░░░░░░░░░░] 3.8%  (In Progress)
+Phase 2: Ingestion      [████████░░░░░░░░░░░░] 42.0% (In Progress)
 Phase 3: Search & RAG   [░░░░░░░░░░░░░░░░░░░] 0.0%  (Planned)
 Phase 4: UI & Graph     [░░░░░░░░░░░░░░░░░░░] 0.0%  (Planned)
 Phase 5: Evaluation     [░░░░░░░░░░░░░░░░░░░] 0.0%  (Planned)

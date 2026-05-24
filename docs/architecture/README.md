@@ -40,8 +40,8 @@ All Mermaid diagrams are version-controlled in Markdown (render on GitHub, VS Co
 | File walker + language detection | [as-built-code-ingestion.md](as-built-code-ingestion.md) | 🟩 Implemented (US-03.01) |
 | Tree-sitter parsers (Py, Java, JS/TS, Go) | [as-built-code-ingestion.md](as-built-code-ingestion.md) | 🟩 Implemented (US-03.02–05) |
 | Parser rules + `min_chunk_lines` | [as-built-code-ingestion.md](as-built-code-ingestion.md) | 🟩 Implemented (US-03.06) |
-| Metadata enrichment (docstring, complexity) | [universal-chunk-schema.md](../design/universal-chunk-schema.md) | 🟨 PR / next merge (US-03.07) |
-| Git incremental walker | HLA §8 | 🔮 Planned (US-03.10) |
+| Metadata enrichment (docstring, complexity) | [universal-chunk-schema.md](../design/universal-chunk-schema.md) | 🟩 Implemented (US-03.07–09) |
+| Git incremental walker | [as-built-code-ingestion.md](as-built-code-ingestion.md) §7 | 🟩 Implemented (US-03.10) |
 | Embeddings + Qdrant write path | HLA §4 | 🔮 Planned (EPIC-05) |
 | Hybrid search + RAG generation | HLA §5–6 | 🔮 Planned (EPIC-06–07) |
 
