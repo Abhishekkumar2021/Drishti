@@ -30,6 +30,7 @@ def build_hybrid_search_pipeline(
     reranker: ChunkReranker | None = None,
 ) -> HybridSearchPipeline:
     """Construct a ``HybridSearchPipeline`` from application settings."""
+    settings.validate_runtime_configuration(strict=False)
     collection = settings.qdrant_collection_name
     resolved_expander = expander or _default_expander(settings)
     resolved_reranker = reranker or _default_reranker(settings)

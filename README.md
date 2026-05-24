@@ -53,7 +53,7 @@ It also ingests PDFs, Markdown docs, diagrams, and API specs, enabling **cross-m
 │                                      ┌─────────┴──────────┐         │
 │                                      ▼                    ▼         │
 │                               Dense Embedding       BM25 Sparse     │
-│                            (text-embedding-3-small)  (tokenizer)    │
+│                         (configurable provider)      (tokenizer)    │
 │                                      │                    │         │
 │                                      └────────┬───────────┘         │
 │                                               ▼                     │
@@ -81,7 +81,7 @@ It also ingests PDFs, Markdown docs, diagrams, and API specs, enabling **cross-m
 │                                           hierarchy, deps)          │
 │                                                  │                   │
 │                                                  ▼                   │
-│                                          Claude API (streaming)      │
+│                                    LLM (configurable provider)       │
 │                                          → Answer with citations     │
 │                                          → Code snippets             │
 │                                          → File paths + line nums   │
@@ -100,10 +100,11 @@ It also ingests PDFs, Markdown docs, diagrams, and API specs, enabling **cross-m
 | **Chunk metadata** | Docstrings, params, complexity, context paths | 🟩 Implemented |
 | **Incremental git indexing** | Diff-based re-index via `IncrementalIndexer` | 🟩 Implemented |
 | **PDF Ingestion** | Layout-aware parsing: text blocks, tables, images | 🔮 Planned |
-| **Hybrid Search** | BM25 keyword + vector semantic search with RRF fusion | 🔮 Planned |
-| **Re-ranking** | Cohere rerank-v3.5 for precision | 🔮 Planned |
+| **Hybrid Search** | BM25 + dense vectors, RRF fusion (`HybridSearchPipeline`) | 🟩 Implemented |
+| **Re-ranking** | Cohere rerank or lexical fallback (configurable) | 🟩 Implemented |
+| **Provider-agnostic models** | Any embedding/LLM via `EMBEDDING_PROVIDER`, `LLM_PROVIDER` | 🟩 Implemented |
 | **Cross-Modal Q&A** | Query code + docs + diagrams together | 🔮 Planned |
-| **Streaming Answers** | Claude API with SSE streaming + citations | 🔮 Planned |
+| **Streaming Answers** | LLM streaming + citations (EPIC-07) | 🔮 Planned |
 | **Impact Analysis** | "What breaks if I change X?" via dependency graph | 🔮 Planned |
 | **Code Navigation** | Click citation → file path + line number | 🔮 Planned |
 | **RAG Evaluation** | RAGAS metrics: precision, recall, faithfulness | 🔮 Planned |
@@ -117,10 +118,10 @@ It also ingests PDFs, Markdown docs, diagrams, and API specs, enabling **cross-m
 | **Runtime** | Python 3.12 | Best ML/AI ecosystem |
 | **Web Framework** | FastAPI | Async, auto-docs, Pydantic native |
 | **AST Parsing** | Tree-sitter | Multi-language, incremental, fast |
-| **Embeddings** | OpenAI text-embedding-3-small | Best quality/cost for code |
+| **Embeddings** | OpenAI (default), Cohere, Ollama, OpenAI-compatible | `EMBEDDING_PROVIDER` |
 | **Vector DB** | Qdrant | Native hybrid search (dense+sparse) |
-| **Re-ranking** | Cohere rerank-v3.5 | Best quality, free tier |
-| **LLM** | Claude API | Best code understanding |
+| **Re-ranking** | Cohere (default) or lexical | `RERANK_PROVIDER` |
+| **LLM** | Anthropic (default), OpenAI, Ollama | `LLM_PROVIDER` |
 | **PDF Parsing** | PyMuPDF | Layout-aware, tables, images |
 | **Graph DB** | Neo4j (optional) | Dependency graph traversal |
 | **Cache** | Redis | Query result caching |
@@ -143,7 +144,7 @@ It also ingests PDFs, Markdown docs, diagrams, and API specs, enabling **cross-m
 
 - **Python 3.12+**
 - **Docker** (for Qdrant and Redis)
-- **API Keys**: OpenAI, Anthropic (Claude), Cohere
+- **API Keys**: Depends on providers chosen (see [Model providers](docs/design/model-providers.md)); defaults use OpenAI + Anthropic + Cohere
 
 ### Setup
 
@@ -203,7 +204,7 @@ Drishti/
 │   ├── rfc/                           # Request for Comments
 │   ├── lld/                           # Low-Level Design docs (5)
 │   ├── product/                       # Vision, epics (12), release plan
-│   ├── design/                        # API contracts
+│   ├── design/                        # API contracts, model providers
 │   ├── evaluation/                    # RAG metrics & baselines
 │   ├── deep-dives/                    # Technical deep-dives (5 chapters)
 │   └── model-card.md                  # AI model documentation
@@ -248,6 +249,7 @@ Drishti/
 | [Universal Chunk Schema](docs/design/universal-chunk-schema.md) | Chunk fields + ER diagram |
 | [ADR Index](docs/adr/README.md) | 10 Architecture Decision Records |
 | [API Contracts](docs/design/api-contracts.md) | REST API + WebSocket specs |
+| [Model Providers](docs/design/model-providers.md) | Embedding, LLM, rerank configuration |
 | [LLD Index](docs/lld/README.md) | Design patterns, data models, search pipeline |
 | [Onboarding](docs/onboarding/README.md) | 30-minute contributor path |
 | [Operations Runbook](docs/operations/README.md) | CI, health checks, troubleshooting |

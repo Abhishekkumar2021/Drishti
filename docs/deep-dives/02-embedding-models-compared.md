@@ -50,7 +50,7 @@ Drishti uses both vector representations to capture different search signals:
 | **Dimensionality** | Fixed, continuous float dimensions (e.g. 1536). | Very high, discrete dimensions (vocabulary size). |
 | **Value Density** | Every dimension contains a non-zero float. | Most dimensions are zero; only matching terms have values. |
 | **Strengths** | Captures synonyms, concepts, and semantic intent. | Captures exact class names, variable codes, and keywords. |
-| **Model Source** | OpenAI `text-embedding-3-small` / Cohere. | BM25 / Splade algorithms. |
+| **Model Source** | Configurable via `EMBEDDING_PROVIDER` (OpenAI, Cohere, Ollama, OpenAI-compatible). | BM25 (in-process). |
 
 ---
 

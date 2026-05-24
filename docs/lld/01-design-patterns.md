@@ -135,14 +135,14 @@ class LLMClientFactory:
     def get_client(provider: str, api_key: str) -> BaseLLMClient:
         provider = provider.lower()
         if provider == "anthropic":
-            from drishti.generation.llm_client import ClaudeClient
-            return ClaudeClient(api_key=api_key)
+            from drishti.generation.llm import AnthropicChatLLM
+            return AnthropicChatLLM(api_key=api_key, model="claude-sonnet-4-20250514")
         elif provider == "openai":
-            from drishti.generation.llm_client import OpenAICLient
-            return OpenAICLient(api_key=api_key)
+            from drishti.generation.llm import OpenAIChatLLM
+            return OpenAIChatLLM(api_key=api_key, model="gpt-4o-mini")
         elif provider == "mock":
-            from drishti.generation.llm_client import MockLLMClient
-            return MockLLMClient()
+            from drishti.generation.llm import MockChatLLM
+            return MockChatLLM()
         else:
             raise ValueError(f"Unsupported LLM provider: {provider}")
 ```

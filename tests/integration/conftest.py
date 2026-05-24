@@ -26,6 +26,10 @@ def _integration_settings() -> Settings:
         health_check_timeout_seconds=float(os.environ.get("HEALTH_CHECK_TIMEOUT_SECONDS", "5")),
         api_token="",
         debug=True,
+        embedding_provider="hashing",
+        embedding_dimensions=16,
+        llm_provider="mock",
+        rerank_provider="lexical",
     )
 
 
@@ -67,10 +71,11 @@ def qdrant_client(integration_settings: Settings) -> Iterator[QdrantClient]:
     """Qdrant client for storage integration tests."""
     from qdrant_client import QdrantClient
 
+    timeout_seconds = int(integration_settings.health_check_timeout_seconds)
     client = QdrantClient(
         host=integration_settings.qdrant_host,
         port=integration_settings.qdrant_port,
-        timeout=integration_settings.health_check_timeout_seconds,
+        timeout=timeout_seconds,
         check_compatibility=False,
     )
     yield client

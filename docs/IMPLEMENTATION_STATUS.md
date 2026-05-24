@@ -2,7 +2,7 @@
 
 This file is the living source of truth for the current build status of Drishti. It tracks progress at the Epic and User Story levels.
 
-*Last Updated: 2026-05-24*
+*Last Updated: 2026-05-25*
 
 ---
 
@@ -96,7 +96,7 @@ Phase 6: Release        [░░░░░░░░░░░░░░░░░░�
 #### EPIC-05: Embedding & Vector Storage (Priority: P0)
 * **Points**: 34 | **Status**: 🟩 Completed (100%)
 * **Stories**:
-  * [x] **US-05.01**: OpenAI dense embedding integration (`text-embedding-3-small`)
+  * [x] **US-05.01**: Dense embedding integration (OpenAI default; `EMBEDDING_PROVIDER` for any model)
   * [x] **US-05.02**: Sparse embedding (BM25 tokenizer)
   * [x] **US-05.03**: Qdrant database client initialization and index schemas
   * [x] **US-05.04**: Payload-based metadata filter compilation
@@ -118,7 +118,7 @@ Phase 6: Release        [░░░░░░░░░░░░░░░░░░�
 * **Points**: 42 | **Status**: 🟩 Completed (100%)
 * **Stories**:
   * [x] **US-07.01**: Prompt template compiler & context builder
-  * [x] **US-07.02**: LLM client integration (`create_chat_llm`, Anthropic/OpenAI)
+  * [x] **US-07.02**: LLM client integration (`create_chat_llm`, provider-agnostic)
   * [x] **US-07.03**: Streaming response mechanism (SSE events)
   * [x] **US-07.04**: Citation parser & line reference generator
 
@@ -203,7 +203,7 @@ Once a User Story is implemented, the corresponding code files must be registere
 | US-03.08 | [ast/metadata.py](file:///Users/abhishek/Dev/Drishti/src/drishti/ingestion/ast/metadata.py) | 🟩 Completed | [test_metadata_enrichment.py](file:///Users/abhishek/Dev/Drishti/tests/unit/test_metadata_enrichment.py) |
 | US-03.09 | [symbols.py](file:///Users/abhishek/Dev/Drishti/src/drishti/ingestion/symbols.py), [ast/metadata.py](file:///Users/abhishek/Dev/Drishti/src/drishti/ingestion/ast/metadata.py) | 🟩 Completed | [test_metadata_enrichment.py](file:///Users/abhishek/Dev/Drishti/tests/unit/test_metadata_enrichment.py) |
 | US-03.10 | [git_changes.py](file:///Users/abhishek/Dev/Drishti/src/drishti/ingestion/git_changes.py), [incremental.py](file:///Users/abhishek/Dev/Drishti/src/drishti/ingestion/incremental.py), [index_state.py](file:///Users/abhishek/Dev/Drishti/src/drishti/ingestion/index_state.py), [chunk_index.py](file:///Users/abhishek/Dev/Drishti/src/drishti/ingestion/chunk_index.py) | 🟩 Completed | [test_git_incremental.py](file:///Users/abhishek/Dev/Drishti/tests/unit/test_git_incremental.py) |
-| US-05.01 | [dense.py](file:///Users/abhishek/Dev/Drishti/src/drishti/embedding/dense.py) | 🟩 Completed | [test_dense_embedding.py](file:///Users/abhishek/Dev/Drishti/tests/unit/test_dense_embedding.py) |
+| US-05.01 | [embedding/factory.py](file:///Users/abhishek/Dev/Drishti/src/drishti/embedding/factory.py), [dense.py](file:///Users/abhishek/Dev/Drishti/src/drishti/embedding/dense.py), [openai_compatible.py](file:///Users/abhishek/Dev/Drishti/src/drishti/embedding/openai_compatible.py), [cohere_dense.py](file:///Users/abhishek/Dev/Drishti/src/drishti/embedding/cohere_dense.py), [ollama_dense.py](file:///Users/abhishek/Dev/Drishti/src/drishti/embedding/ollama_dense.py), [model-providers.md](file:///Users/abhishek/Dev/Drishti/docs/design/model-providers.md) | 🟩 Completed | [test_dense_embedding.py](file:///Users/abhishek/Dev/Drishti/tests/unit/test_dense_embedding.py), [test_provider_factories.py](file:///Users/abhishek/Dev/Drishti/tests/unit/test_provider_factories.py) |
 | US-05.02 | [sparse.py](file:///Users/abhishek/Dev/Drishti/src/drishti/embedding/sparse.py) | 🟩 Completed | [test_sparse_embedding.py](file:///Users/abhishek/Dev/Drishti/tests/unit/test_sparse_embedding.py) |
 | US-05.03 | [schema.py](file:///Users/abhishek/Dev/Drishti/src/drishti/storage/schema.py), [qdrant_store.py](file:///Users/abhishek/Dev/Drishti/src/drishti/storage/qdrant_store.py), [pipeline.py](file:///Users/abhishek/Dev/Drishti/src/drishti/embedding/pipeline.py) | 🟩 Completed | [test_qdrant_chunk_store.py](file:///Users/abhishek/Dev/Drishti/tests/integration/test_qdrant_chunk_store.py), [test_embedding_pipeline.py](file:///Users/abhishek/Dev/Drishti/tests/unit/test_embedding_pipeline.py) |
 | US-05.04 | [filters.py](file:///Users/abhishek/Dev/Drishti/src/drishti/storage/filters.py) | 🟩 Completed | [test_storage_filters.py](file:///Users/abhishek/Dev/Drishti/tests/unit/test_storage_filters.py) |
@@ -211,7 +211,7 @@ Once a User Story is implemented, the corresponding code files must be registere
 | US-06.02 | [sparse.py](file:///Users/abhishek/Dev/Drishti/src/drishti/search/sparse.py) | 🟩 Completed | [test_sparse_retriever.py](file:///Users/abhishek/Dev/Drishti/tests/unit/test_sparse_retriever.py) |
 | US-06.03 | [rrf.py](file:///Users/abhishek/Dev/Drishti/src/drishti/search/rrf.py) | 🟩 Completed | [test_rrf.py](file:///Users/abhishek/Dev/Drishti/tests/unit/test_rrf.py) |
 | US-06.04 | [rerank.py](file:///Users/abhishek/Dev/Drishti/src/drishti/search/rerank.py) | 🟩 Completed | [test_search_rerank.py](file:///Users/abhishek/Dev/Drishti/tests/unit/test_search_rerank.py) |
-| US-06.05 | [expansion.py](file:///Users/abhishek/Dev/Drishti/src/drishti/search/expansion.py) | 🟩 Completed | [test_query_expansion.py](file:///Users/abhishek/Dev/Drishti/tests/unit/test_query_expansion.py) |
+| US-06.05 | [expansion.py](file:///Users/abhishek/Dev/Drishti/src/drishti/search/expansion.py), [generation/factory.py](file:///Users/abhishek/Dev/Drishti/src/drishti/generation/factory.py), [generation/llm.py](file:///Users/abhishek/Dev/Drishti/src/drishti/generation/llm.py) | 🟩 Completed | [test_query_expansion.py](file:///Users/abhishek/Dev/Drishti/tests/unit/test_query_expansion.py), [test_provider_factories.py](file:///Users/abhishek/Dev/Drishti/tests/unit/test_provider_factories.py) |
 | US-06.* | [pipeline.py](file:///Users/abhishek/Dev/Drishti/src/drishti/search/pipeline.py), [factory.py](file:///Users/abhishek/Dev/Drishti/src/drishti/search/factory.py) | 🟩 Completed | [test_hybrid_search_pipeline.py](file:///Users/abhishek/Dev/Drishti/tests/unit/test_hybrid_search_pipeline.py), [test_hybrid_search.py](file:///Users/abhishek/Dev/Drishti/tests/integration/test_hybrid_search.py) |
 | US-07.01 | [generation/context.py](file:///Users/abhishek/Dev/Drishti/src/drishti/generation/context.py), [generation/prompts.py](file:///Users/abhishek/Dev/Drishti/src/drishti/generation/prompts.py) | 🟩 Completed | [test_context_builder.py](file:///Users/abhishek/Dev/Drishti/tests/unit/test_context_builder.py) |
 | US-07.02 | [generation/llm.py](file:///Users/abhishek/Dev/Drishti/src/drishti/generation/llm.py), [generation/factory.py](file:///Users/abhishek/Dev/Drishti/src/drishti/generation/factory.py) | 🟩 Completed | [test_generation_llm.py](file:///Users/abhishek/Dev/Drishti/tests/unit/test_generation_llm.py) |

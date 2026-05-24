@@ -15,6 +15,7 @@ This repository is **documentation-first**: architecture, ADRs, product epics, L
 | Know what's built vs planned | [IMPLEMENTATION_STATUS.md](IMPLEMENTATION_STATUS.md) |
 | Set up locally | [Onboarding](onboarding/README.md) · [Operations](operations/README.md) |
 | Review API shapes | [API Contracts](design/api-contracts.md) |
+| Configure embedding/LLM providers | [Model Providers](design/model-providers.md) |
 | Understand chunk data | [Universal Chunk Schema](design/universal-chunk-schema.md) |
 
 ---
@@ -45,6 +46,7 @@ This repository is **documentation-first**: architecture, ADRs, product epics, L
 |----------|-------------|
 | [design/README.md](design/README.md) | Design specs index |
 | [design/api-contracts.md](design/api-contracts.md) | REST & WebSocket contracts |
+| [design/model-providers.md](design/model-providers.md) | Embedding, LLM, rerank provider configuration |
 | [design/universal-chunk-schema.md](design/universal-chunk-schema.md) | Chunk field reference + ER diagram |
 
 ### Low-Level Design (LLD)

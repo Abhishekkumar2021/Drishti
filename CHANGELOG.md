@@ -20,6 +20,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - BM25 sparse encoder and `ChunkEmbeddingPipeline`
   - `QdrantChunkStore` with hybrid dense+sparse vectors, payload indexes, and filter compilation
 - Provider-agnostic model configuration (`EMBEDDING_PROVIDER`, `LLM_PROVIDER`, `RERANK_PROVIDER`)
+  - Production startup validation (`validate_runtime_configuration`) and provider summary logging
+  - Documentation: [docs/design/model-providers.md](docs/design/model-providers.md); README and architecture docs synced
   - Embedding: OpenAI, Cohere, Ollama, OpenAI-compatible endpoints, hashing (tests)
   - LLM: Anthropic, OpenAI, Ollama, OpenAI-compatible, mock (with SSE streaming)
   - `create_dense_embedder()` and `create_chat_llm()` factories; runtime config validation

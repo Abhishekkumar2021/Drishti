@@ -54,8 +54,8 @@ flowchart TB
     subgraph drishti_host [Drishti Host — FastAPI]
         API[API Gateway<br/>🟩 implemented]
         ING[Ingestion Workers<br/>🟨 parsers done, embed TBD]
-        SRCH[Search Service<br/>🔮 planned]
-        GEN[Generation Service<br/>🔮 planned]
+        SRCH[Search Service<br/>🟩 library]
+        GEN[Generation Service<br/>🟨 LLM factory]
     end
 
     subgraph data [Data Stores]

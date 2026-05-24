@@ -7,7 +7,7 @@ Approved
 We need an embedding model to convert code blocks and documentation text into dense vector representations. The model must perform well on code understanding tasks, keep dimensionality manageable to reduce storage costs, and have high throughput.
 
 ## Decision
-We select **OpenAI's `text-embedding-3-small`** as our primary dense embedding model.
+We select **OpenAI's `text-embedding-3-small`** as our **default** dense embedding model when `EMBEDDING_PROVIDER=openai`. Other providers (Cohere, Ollama, OpenAI-compatible endpoints) are supported via [model-providers.md](../design/model-providers.md) without changing application code.
 
 ## Alternatives Considered
 * **`text-embedding-ada-002`**: Older generation model. It has higher latency and lower benchmark performance compared to `text-embedding-3-small`.
