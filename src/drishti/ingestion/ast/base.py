@@ -7,6 +7,7 @@ import uuid
 from abc import ABC, abstractmethod
 from datetime import UTC, datetime
 from importlib import resources
+from typing import ClassVar
 
 from tree_sitter import Language, Node, Parser, Query, QueryCursor
 
@@ -18,6 +19,8 @@ class TreeSitterParser(BaseParser, ABC):
     """Language-agnostic Tree-sitter parser using query captures."""
 
     _CHUNK_NODE_CAPTURE = "chunk_node"
+    _SYMBOL_NAME_CAPTURE = "symbol_name"
+    _ENCLOSING_SCOPE_TYPES: ClassVar[tuple[str, ...]] = ("class_definition",)
 
     def __init__(
         self,
@@ -75,17 +78,24 @@ class TreeSitterParser(BaseParser, ABC):
         chunks: list[UniversalChunk] = []
         source_id = hashlib.sha256(file_content).hexdigest()
         indexed_at = last_modified if last_modified is not None else datetime.now(UTC)
+        package_name = self._extract_package_name(tree.root_node, file_content)
 
         for _pattern_index, capture_map in cursor.matches(tree.root_node):
-            for definition_node in capture_map.get(self._CHUNK_NODE_CAPTURE, []):
+            chunk_nodes = capture_map.get(self._CHUNK_NODE_CAPTURE, [])
+            symbol_nodes = capture_map.get(self._SYMBOL_NAME_CAPTURE, [])
+
+            for index, definition_node in enumerate(chunk_nodes):
                 if self._has_error_descendant(definition_node):
                     continue
 
-                name_node = definition_node.child_by_field_name("name")
-                if name_node is None:
+                symbol_name = self._resolve_symbol_name(
+                    definition_node,
+                    file_content,
+                    symbol_nodes[index] if index < len(symbol_nodes) else None,
+                )
+                if not symbol_name:
                     continue
 
-                symbol_name = self._node_text(file_content, name_node)
                 span_node, decorators = self._chunk_span(definition_node, file_content)
                 span_key = (span_node.start_byte, span_node.end_byte, definition_node.type)
                 if span_key in seen_spans:
@@ -102,6 +112,7 @@ class TreeSitterParser(BaseParser, ABC):
                         decorators=decorators,
                         source_id=source_id,
                         indexed_at=indexed_at,
+                        package_name=package_name,
                     )
                 )
 
@@ -118,11 +129,12 @@ class TreeSitterParser(BaseParser, ABC):
         decorators: list[str],
         source_id: str,
         indexed_at: datetime,
+        package_name: str | None = None,
     ) -> UniversalChunk:
         content = self._node_text(file_content, span_node)
         start_line = span_node.start_point[0] + 1
         end_line = self._inclusive_end_line(span_node)
-        parent_class = self._enclosing_class_name(definition_node, file_content)
+        parent_class = self._enclosing_scope_name(definition_node, file_content)
 
         return UniversalChunk(
             id=str(uuid.uuid4()),
@@ -138,9 +150,30 @@ class TreeSitterParser(BaseParser, ABC):
             node_type=definition_node.type,
             name=symbol_name,
             parent_class=parent_class,
+            package_name=package_name,
             decorators=decorators,
             last_modified=indexed_at,
         )
+
+    @classmethod
+    def _resolve_symbol_name(
+        cls,
+        definition_node: Node,
+        source: bytes,
+        capture_symbol_node: Node | None,
+    ) -> str | None:
+        if capture_symbol_node is not None:
+            return cls._node_text(source, capture_symbol_node)
+
+        name_node = definition_node.child_by_field_name("name")
+        if name_node is None:
+            return None
+        return cls._node_text(source, name_node)
+
+    @classmethod
+    def _extract_package_name(cls, root: Node, source: bytes) -> str | None:
+        """Return package name when the language exposes package declarations."""
+        return None
 
     @staticmethod
     def _inclusive_end_line(node: Node) -> int:
@@ -157,33 +190,46 @@ class TreeSitterParser(BaseParser, ABC):
 
     @classmethod
     def _chunk_span(cls, definition_node: Node, source: bytes) -> tuple[Node, list[str]]:
-        parent = definition_node.parent
-        if parent is not None and parent.type == "decorated_definition":
-            return parent, cls._extract_decorators(parent, source)
-        return definition_node, []
+        span_node = cls._resolve_span_node(definition_node)
+        decorators = cls._extract_decorators(definition_node, source)
+        return span_node, decorators
 
     @classmethod
-    def _extract_decorators(cls, decorated_node: Node, source: bytes) -> list[str]:
+    def _resolve_span_node(cls, definition_node: Node) -> Node:
+        parent = definition_node.parent
+        if parent is not None and parent.type == "decorated_definition":
+            return parent
+        return definition_node
+
+    @classmethod
+    def _extract_decorators(cls, definition_node: Node, source: bytes) -> list[str]:
+        parent = definition_node.parent
+        if parent is not None and parent.type == "decorated_definition":
+            return cls._extract_python_decorators(parent, source)
+        return []
+
+    @classmethod
+    def _extract_python_decorators(cls, decorated_node: Node, source: bytes) -> list[str]:
         decorators: list[str] = []
         for child in decorated_node.children:
             if child.type != "decorator":
                 continue
             raw = cls._node_text(source, child).strip()
-            decorators.append(cls._normalize_decorator(raw))
+            decorators.append(cls._normalize_annotation(raw))
         return decorators
 
     @staticmethod
-    def _normalize_decorator(raw: str) -> str:
+    def _normalize_annotation(raw: str) -> str:
         text = raw.lstrip("@").strip()
         if "(" in text:
             return text.split("(", maxsplit=1)[0].strip()
         return text
 
     @classmethod
-    def _enclosing_class_name(cls, node: Node, source: bytes) -> str | None:
+    def _enclosing_scope_name(cls, node: Node, source: bytes) -> str | None:
         current = node.parent
         while current is not None:
-            if current.type == "class_definition":
+            if current.type in cls._ENCLOSING_SCOPE_TYPES:
                 name_node = current.child_by_field_name("name")
                 if name_node is not None:
                     return cls._node_text(source, name_node)

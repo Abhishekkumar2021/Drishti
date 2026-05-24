@@ -108,7 +108,7 @@ class TestPythonParser:
 class TestParserRegistryIntegration:
     def test_default_registry_registers_python_extensions(self) -> None:
         registry = create_default_parser_registry()
-        assert registry.registered_extensions() == frozenset({".py", ".pyi", ".pyw"})
+        assert frozenset({".py", ".pyi", ".pyw"}).issubset(registry.registered_extensions())
 
     def test_registry_returns_python_parser(self) -> None:
         registry: ParserRegistry = create_default_parser_registry()

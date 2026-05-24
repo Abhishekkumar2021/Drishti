@@ -143,6 +143,7 @@ class UniversalChunk(BaseModel):
     node_type: str | None            # "method_declaration", "class_declaration"
     name: str | None                 # Name of the symbol (e.g. "AuthService")
     parent_class: str | None         # Enclosing class context
+    package_name: str | None         # Java package path when applicable
     decorators: list[str] = []       # Decorator names (e.g. dataclass, property)
     dependencies: list[str] = []     # External symbol imports
     last_modified: datetime          # Git commit datetime or file datetime
