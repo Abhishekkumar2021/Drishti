@@ -5,9 +5,9 @@ from __future__ import annotations
 import json
 import logging
 import re
-from typing import TYPE_CHECKING, Any, Protocol
+from typing import TYPE_CHECKING, Protocol
 
-from drishti.exceptions import SearchError
+from drishti.generation.llm import ChatLLM
 
 if TYPE_CHECKING:
     from drishti.config import Settings
@@ -42,29 +42,13 @@ class PassthroughQueryExpander:
         return [stripped] if stripped else []
 
 
-class AnthropicQueryExpander:
-    """Expand queries using a fast Anthropic completion."""
+class LLMQueryExpander:
+    """Expand queries using any configured ``ChatLLM`` provider."""
 
-    def __init__(
-        self,
-        settings: Settings,
-        *,
-        client: Any | None = None,
-        max_terms: int = 12,
-    ) -> None:
-        """Initialize the Anthropic client from settings."""
-        self._model = settings.anthropic_model
+    def __init__(self, llm: ChatLLM, *, max_terms: int = 12) -> None:
+        """Wire a chat LLM client for synonym generation."""
+        self._llm = llm
         self._max_terms = max(1, max_terms)
-        api_key = settings.anthropic_api_key.strip()
-        if client is None and not api_key:
-            msg = "ANTHROPIC_API_KEY is required for query expansion"
-            raise SearchError(msg)
-        if client is not None:
-            self._client: Any = client
-        else:
-            import anthropic
-
-            self._client = anthropic.Anthropic(api_key=api_key)
 
     def expand(self, query: str) -> list[str]:
         """Return deduplicated query terms including LLM-generated synonyms."""
@@ -72,20 +56,32 @@ class AnthropicQueryExpander:
         if not stripped:
             return []
 
-        message = self._client.messages.create(
-            model=self._model,
+        raw_text = self._llm.complete(
+            _EXPANSION_PROMPT.format(query=stripped),
             max_tokens=256,
-            messages=[
-                {
-                    "role": "user",
-                    "content": _EXPANSION_PROMPT.format(query=stripped),
-                }
-            ],
         )
-        text_blocks = [block.text for block in message.content if hasattr(block, "text")]
-        raw_text = "\n".join(text_blocks).strip()
         extra_terms = _parse_json_term_list(raw_text)
         return _dedupe_terms([stripped, *extra_terms], max_terms=self._max_terms)
+
+
+class AnthropicQueryExpander(LLMQueryExpander):
+    """Backward-compatible expander that builds an Anthropic client from settings."""
+
+    def __init__(
+        self,
+        settings: Settings,
+        *,
+        client: object | None = None,
+        max_terms: int = 12,
+    ) -> None:
+        from drishti.generation.llm import AnthropicChatLLM
+
+        llm = AnthropicChatLLM(
+            api_key=settings.api_key_for_llm_provider(),
+            model=settings.resolved_llm_model(),
+            client=client,
+        )
+        super().__init__(llm, max_terms=max_terms)
 
 
 class StaticQueryExpander:

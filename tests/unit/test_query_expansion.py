@@ -8,9 +8,10 @@ from unittest.mock import MagicMock
 import pytest
 
 from drishti.config import Settings
-from drishti.exceptions import SearchError
+from drishti.exceptions import GenerationError
 from drishti.search.expansion import (
     AnthropicQueryExpander,
+    LLMQueryExpander,
     PassthroughQueryExpander,
     StaticQueryExpander,
     combine_expanded_query,
@@ -39,7 +40,7 @@ class TestAnthropicQueryExpander:
         mock_client.messages.create.return_value = SimpleNamespace(
             content=[SimpleNamespace(text='["JWT", "bearer", "authenticate"]')]
         )
-        settings = Settings(anthropic_api_key="test-key")
+        settings = Settings(anthropic_api_key="test-key", llm_provider="anthropic")
         expander = AnthropicQueryExpander(settings, client=mock_client)
 
         terms = expander.expand("auth")
@@ -49,8 +50,16 @@ class TestAnthropicQueryExpander:
 
     def test_requires_api_key_when_client_not_injected(self) -> None:
         settings = Settings(anthropic_api_key="")
-        with pytest.raises(SearchError, match="ANTHROPIC_API_KEY"):
+        with pytest.raises(GenerationError, match="API key"):
             AnthropicQueryExpander(settings)
+
+
+class TestLLMQueryExpanderIntegration:
+    def test_delegates_to_chat_llm(self) -> None:
+        mock_llm = MagicMock()
+        mock_llm.complete.return_value = '["sign_in"]'
+        terms = LLMQueryExpander(mock_llm).expand("auth")
+        assert "sign_in" in terms
 
 
 class TestCombineExpandedQuery:

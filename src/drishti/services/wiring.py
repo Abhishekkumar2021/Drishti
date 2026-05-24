@@ -7,7 +7,8 @@ from pathlib import Path
 from qdrant_client import QdrantClient
 
 from drishti.config import Settings
-from drishti.embedding.dense import DenseEmbedder, HashingDenseEmbedder, OpenAIDenseEmbeddingClient
+from drishti.embedding.dense import DenseEmbedder
+from drishti.embedding.factory import create_dense_embedder
 from drishti.embedding.pipeline import ChunkEmbeddingPipeline
 from drishti.embedding.sparse import BM25SparseEncoder
 from drishti.generation.pipeline import RAGPipeline
@@ -17,13 +18,6 @@ from drishti.ingestion.incremental import IncrementalIndexer
 from drishti.search.factory import build_hybrid_search_pipeline
 from drishti.search.pipeline import HybridSearchPipeline
 from drishti.storage.qdrant_store import QdrantChunkStore
-
-
-def create_dense_embedder(settings: Settings) -> DenseEmbedder:
-    """Return the configured dense embedder or a deterministic fallback."""
-    if settings.openai_api_key.strip():
-        return OpenAIDenseEmbeddingClient(settings)
-    return HashingDenseEmbedder(dimensions=settings.openai_embedding_dimensions)
 
 
 def create_qdrant_client(settings: Settings) -> QdrantClient:

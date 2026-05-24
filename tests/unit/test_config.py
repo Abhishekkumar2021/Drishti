@@ -30,6 +30,18 @@ class TestSettings:
         settings = Settings()
         assert settings.qdrant_collection_name == "drishti_chunks"
 
+    def test_default_embedding_provider_is_openai(self) -> None:
+        settings = Settings()
+        assert settings.embedding_provider == "openai"
+
+    def test_default_llm_provider_is_anthropic(self) -> None:
+        settings = Settings()
+        assert settings.llm_provider == "anthropic"
+
+    def test_legacy_openai_embedding_model_fallback(self) -> None:
+        settings = Settings(openai_embedding_model="text-embedding-3-large")
+        assert settings.resolved_embedding_model() == "text-embedding-3-large"
+
     def test_get_settings_is_cached(self) -> None:
         get_settings.cache_clear()
         first = get_settings()

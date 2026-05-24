@@ -4,34 +4,54 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from drishti.exceptions import ConfigurationError, GenerationError
-from drishti.generation.llm import AnthropicChatLLM, ChatLLM, MockChatLLM, OpenAIChatLLM
+from drishti.exceptions import ConfigurationError
+from drishti.generation.llm import (
+    AnthropicChatLLM,
+    ChatLLM,
+    MockChatLLM,
+    OllamaChatLLM,
+    OpenAIChatLLM,
+)
 
 if TYPE_CHECKING:
     from drishti.config import Settings
 
 
 def create_chat_llm(settings: Settings, *, provider: str | None = None) -> ChatLLM:
-    """Instantiate a chat LLM from application settings."""
-    resolved = (provider or getattr(settings, "llm_provider", None) or "anthropic").strip().lower()
+    """Instantiate a chat LLM from ``LLM_PROVIDER`` and related settings."""
+    try:
+        settings.validate_llm_provider()
+    except ValueError as exc:
+        raise ConfigurationError(str(exc)) from exc
+
+    resolved = (provider or settings.llm_provider).strip().lower()
+    model = settings.resolved_llm_model()
 
     if resolved == "mock":
-        return MockChatLLM()
+        return MockChatLLM(model=model)
 
     if resolved == "anthropic":
-        api_key = settings.anthropic_api_key.strip()
-        if not api_key:
-            msg = "ANTHROPIC_API_KEY is required for LLM generation"
-            raise GenerationError(msg)
-        return AnthropicChatLLM(api_key=api_key, model=settings.anthropic_model)
+        return AnthropicChatLLM(
+            api_key=settings.api_key_for_llm_provider(),
+            model=model,
+        )
 
-    if resolved == "openai":
-        api_key = settings.openai_api_key.strip()
-        if not api_key:
-            msg = "OPENAI_API_KEY is required for LLM generation"
-            raise GenerationError(msg)
-        model = getattr(settings, "llm_model", "") or "gpt-4o-mini"
-        return OpenAIChatLLM(api_key=api_key, model=model.strip() or "gpt-4o-mini")
+    if resolved in {"openai", "openai_compatible"}:
+        api_base = settings.resolved_llm_api_base()
+        if resolved == "openai_compatible" and not api_base:
+            msg = "LLM_API_BASE is required when LLM_PROVIDER=openai_compatible"
+            raise ConfigurationError(msg)
+        return OpenAIChatLLM(
+            api_key=settings.api_key_for_llm_provider(),
+            model=model,
+            api_base=api_base,
+        )
 
-    msg = f"Unsupported LLM provider for generation: {resolved!r}"
+    if resolved == "ollama":
+        return OllamaChatLLM(
+            model=model,
+            api_base=settings.resolved_llm_api_base(),
+        )
+
+    msg = f"Unsupported LLM provider: {resolved}"
     raise ConfigurationError(msg)

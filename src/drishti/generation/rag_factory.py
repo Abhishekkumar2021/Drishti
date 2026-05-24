@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from drishti.embedding.dense import HashingDenseEmbedder
+from drishti.embedding.factory import create_dense_embedder
 from drishti.generation.context import ContextBuilder
 from drishti.generation.factory import create_chat_llm
 from drishti.generation.pipeline import RAGPipeline
@@ -24,7 +24,7 @@ def build_rag_pipeline(
     dense_embedder: DenseEmbedder | None = None,
 ) -> RAGPipeline:
     """Construct a RAG pipeline with hybrid search and configured LLM."""
-    embedder = dense_embedder or _default_embedder(settings)
+    embedder = dense_embedder or create_dense_embedder(settings)
     search = build_hybrid_search_pipeline(settings, client=client, dense_embedder=embedder)
     return RAGPipeline(
         search=search,
@@ -35,11 +35,3 @@ def build_rag_pipeline(
         ),
         settings=settings,
     )
-
-
-def _default_embedder(settings: Settings) -> DenseEmbedder:
-    if settings.openai_api_key.strip():
-        from drishti.embedding.dense import OpenAIDenseEmbeddingClient
-
-        return OpenAIDenseEmbeddingClient(settings)
-    return HashingDenseEmbedder(dimensions=settings.openai_embedding_dimensions)

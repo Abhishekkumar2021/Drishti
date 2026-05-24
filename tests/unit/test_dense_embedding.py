@@ -34,7 +34,7 @@ class TestOpenAIDenseEmbeddingClient:
 
     def test_requires_api_key_when_client_not_injected(self) -> None:
         settings = Settings(openai_api_key="")
-        with pytest.raises(EmbeddingError, match="OPENAI_API_KEY"):
+        with pytest.raises(EmbeddingError, match=r"API key"):
             OpenAIDenseEmbeddingClient(settings)
 
     def test_batches_large_inputs(self) -> None:

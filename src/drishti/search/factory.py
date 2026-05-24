@@ -4,12 +4,9 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from drishti.generation.factory import create_chat_llm
 from drishti.search.dense import DenseVectorRetriever
-from drishti.search.expansion import (
-    AnthropicQueryExpander,
-    PassthroughQueryExpander,
-    QueryExpander,
-)
+from drishti.search.expansion import LLMQueryExpander, PassthroughQueryExpander, QueryExpander
 from drishti.search.pipeline import HybridSearchPipeline
 from drishti.search.rerank import ChunkReranker, CohereReranker, LexicalReranker
 from drishti.search.rrf import ReciprocalRankFusion
@@ -59,12 +56,24 @@ def build_hybrid_search_pipeline(
 
 
 def _default_expander(settings: Settings) -> QueryExpander:
-    if settings.anthropic_api_key.strip():
-        return AnthropicQueryExpander(settings)
+    if settings.llm_provider == "mock":
+        return PassthroughQueryExpander()
+    if settings.llm_provider == "ollama":
+        return LLMQueryExpander(create_chat_llm(settings))
+    if settings.api_key_for_llm_provider():
+        return LLMQueryExpander(create_chat_llm(settings))
     return PassthroughQueryExpander()
 
 
 def _default_reranker(settings: Settings) -> ChunkReranker:
-    if settings.cohere_api_key.strip():
-        return CohereReranker(settings, min_score=settings.rerank_min_score)
+    settings.validate_rerank_provider()
+    provider = settings.rerank_provider
+    if provider == "lexical":
+        return LexicalReranker()
+    if provider == "cohere" or (provider == "auto" and settings.api_key_for_rerank_provider()):
+        return CohereReranker(
+            settings,
+            min_score=settings.rerank_min_score,
+            model=settings.resolved_rerank_model(),
+        )
     return LexicalReranker()

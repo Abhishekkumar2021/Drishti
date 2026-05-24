@@ -45,6 +45,9 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     @asynccontextmanager
     async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
         logger.info("Drishti v%s starting", __version__)
+        app_settings.validate_runtime_configuration()
+        for key, value in app_settings.runtime_provider_summary().items():
+            logger.info("Config %s=%s", key, value)
         logger.info("Qdrant: %s", app_settings.qdrant_url)
         logger.info("Collection: %s", app_settings.qdrant_collection_name)
         if app_settings.api_auth_enabled:
@@ -109,6 +112,8 @@ def register_exception_handlers(app: FastAPI) -> None:
             status_code = 401
         elif exc.code == "AUTHORIZATION_ERROR":
             status_code = 403
+        elif exc.code == "CONFIGURATION_ERROR":
+            status_code = 500
         elif exc.code in ("GENERATION_ERROR", "SEARCH_ERROR", "EMBEDDING_ERROR"):
             status_code = 502
         elif exc.code in ("PATH_VALIDATION_ERROR", "GIT_REPOSITORY_ERROR", "INGESTION_ERROR"):
