@@ -21,11 +21,11 @@ This file is the living source of truth for the current build status of Drishti.
 |-----------|--------------|-----------|------------|--------|
 | **Phase 1: Foundation** | 55 | 55 | 100.0% | 🟩 Completed |
 | **Phase 2: Ingestion** | 131 | 89 | 67.9% | 🟨 In Progress |
-| **Phase 3: Core Search & RAG** | 131 | 0 | 0.0% | 🔮 Planned |
+| **Phase 3: Core Search & RAG** | 131 | 55 | 42.0% | 🟨 In Progress |
 | **Phase 4: Advanced Features** | 89 | 0 | 0.0% | 🔮 Planned |
 | **Phase 5: Evaluation** | 34 | 0 | 0.0% | 🔮 Planned |
 | **Phase 6: Release** | 21 | 0 | 0.0% | 🔮 Planned |
-| **Total Project** | **461** | **144** | **31.2%** | **🟨 In Progress** |
+| **Total Project** | **461** | **199** | **43.2%** | **🟨 In Progress** |
 
 ---
 
@@ -34,7 +34,7 @@ This file is the living source of truth for the current build status of Drishti.
 ```
 Phase 1: Foundation     [████████████████████] 100.0% (Completed)
 Phase 2: Ingestion      [█████████████░░░░░░░] 67.9% (In Progress)
-Phase 3: Search & RAG   [░░░░░░░░░░░░░░░░░░░] 0.0%  (Planned)
+Phase 3: Search & RAG   [████████░░░░░░░░░░░░] 42.0% (In Progress)
 Phase 4: UI & Graph     [░░░░░░░░░░░░░░░░░░░] 0.0%  (Planned)
 Phase 5: Evaluation     [░░░░░░░░░░░░░░░░░░░] 0.0%  (Planned)
 Phase 6: Release        [░░░░░░░░░░░░░░░░░░░] 0.0%  (Planned)
@@ -106,13 +106,13 @@ Phase 6: Release        [░░░░░░░░░░░░░░░░░░�
 ### Phase 3: Core Search & RAG (Epics 06–08)
 
 #### EPIC-06: Hybrid Search Engine (Priority: P0)
-* **Points**: 55 | **Status**: 🔮 Planned (0%)
+* **Points**: 55 | **Status**: 🟩 Completed (100%)
 * **Stories**:
-  * [ ] **US-06.01**: Dense vector retriever
-  * [ ] **US-06.02**: Sparse BM25 retriever
-  * [ ] **US-06.03**: Reciprocal Rank Fusion (RRF) combiner
-  * [ ] **US-06.04**: Cohere re-ranking integration
-  * [ ] **US-06.05**: LLM query expansion implementation
+  * [x] **US-06.01**: Dense vector retriever
+  * [x] **US-06.02**: Sparse BM25 retriever
+  * [x] **US-06.03**: Reciprocal Rank Fusion (RRF) combiner
+  * [x] **US-06.04**: Cohere re-ranking integration
+  * [x] **US-06.05**: LLM query expansion implementation
 
 #### EPIC-07: RAG Pipeline & Generation (Priority: P0)
 * **Points**: 42 | **Status**: 🔮 Planned (0%)
@@ -207,3 +207,9 @@ Once a User Story is implemented, the corresponding code files must be registere
 | US-05.02 | [sparse.py](file:///Users/abhishek/Dev/Drishti/src/drishti/embedding/sparse.py) | 🟩 Completed | [test_sparse_embedding.py](file:///Users/abhishek/Dev/Drishti/tests/unit/test_sparse_embedding.py) |
 | US-05.03 | [schema.py](file:///Users/abhishek/Dev/Drishti/src/drishti/storage/schema.py), [qdrant_store.py](file:///Users/abhishek/Dev/Drishti/src/drishti/storage/qdrant_store.py), [pipeline.py](file:///Users/abhishek/Dev/Drishti/src/drishti/embedding/pipeline.py) | 🟩 Completed | [test_qdrant_chunk_store.py](file:///Users/abhishek/Dev/Drishti/tests/integration/test_qdrant_chunk_store.py), [test_embedding_pipeline.py](file:///Users/abhishek/Dev/Drishti/tests/unit/test_embedding_pipeline.py) |
 | US-05.04 | [filters.py](file:///Users/abhishek/Dev/Drishti/src/drishti/storage/filters.py) | 🟩 Completed | [test_storage_filters.py](file:///Users/abhishek/Dev/Drishti/tests/unit/test_storage_filters.py) |
+| US-06.01 | [dense.py](file:///Users/abhishek/Dev/Drishti/src/drishti/search/dense.py) | 🟩 Completed | [test_dense_retriever.py](file:///Users/abhishek/Dev/Drishti/tests/unit/test_dense_retriever.py) |
+| US-06.02 | [sparse.py](file:///Users/abhishek/Dev/Drishti/src/drishti/search/sparse.py) | 🟩 Completed | [test_sparse_retriever.py](file:///Users/abhishek/Dev/Drishti/tests/unit/test_sparse_retriever.py) |
+| US-06.03 | [rrf.py](file:///Users/abhishek/Dev/Drishti/src/drishti/search/rrf.py) | 🟩 Completed | [test_rrf.py](file:///Users/abhishek/Dev/Drishti/tests/unit/test_rrf.py) |
+| US-06.04 | [rerank.py](file:///Users/abhishek/Dev/Drishti/src/drishti/search/rerank.py) | 🟩 Completed | [test_search_rerank.py](file:///Users/abhishek/Dev/Drishti/tests/unit/test_search_rerank.py) |
+| US-06.05 | [expansion.py](file:///Users/abhishek/Dev/Drishti/src/drishti/search/expansion.py) | 🟩 Completed | [test_query_expansion.py](file:///Users/abhishek/Dev/Drishti/tests/unit/test_query_expansion.py) |
+| US-06.* | [pipeline.py](file:///Users/abhishek/Dev/Drishti/src/drishti/search/pipeline.py), [factory.py](file:///Users/abhishek/Dev/Drishti/src/drishti/search/factory.py) | 🟩 Completed | [test_hybrid_search_pipeline.py](file:///Users/abhishek/Dev/Drishti/tests/unit/test_hybrid_search_pipeline.py), [test_hybrid_search.py](file:///Users/abhishek/Dev/Drishti/tests/integration/test_hybrid_search.py) |
