@@ -67,3 +67,4 @@ benchmarks/results/*.json
 
 # Scratch files
 scratch/
+coverage.xml
