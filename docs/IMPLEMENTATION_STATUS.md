@@ -1,0 +1,193 @@
+# Implementation Status: Drishti (दृष्टि)
+
+This file is the living source of truth for the current build status of Drishti. It tracks progress at the Epic and User Story levels.
+
+*Last Updated: 2026-05-24*
+
+---
+
+## Table of Contents
+
+1. [Overall Summary](#1-overall-summary)
+2. [Phase Progression](#2-phase-progression)
+3. [Detailed Epic Status](#3-detailed-epic-status)
+4. [File Mapping & Code Integrations](#4-file-mapping--code-integrations)
+
+---
+
+## 1. Overall Summary
+
+| Component | Total Points | Completed | Progress % | Status |
+|-----------|--------------|-----------|------------|--------|
+| **Phase 1: Foundation** | 55 | 38 | 69.1% | 🟨 In Progress |
+| **Phase 2: Ingestion** | 131 | 0 | 0.0% | 🔮 Planned |
+| **Phase 3: Core Search & RAG** | 131 | 0 | 0.0% | 🔮 Planned |
+| **Phase 4: Advanced Features** | 89 | 0 | 0.0% | 🔮 Planned |
+| **Phase 5: Evaluation** | 34 | 0 | 0.0% | 🔮 Planned |
+| **Phase 6: Release** | 21 | 0 | 0.0% | 🔮 Planned |
+| **Total Project** | **461** | **38** | **8.2%** | **🟨 In Progress** |
+
+---
+
+## 2. Phase Progression
+
+```
+Phase 1: Foundation     [██████████████░░░░░] 69.1% (In Progress)
+Phase 2: Ingestion      [░░░░░░░░░░░░░░░░░░░] 0.0%  (Planned)
+Phase 3: Search & RAG   [░░░░░░░░░░░░░░░░░░░] 0.0%  (Planned)
+Phase 4: UI & Graph     [░░░░░░░░░░░░░░░░░░░] 0.0%  (Planned)
+Phase 5: Evaluation     [░░░░░░░░░░░░░░░░░░░] 0.0%  (Planned)
+Phase 6: Release        [░░░░░░░░░░░░░░░░░░░] 0.0%  (Planned)
+```
+
+---
+
+## 3. Detailed Epic Status
+
+### Phase 1: Foundation (Epics 01–02)
+
+#### EPIC-01: Project Setup & Documentation (Priority: P0)
+* **Points**: 21 | **Status**: 🟩 Completed (100%)
+* **Stories**:
+  * [x] **US-01.01**: Python structure + UV package manager (`pyproject.toml`)
+  * [x] **US-01.02**: Docker setup (Qdrant, Redis)
+  * [x] **US-01.03**: GitHub Actions CI workflow setup
+  * [x] **US-01.04**: Initial root documents (README.md, Makefile)
+  * [x] **US-01.05**: Community documents (CONTRIBUTING.md, AGENTS.md, CODE_OF_CONDUCT.md, SECURITY.md)
+
+#### EPIC-02: Documentation & Process (Priority: P0)
+* **Points**: 34 | **Status**: 🟨 In Progress (50%)
+* **Stories**:
+  * [x] **US-02.01**: PRODUCT-VISION.md
+  * [x] **US-02.02**: EPICS-OVERVIEW.md
+  * [ ] **US-02.03**: 12 Epic detailed documents (in `docs/product/epics/`)
+  * [ ] **US-02.04**: 10 Tech ADRs (in `docs/adr/`)
+  * [x] **US-02.05**: High-Level Architecture (HLA) document
+  * [x] **US-02.06**: Initalize IMPLEMENTATION_STATUS.md
+  * [x] **US-02.07**: RELEASE-PLAN.md
+
+---
+
+### Phase 2: Ingestion & Storage (Epics 03–05)
+
+#### EPIC-03: Code Ingestion Pipeline (Priority: P0)
+* **Points**: 55 | **Status**: 🔮 Planned (0%)
+* **Stories**:
+  * [ ] **US-03.01**: File walk and programming language detection
+  * [ ] **US-03.02**: Python Tree-sitter integration
+  * [ ] **US-03.03**: Java Tree-sitter integration
+  * [ ] **US-03.04**: JavaScript/TypeScript Tree-sitter integration
+  * [ ] **US-03.05**: Go Tree-sitter integration
+  * [ ] **US-03.06**: AST node extraction rule engine
+  * [ ] **US-03.07**: Metadata enrichment (parameters, complexity, docstrings)
+  * [ ] **US-03.08**: Parent/child relationship linking (method → class)
+  * [ ] **US-03.09**: Dependency/import extraction
+  * [ ] **US-03.10**: Repository git walker (incremental indexing via diffs)
+
+#### EPIC-04: Document Ingestion Pipeline (Priority: P1)
+* **Points**: 42 | **Status**: 🔮 Planned (0%)
+* **Stories**:
+  * [ ] **US-04.01**: PDF layout-aware parser (PyMuPDF)
+  * [ ] **US-04.02**: PDF table structure extraction
+  * [ ] **US-04.03**: Markdown header hierarchy parser
+  * [ ] **US-04.04**: Multi-modal image analysis (Claude Vision API)
+  * [ ] **US-04.05**: OpenAPI spec endpoint parser
+
+#### EPIC-05: Embedding & Vector Storage (Priority: P0)
+* **Points**: 34 | **Status**: 🔮 Planned (0%)
+* **Stories**:
+  * [ ] **US-05.01**: OpenAI dense embedding integration (`text-embedding-3-small`)
+  * [ ] **US-05.02**: Sparse embedding (BM25 tokenizer)
+  * [ ] **US-05.03**: Qdrant database client initialization and index schemas
+  * [ ] **US-05.04**: Payload-based metadata filter compilation
+
+---
+
+### Phase 3: Core Search & RAG (Epics 06–08)
+
+#### EPIC-06: Hybrid Search Engine (Priority: P0)
+* **Points**: 55 | **Status**: 🔮 Planned (0%)
+* **Stories**:
+  * [ ] **US-06.01**: Dense vector retriever
+  * [ ] **US-06.02**: Sparse BM25 retriever
+  * [ ] **US-06.03**: Reciprocal Rank Fusion (RRF) combiner
+  * [ ] **US-06.04**: Cohere re-ranking integration
+  * [ ] **US-06.05**: LLM query expansion implementation
+
+#### EPIC-07: RAG Pipeline & Generation (Priority: P0)
+* **Points**: 42 | **Status**: 🔮 Planned (0%)
+* **Stories**:
+  * [ ] **US-07.01**: Prompt template compiler & context builder
+  * [ ] **US-07.02**: LLM client integration (Claude API)
+  * [ ] **US-07.03**: Streaming response mechanism
+  * [ ] **US-07.04**: Citation parser & line reference generator
+
+#### EPIC-08: API & Backend Service (Priority: P0)
+* **Points**: 34 | **Status**: 🔮 Planned (0%)
+* **Stories**:
+  * [ ] **US-08.01**: FastAPI routing (`/ingest`, `/search`, `/ask`)
+  * [ ] **US-08.02**: Request validation via Pydantic
+  * [ ] **US-08.03**: Redis cache configuration for queries
+  * [ ] **US-08.04**: Rate limiting middleware
+
+---
+
+### Phase 4: UI & Graph DB (Epics 09–10)
+
+#### EPIC-09: Dependency Graph & Impact Analysis (Priority: P2)
+* **Points**: 34 | **Status**: 🔮 Planned (0%)
+* **Stories**:
+  * [ ] **US-09.01**: Neo4j database setup & schema definition
+  * [ ] **US-09.02**: Graph builder (node creation for methods, files, packages)
+  * [ ] **US-09.03**: Dependency tracing algorithm
+  * [ ] **US-09.04**: Change impact analysis endpoint (`/api/v1/impact-analysis`)
+
+#### EPIC-10: Frontend UI (Priority: P1)
+* **Points**: 55 | **Status**: 🔮 Planned (0%)
+* **Stories**:
+  * [ ] **US-10.01**: Next.js 14 layout & landing page
+  * [ ] **US-10.02**: Chat interface with streaming responses
+  * [ ] **US-10.03**: Monaco Editor component for source code rendering
+  * [ ] **US-10.04**: Citation mapping (clicking citation opens file to specific line)
+  * [ ] **US-10.05**: Interactive dependency graph view
+
+---
+
+### Phase 5: Evaluation & Benchmarking (Epic 11)
+
+#### EPIC-11: Evaluation & Benchmarking (Priority: P1)
+* **Points**: 34 | **Status**: 🔮 Planned (0%)
+* **Stories**:
+  * [ ] **US-11.01**: Golden Q&A dataset curation
+  * [ ] **US-11.02**: RAGAS evaluation runner script
+  * [ ] **US-11.03**: Comparative dashboard (AST vs Naive chunking)
+
+---
+
+### Phase 6: Release (Epic 12)
+
+#### EPIC-12: Demo, Polish & Deployment (Priority: P1)
+* **Points**: 21 | **Status**: 🔮 Planned (0%)
+* **Stories**:
+  * [ ] **US-12.01**: Seed script for sample projects
+  * [ ] **US-12.02**: Docker production optimization
+  * [ ] **US-12.03**: Final release package deployment guidelines
+
+---
+
+## 4. File Mapping & Code Integrations
+
+Once a User Story is implemented, the corresponding code files must be registered below:
+
+| Story ID | Target File | Status | Tests |
+|----------|-------------|--------|-------|
+| US-01.01 | [pyproject.toml](file:///Users/abhishek/Dev/Drishti/pyproject.toml) | 🟩 Completed | - |
+| US-01.02 | [docker-compose.yml](file:///Users/abhishek/Dev/Drishti/docker-compose.yml), [Dockerfile](file:///Users/abhishek/Dev/Drishti/Dockerfile) | 🟩 Completed | - |
+| US-01.03 | [.github/workflows/ci.yml](file:///Users/abhishek/Dev/Drishti/.github/workflows/ci.yml) | 🟩 Completed | - |
+| US-01.04 | [README.md](file:///Users/abhishek/Dev/Drishti/README.md), [Makefile](file:///Users/abhishek/Dev/Drishti/Makefile) | 🟩 Completed | - |
+| US-01.05 | [AGENTS.md](file:///Users/abhishek/Dev/Drishti/AGENTS.md), [CONTRIBUTING.md](file:///Users/abhishek/Dev/Drishti/CONTRIBUTING.md), [CODE_OF_CONDUCT.md](file:///Users/abhishek/Dev/Drishti/CODE_OF_CONDUCT.md), [SECURITY.md](file:///Users/abhishek/Dev/Drishti/SECURITY.md) | 🟩 Completed | - |
+| US-02.01 | [PRODUCT-VISION.md](file:///Users/abhishek/Dev/Drishti/docs/product/PRODUCT-VISION.md) | 🟩 Completed | - |
+| US-02.02 | [EPICS-OVERVIEW.md](file:///Users/abhishek/Dev/Drishti/docs/product/EPICS-OVERVIEW.md) | 🟩 Completed | - |
+| US-02.05 | [high-level-architecture.md](file:///Users/abhishek/Dev/Drishti/docs/architecture/high-level-architecture.md) | 🟩 Completed | - |
+| US-02.06 | [IMPLEMENTATION_STATUS.md](file:///Users/abhishek/Dev/Drishti/docs/IMPLEMENTATION_STATUS.md) | 🟩 Completed | - |
+| US-02.07 | [RELEASE-PLAN.md](file:///Users/abhishek/Dev/Drishti/docs/product/releases/RELEASE-PLAN.md) | 🟩 Completed | - |

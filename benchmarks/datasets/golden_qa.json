@@ -1,0 +1,20 @@
+[
+  {
+    "id": "qa_001",
+    "question": "What parameters does verify_access_token accept in token.py, and what exceptions does it raise?",
+    "expected_files": ["src/auth/token.py"],
+    "ground_truth_answer": "The verify_access_token function in src/auth/token.py accepts a single string parameter 'token'. It raises a CredentialsException if the token signature is invalid, expired, or cannot be decoded."
+  },
+  {
+    "id": "qa_002",
+    "question": "Explain how language detection is implemented in the ingestion pipeline.",
+    "expected_files": ["src/drishti/utils/language_detect.py"],
+    "ground_truth_answer": "Language detection is resolved in the ingestion pipeline by mapping file extensions to canonical names (e.g. '.py' to Python, '.java' to Java). It optionally checks file content headers to disambiguate between similar extensions."
+  },
+  {
+    "id": "qa_003",
+    "question": "Where is the FastAPI application router and app object initialized?",
+    "expected_files": ["src/drishti/main.py"],
+    "ground_truth_answer": "The FastAPI application router and main app object are initialized in src/drishti/main.py, which configures lifespan events, middlewares (CORS), and routers."
+  }
+]
