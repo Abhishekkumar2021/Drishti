@@ -94,8 +94,11 @@ It also ingests PDFs, Markdown docs, diagrams, and API specs, enabling **cross-m
 
 | Feature | Description | Status |
 |---------|-------------|--------|
-| **AST-Aware Chunking** | Tree-sitter parses code into functions, classes, interfaces | 🔮 Planned |
-| **Multi-Language** | Python, Java, JavaScript/TypeScript, Go | 🔮 Planned |
+| **AST-Aware Chunking** | Tree-sitter parses code into functions, classes, interfaces | 🟩 Implemented |
+| **Multi-Language** | Python, Java, JavaScript/TypeScript, Go | 🟩 Implemented |
+| **Parser rule engine** | JSON-driven queries + `min_chunk_lines` | 🟩 Implemented |
+| **Chunk metadata** | Docstrings, params, complexity, context paths | 🟨 In PR / US-03.07 |
+| **Incremental git indexing** | Diff-based re-index | 🔮 Planned |
 | **PDF Ingestion** | Layout-aware parsing: text blocks, tables, images | 🔮 Planned |
 | **Hybrid Search** | BM25 keyword + vector semantic search with RRF fusion | 🔮 Planned |
 | **Re-ranking** | Cohere rerank-v3.5 for precision | 🔮 Planned |
@@ -238,10 +241,17 @@ Drishti/
 
 | Document | Description |
 |----------|-------------|
+| [Documentation Hub](docs/README.md) | Master index — start here |
+| [Architecture Hub](docs/architecture/README.md) | C4, sequences, deployment, as-built ingestion |
+| [C4 Model](docs/architecture/c4-model.md) | Context / container / component diagrams |
 | [High-Level Architecture](docs/architecture/high-level-architecture.md) | Target system design |
+| [As-Built Ingestion](docs/architecture/as-built-code-ingestion.md) | Implemented Tree-sitter pipeline |
+| [Universal Chunk Schema](docs/design/universal-chunk-schema.md) | Chunk fields + ER diagram |
 | [ADR Index](docs/adr/README.md) | 10 Architecture Decision Records |
 | [API Contracts](docs/design/api-contracts.md) | REST API + WebSocket specs |
 | [LLD Index](docs/lld/README.md) | Design patterns, data models, search pipeline |
+| [Onboarding](docs/onboarding/README.md) | 30-minute contributor path |
+| [Operations Runbook](docs/operations/README.md) | CI, health checks, troubleshooting |
 
 ### Deep-Dives (Interview-Ready)
 
@@ -268,7 +278,8 @@ Drishti/
 ```
 Documentation (architecture, ADRs, product, LLD)  ████████████████████ 100%
 Engineering foundation (pyproject, CI, Docker)     ████████████████████ 100%
-Core pipeline (ingestion → embedding → search)     ██░░░░░░░░░░░░░░░░░░  ~9%
+Code ingestion (Tree-sitter, EPIC-03)               █████████████░░░░░░░  ~67%
+Core pipeline (embedding → search → RAG)           ░░░░░░░░░░░░░░░░░░░░   0%
 RAG generation (context → LLM → citations)         ░░░░░░░░░░░░░░░░░░░░   0%
 Frontend UI (Next.js + Monaco)                     ░░░░░░░░░░░░░░░░░░░░   0%
 Evaluation & benchmarks                            ░░░░░░░░░░░░░░░░░░░░   0%
@@ -313,6 +324,6 @@ Run `make pre-commit` before every commit.
 
 Built as a serious engineering study — every design decision is intentional, documented, and interview-ready.
 
-**[Implementation Status](docs/IMPLEMENTATION_STATUS.md) · [Architecture](docs/architecture/high-level-architecture.md) · [ADRs](docs/adr/README.md) · [Product](docs/product/README.md) · [LLD](docs/lld/README.md) · [Deep-Dives](docs/deep-dives/README.md)**
+**[Docs Hub](docs/README.md) · [Implementation Status](docs/IMPLEMENTATION_STATUS.md) · [Architecture](docs/architecture/README.md) · [C4](docs/architecture/c4-model.md) · [ADRs](docs/adr/README.md) · [LLD](docs/lld/README.md)**
 
 </div>

@@ -62,32 +62,47 @@ class BaseParser(ABC):
 ### Intent
 Decouple the selection of parsers from the execution logic. Instead of writing long `if-elif-else` checks in the ingestion loop, parsers register themselves against file extension matchers, and a central registry retrieves the correct strategy automatically.
 
-### Implementation Blueprint
+### As-Built Implementation
+
+Production parsers are declared in `PARSER_CATALOG` and wired by `create_default_parser_registry()`:
+
 ```python
-from typing import Dict, Type
-from drishti.ingestion.base import BaseParser
+# ingestion/ast/catalog.py (excerpt)
+PARSER_CATALOG: tuple[tuple[tuple[str, ...], ParserFactory], ...] = (
+    ((".py", ".pyi", ".pyw"), _python_factory),
+    ((".java",), _java_factory),
+    ((".js", ".jsx", ".mjs", ".cjs"), _javascript_factory),
+    ((".ts",), _typescript_factory),
+    ((".tsx",), _tsx_factory),
+    ((".go",), _go_factory),
+)
+
+def create_default_parser_registry() -> ParserRegistry:
+    registry = ParserRegistry()
+    rules = load_parser_rules()
+    for extensions, factory in PARSER_CATALOG:
+        parser = factory(rules)
+        for extension in extensions:
+            registry.register(extension, parser)
+    return registry
+```
+
+```mermaid
+flowchart TD
+    CAT[PARSER_CATALOG] --> REG[ParserRegistry]
+    RULES[parser_rules.json] --> FACT[from_rules]
+    FACT --> CAT
+    REG --> WALK[FileWalker]
+```
+
+### Implementation Blueprint (interface)
+```python
+from drishti.ingestion.base import BaseParser, ParserRegistry
 
 class ParserRegistry:
-    """
-    Central registry broker for file parsers.
-    """
-    
-    def __init__(self):
-        self._parsers: Dict[str, BaseParser] = {}
-        
-    def register(self, extension: str, parser: BaseParser) -> None:
-        """Registers a parser instance for a specific file extension."""
-        self._parsers[extension.lower()] = parser
-        
-    def get_parser(self, file_path: str) -> BaseParser:
-        """
-        Retrieves the appropriate parser for the file extension.
-        Raises ValueError if no matching parser is found.
-        """
-        ext = "." + file_path.split(".")[-1].lower()
-        if ext not in self._parsers:
-            raise ValueError(f"No parser registered for file type: {ext}")
-        return self._parsers[ext]
+    def register(self, extension: str, parser: BaseParser) -> None: ...
+    def get_parser(self, file_path: str) -> BaseParser: ...
+    def registered_extensions(self) -> frozenset[str]: ...
 ```
 
 ---
