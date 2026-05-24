@@ -16,11 +16,15 @@ from starlette.responses import Response
 
 from drishti import __version__
 from drishti.api.responses import ErrorDetail, ErrorResponse, HealthResponse, LivenessResponse
+from drishti.api.routes import router as api_router
 from drishti.config import Settings, get_settings
 from drishti.exceptions import DrishtiError
 from drishti.middleware.auth import BearerAuthMiddleware
+from drishti.middleware.rate_limit import RateLimitMiddleware
 from drishti.middleware.request_id import RequestIdMiddleware
 from drishti.services.health import ServiceStatus, probe_dependencies
+from drishti.services.query_cache import QueryCache
+from drishti.services.wiring import create_qdrant_client
 
 logger = logging.getLogger(__name__)
 
@@ -47,7 +51,18 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             logger.info("API authentication enabled")
         else:
             logger.warning("API authentication disabled — set API_TOKEN for production")
+
+        qdrant_client = create_qdrant_client(app_settings)
+        app.state.qdrant_client = qdrant_client
+        app.state.query_cache = QueryCache(
+            app_settings.redis_url,
+            ttl_seconds=app_settings.cache_ttl_seconds,
+            enabled=app_settings.cache_enabled,
+        )
+
         yield
+
+        qdrant_client.close()
         logger.info("Drishti shutting down")
 
     docs_url = "/docs" if app_settings.enable_openapi_docs else None
@@ -67,6 +82,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     )
 
     application.add_middleware(RequestIdMiddleware)
+    application.add_middleware(RateLimitMiddleware, settings=app_settings)
     application.add_middleware(BearerAuthMiddleware, settings=app_settings)
     application.add_middleware(
         CORSMiddleware,
@@ -78,6 +94,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
 
     register_exception_handlers(application)
     register_health_routes(application, app_settings)
+    application.include_router(api_router)
     return application
 
 
@@ -92,8 +109,10 @@ def register_exception_handlers(app: FastAPI) -> None:
             status_code = 401
         elif exc.code == "AUTHORIZATION_ERROR":
             status_code = 403
-        elif exc.code == "GENERATION_ERROR":
+        elif exc.code in ("GENERATION_ERROR", "SEARCH_ERROR", "EMBEDDING_ERROR"):
             status_code = 502
+        elif exc.code in ("PATH_VALIDATION_ERROR", "GIT_REPOSITORY_ERROR", "INGESTION_ERROR"):
+            status_code = 400
         elif exc.code == "SERVICE_UNAVAILABLE":
             status_code = 503
 

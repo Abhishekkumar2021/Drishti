@@ -21,11 +21,11 @@ This file is the living source of truth for the current build status of Drishti.
 |-----------|--------------|-----------|------------|--------|
 | **Phase 1: Foundation** | 55 | 55 | 100.0% | 🟩 Completed |
 | **Phase 2: Ingestion** | 131 | 89 | 67.9% | 🟨 In Progress |
-| **Phase 3: Core Search & RAG** | 131 | 97 | 74.0% | 🟨 In Progress |
+| **Phase 3: Core Search & RAG** | 131 | 131 | 100.0% | 🟩 Completed |
 | **Phase 4: Advanced Features** | 89 | 0 | 0.0% | 🔮 Planned |
 | **Phase 5: Evaluation** | 34 | 0 | 0.0% | 🔮 Planned |
 | **Phase 6: Release** | 21 | 0 | 0.0% | 🔮 Planned |
-| **Total Project** | **461** | **241** | **52.3%** | **🟨 In Progress** |
+| **Total Project** | **461** | **275** | **59.7%** | **🟨 In Progress** |
 
 ---
 
@@ -34,7 +34,7 @@ This file is the living source of truth for the current build status of Drishti.
 ```
 Phase 1: Foundation     [████████████████████] 100.0% (Completed)
 Phase 2: Ingestion      [█████████████░░░░░░░] 67.9% (In Progress)
-Phase 3: Search & RAG   [██████████████░░░░░░] 74.0% (In Progress)
+Phase 3: Search & RAG   [████████████████████] 100.0% (Completed)
 Phase 4: UI & Graph     [░░░░░░░░░░░░░░░░░░░] 0.0%  (Planned)
 Phase 5: Evaluation     [░░░░░░░░░░░░░░░░░░░] 0.0%  (Planned)
 Phase 6: Release        [░░░░░░░░░░░░░░░░░░░] 0.0%  (Planned)
@@ -123,12 +123,12 @@ Phase 6: Release        [░░░░░░░░░░░░░░░░░░�
   * [x] **US-07.04**: Citation parser & line reference generator
 
 #### EPIC-08: API & Backend Service (Priority: P0)
-* **Points**: 34 | **Status**: 🔮 Planned (0%)
+* **Points**: 34 | **Status**: 🟩 Completed (100%)
 * **Stories**:
-  * [ ] **US-08.01**: FastAPI routing (`/ingest`, `/search`, `/ask`)
-  * [ ] **US-08.02**: Request validation via Pydantic
-  * [ ] **US-08.03**: Redis cache configuration for queries
-  * [ ] **US-08.04**: Rate limiting middleware
+  * [x] **US-08.01**: FastAPI routing (`/ingest`, `/search`, `/ask`)
+  * [x] **US-08.02**: Request validation via Pydantic
+  * [x] **US-08.03**: Redis cache configuration for queries
+  * [x] **US-08.04**: Rate limiting middleware
 
 ---
 
@@ -217,3 +217,7 @@ Once a User Story is implemented, the corresponding code files must be registere
 | US-07.02 | [generation/llm.py](file:///Users/abhishek/Dev/Drishti/src/drishti/generation/llm.py), [generation/factory.py](file:///Users/abhishek/Dev/Drishti/src/drishti/generation/factory.py) | 🟩 Completed | [test_generation_llm.py](file:///Users/abhishek/Dev/Drishti/tests/unit/test_generation_llm.py) |
 | US-07.03 | [generation/streaming.py](file:///Users/abhishek/Dev/Drishti/src/drishti/generation/streaming.py), [generation/pipeline.py](file:///Users/abhishek/Dev/Drishti/src/drishti/generation/pipeline.py) | 🟩 Completed | [test_rag_pipeline.py](file:///Users/abhishek/Dev/Drishti/tests/unit/test_rag_pipeline.py) |
 | US-07.04 | [generation/citations.py](file:///Users/abhishek/Dev/Drishti/src/drishti/generation/citations.py) | 🟩 Completed | [test_citations.py](file:///Users/abhishek/Dev/Drishti/tests/unit/test_citations.py) |
+| US-08.01 | [api/routes.py](file:///Users/abhishek/Dev/Drishti/src/drishti/api/routes.py), [main.py](file:///Users/abhishek/Dev/Drishti/src/drishti/main.py) | 🟩 Completed | [test_api_routes.py](file:///Users/abhishek/Dev/Drishti/tests/unit/test_api_routes.py), [test_main.py](file:///Users/abhishek/Dev/Drishti/tests/unit/test_main.py) |
+| US-08.02 | [api/schemas.py](file:///Users/abhishek/Dev/Drishti/src/drishti/api/schemas.py), [api/responses.py](file:///Users/abhishek/Dev/Drishti/src/drishti/api/responses.py) | 🟩 Completed | [test_schemas.py](file:///Users/abhishek/Dev/Drishti/tests/unit/test_schemas.py) |
+| US-08.03 | [services/query_cache.py](file:///Users/abhishek/Dev/Drishti/src/drishti/services/query_cache.py) | 🟩 Completed | [test_query_cache.py](file:///Users/abhishek/Dev/Drishti/tests/unit/test_query_cache.py) |
+| US-08.04 | [middleware/rate_limit.py](file:///Users/abhishek/Dev/Drishti/src/drishti/middleware/rate_limit.py) | 🟩 Completed | [test_rate_limit.py](file:///Users/abhishek/Dev/Drishti/tests/unit/test_rate_limit.py) |

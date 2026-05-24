@@ -40,8 +40,12 @@ class Settings(BaseSettings):
     cohere_api_key: str = ""
     cohere_rerank_model: str = "rerank-v3.5"
 
-    # ─── Redis (Cache) ───────────────────────────
+    # ─── Redis (Cache & Rate Limiting) ───────────
     redis_url: str = "redis://localhost:6379/0"
+    cache_enabled: bool = True
+    cache_ttl_seconds: int = 3600
+    rate_limit_enabled: bool = True
+    rate_limit_requests_per_minute: int = 60
 
     # ─── Neo4j (Phase 4, optional) ───────────────
     neo4j_uri: str = "bolt://localhost:7687"

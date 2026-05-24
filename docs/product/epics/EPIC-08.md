@@ -7,7 +7,7 @@ This epic covers exposing Drishti's ingestion, search, and Q&A pipelines via str
 ## Epic Metadata
 * **Complexity**: 34 Story Points
 * **Priority**: P0 (Critical Blocker)
-* **Status**: Planned
+* **Status**: Completed
 
 ---
 
@@ -21,10 +21,10 @@ This epic covers exposing Drishti's ingestion, search, and Q&A pipelines via str
 **Complexity**: 8 SP | **Priority**: P0
 
 **Acceptance Criteria**
-1. [ ] Exposes `/api/v1/ingest` (POST) to trigger repo/doc indexing.
-2. [ ] Exposes `/api/v1/search` (POST) for hybrid retrieval.
-3. [ ] Exposes `/api/v1/ask` (POST) for streaming Q&A.
-4. [ ] Exposes `/api/v1/health` (GET) for container orchestration health checks.
+1. [x] Exposes `/api/v1/ingest` (POST) to trigger repo/doc indexing.
+2. [x] Exposes `/api/v1/search` (POST) for hybrid retrieval.
+3. [x] Exposes `/api/v1/ask` (POST) for streaming Q&A.
+4. [x] Exposes `/api/v1/health` (GET) for container orchestration health checks.
 
 ---
 
@@ -36,8 +36,8 @@ This epic covers exposing Drishti's ingestion, search, and Q&A pipelines via str
 **Complexity**: 5 SP | **Priority**: P0
 
 **Acceptance Criteria**
-1. [ ] Defines input models for search (query, filters, limit) and Q&A (query, history, filters).
-2. [ ] Returns explicit 422 validation errors with descriptive fields when inputs are incorrect.
+1. [x] Defines input models for search (query, filters, limit) and Q&A (query, history, filters).
+2. [x] Returns explicit 422 validation errors with descriptive fields when inputs are incorrect.
 
 ---
 
@@ -49,9 +49,9 @@ This epic covers exposing Drishti's ingestion, search, and Q&A pipelines via str
 **Complexity**: 13 SP | **Priority**: P0
 
 **Acceptance Criteria**
-1. [ ] Computes hash of query, history, and source commit state to act as cache key.
-2. [ ] Stores generated markdown answers in Redis with a configurable TTL (Time to Live).
-3. [ ] Invalidates cache when the underlying repository source files change.
+1. [x] Computes hash of query, history, and source commit state to act as cache key.
+2. [x] Stores generated markdown answers in Redis with a configurable TTL (Time to Live).
+3. [x] Invalidates cache when the underlying repository source files change.
 
 ---
 
@@ -63,6 +63,6 @@ This epic covers exposing Drishti's ingestion, search, and Q&A pipelines via str
 **Complexity**: 8 SP | **Priority**: P0
 
 **Acceptance Criteria**
-1. [ ] Integrates a middleware to limit requests per minute.
-2. [ ] Returns a 429 Too Many Requests status when limits are breached.
-3. [ ] Uses Redis to persist rate limiting counters.
+1. [x] Integrates a middleware to limit requests per minute.
+2. [x] Returns a 429 Too Many Requests status when limits are breached.
+3. [x] Uses Redis to persist rate limiting counters.
