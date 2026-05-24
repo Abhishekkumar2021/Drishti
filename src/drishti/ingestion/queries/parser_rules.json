@@ -1,0 +1,28 @@
+{
+  "version": 1,
+  "defaults": {
+    "min_chunk_lines": 3
+  },
+  "languages": {
+    "python": {
+      "query": "python.scm",
+      "min_chunk_lines": 3
+    },
+    "java": {
+      "query": "java.scm",
+      "min_chunk_lines": 3
+    },
+    "javascript": {
+      "query": "javascript.scm",
+      "min_chunk_lines": 3
+    },
+    "typescript": {
+      "query": "typescript.scm",
+      "min_chunk_lines": 3
+    },
+    "go": {
+      "query": "go.scm",
+      "min_chunk_lines": 3
+    }
+  }
+}

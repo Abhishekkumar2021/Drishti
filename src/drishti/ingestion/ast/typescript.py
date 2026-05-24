@@ -6,10 +6,11 @@ import tree_sitter_typescript as tsts
 from tree_sitter import Language
 
 from drishti.ingestion.ast.ecmascript import EcmaScriptParser
+from drishti.ingestion.ast.rules import ParserRules, load_parser_rules
 
 _TYPESCRIPT_EXTENSIONS = (".ts",)
 _TSX_EXTENSIONS = (".tsx",)
-_QUERY_FILE = "typescript.scm"
+_LANGUAGE = "typescript"
 
 
 class TypeScriptParser(EcmaScriptParser):
@@ -18,14 +19,24 @@ class TypeScriptParser(EcmaScriptParser):
     @classmethod
     def from_package(cls) -> TypeScriptParser:
         """Build a parser for ``.ts`` files."""
-        language = Language(tsts.language_typescript())
-        return cls(language, cls.load_query(_QUERY_FILE), language_name="typescript")
+        return cls.from_rules(load_parser_rules())
 
     @classmethod
-    def for_tsx(cls) -> TypeScriptParser:
+    def from_rules(cls, rules: ParserRules, *, tsx: bool = False) -> TypeScriptParser:
+        """Build a parser using rule-driven query and thresholds."""
+        language = Language(tsts.language_tsx() if tsx else tsts.language_typescript())
+        return cls(
+            language,
+            cls.load_query(rules.query_file_for(_LANGUAGE)),
+            language_name=_LANGUAGE,
+            min_chunk_lines=rules.min_chunk_lines_for(_LANGUAGE),
+        )
+
+    @classmethod
+    def for_tsx(cls, rules: ParserRules | None = None) -> TypeScriptParser:
         """Build a parser for ``.tsx`` files."""
-        language = Language(tsts.language_tsx())
-        return cls(language, cls.load_query(_QUERY_FILE), language_name="typescript")
+        active_rules = rules or load_parser_rules()
+        return cls.from_rules(active_rules, tsx=True)
 
     @property
     def supported_extensions(self) -> tuple[str, ...]:

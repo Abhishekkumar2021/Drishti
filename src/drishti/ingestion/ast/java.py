@@ -8,9 +8,10 @@ import tree_sitter_java as tsjava
 from tree_sitter import Language, Node
 
 from drishti.ingestion.ast.base import TreeSitterParser
+from drishti.ingestion.ast.rules import ParserRules, load_parser_rules
 
 _JAVA_EXTENSIONS = (".java",)
-_QUERY_FILE = "java.scm"
+_LANGUAGE = "java"
 _ANNOTATION_NODE_TYPES = frozenset({"marker_annotation", "annotation"})
 
 
@@ -25,8 +26,18 @@ class JavaParser(TreeSitterParser):
     @classmethod
     def from_package(cls) -> JavaParser:
         """Build a parser using the packaged Java query file."""
+        return cls.from_rules(load_parser_rules())
+
+    @classmethod
+    def from_rules(cls, rules: ParserRules) -> JavaParser:
+        """Build a parser using rule-driven query and thresholds."""
         language = Language(tsjava.language())
-        return cls(language, cls.load_query(_QUERY_FILE), language_name="java")
+        return cls(
+            language,
+            cls.load_query(rules.query_file_for(_LANGUAGE)),
+            language_name=_LANGUAGE,
+            min_chunk_lines=rules.min_chunk_lines_for(_LANGUAGE),
+        )
 
     @property
     def supported_extensions(self) -> tuple[str, ...]:
