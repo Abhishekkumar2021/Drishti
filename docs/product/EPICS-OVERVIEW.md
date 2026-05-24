@@ -65,9 +65,9 @@ The estimation follows standard Fibonacci story points (1, 2, 3, 5, 8, 13) where
 |-----------|------------|----------|-------------|-------------------------|--------|
 | **[EPIC-01](file:///Users/abhishek/Dev/Drishti/docs/product/epics/EPIC-01.md)** | Project Setup & Documentation | P0 | 21 | Scaffold, Docker, CI/CD, Makefile | 🟩 Done |
 | **[EPIC-02](file:///Users/abhishek/Dev/Drishti/docs/product/epics/EPIC-02.md)** | Documentation & Process | P0 | 34 | ADRs, HLA, Vision, LLD | 🟨 In Progress |
-| **[EPIC-03](file:///Users/abhishek/Dev/Drishti/docs/product/epics/EPIC-03.md)** | Code Ingestion Pipeline | P0 | 55 | Tree-sitter parsers, AST extraction | 🔮 Planned |
+| **[EPIC-03](file:///Users/abhishek/Dev/Drishti/docs/product/epics/EPIC-03.md)** | Code Ingestion Pipeline | P0 | 55 | Tree-sitter parsers, AST extraction | 🟩 Done |
 | **[EPIC-04](file:///Users/abhishek/Dev/Drishti/docs/product/epics/EPIC-04.md)** | Document Ingestion Pipeline | P1 | 42 | PDF layouts, Markdown headings, Vision | 🔮 Planned |
-| **[EPIC-05](file:///Users/abhishek/Dev/Drishti/docs/product/epics/EPIC-05.md)** | Embedding & Vector Storage | P0 | 34 | OpenAI & BM25 embeddings, Qdrant | 🔮 Planned |
+| **[EPIC-05](file:///Users/abhishek/Dev/Drishti/docs/product/epics/EPIC-05.md)** | Embedding & Vector Storage | P0 | 34 | OpenAI & BM25 embeddings, Qdrant | 🟩 Done |
 | **[EPIC-06](file:///Users/abhishek/Dev/Drishti/docs/product/epics/EPIC-06.md)** | Hybrid Search Engine | P0 | 55 | RRF fusion, Cohere re-ranking | 🔮 Planned |
 | **[EPIC-07](file:///Users/abhishek/Dev/Drishti/docs/product/epics/EPIC-07.md)** | RAG Pipeline & Generation | P0 | 42 | Context builder, LLM integration, Citations | 🔮 Planned |
 | **[EPIC-08](file:///Users/abhishek/Dev/Drishti/docs/product/epics/EPIC-08.md)** | API & Backend Service | P0 | 34 | FastAPI routing, validation schemas | 🔮 Planned |

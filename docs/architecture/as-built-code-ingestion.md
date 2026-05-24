@@ -19,7 +19,7 @@ flowchart TD
     E --> F[TreeSitterParser.parse]
     F --> G[List of UniversalChunk]
     G --> H[SymbolTable optional<br/>US-03.09]
-    H --> I[(Qdrant upsert<br/>EPIC-05 planned)]
+    H --> I[(Qdrant upsert<br/>QdrantChunkStore)]
 ```
 
 ---
@@ -173,6 +173,9 @@ flowchart TD
 | `git_changes.py` | `GitChangeSet`, diff vs indexed commit |
 | `index_state.py` | `.drishti/index-state.json` persistence |
 | `incremental.py` | `IncrementalIndexer.run()` orchestration |
-| `chunk_index.py` | `ChunkIndex` / `InMemoryChunkIndex` (Qdrant in EPIC-05) |
+| `chunk_index.py` | `ChunkIndex` / `InMemoryChunkIndex` |
+| `embedding/pipeline.py` | `ChunkEmbeddingPipeline` (dense + sparse) |
+| `storage/qdrant_store.py` | `QdrantChunkStore` — hybrid upsert/filter/delete |
+| `storage/filters.py` | `compile_qdrant_filter` for payload predicates |
 
 See [sequence-diagrams.md § Incremental indexing](sequence-diagrams.md#incremental-indexing-planned-us-0310).

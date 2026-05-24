@@ -42,7 +42,7 @@ All Mermaid diagrams are version-controlled in Markdown (render on GitHub, VS Co
 | Parser rules + `min_chunk_lines` | [as-built-code-ingestion.md](as-built-code-ingestion.md) | 🟩 Implemented (US-03.06) |
 | Metadata enrichment (docstring, complexity) | [universal-chunk-schema.md](../design/universal-chunk-schema.md) | 🟩 Implemented (US-03.07–09) |
 | Git incremental walker | [as-built-code-ingestion.md](as-built-code-ingestion.md) §7 | 🟩 Implemented (US-03.10) |
-| Embeddings + Qdrant write path | HLA §4 | 🔮 Planned (EPIC-05) |
+| Embeddings + Qdrant write path | HLA §4 | 🟩 Implemented (EPIC-05) |
 | Hybrid search + RAG generation | HLA §5–6 | 🔮 Planned (EPIC-06–07) |
 
 Live checklist: [IMPLEMENTATION_STATUS.md](../IMPLEMENTATION_STATUS.md).

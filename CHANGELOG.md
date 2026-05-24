@@ -15,6 +15,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Onboarding guide and operations runbook
 - EPIC-03 metadata enrichment on `UniversalChunk` (US-03.07–03.09)
 - Git incremental indexer with `IncrementalIndexer` and `ChunkIndex` (US-03.10)
+- EPIC-05 embedding and vector storage (US-05.01–05.04)
+  - OpenAI dense embeddings with batching/retries; `HashingDenseEmbedder` for tests
+  - BM25 sparse encoder and `ChunkEmbeddingPipeline`
+  - `QdrantChunkStore` with hybrid dense+sparse vectors, payload indexes, and filter compilation
 
 ---
 

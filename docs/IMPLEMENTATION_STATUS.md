@@ -20,12 +20,12 @@ This file is the living source of truth for the current build status of Drishti.
 | Component | Total Points | Completed | Progress % | Status |
 |-----------|--------------|-----------|------------|--------|
 | **Phase 1: Foundation** | 55 | 55 | 100.0% | 🟩 Completed |
-| **Phase 2: Ingestion** | 131 | 55 | 42.0% | 🟨 In Progress |
+| **Phase 2: Ingestion** | 131 | 89 | 67.9% | 🟨 In Progress |
 | **Phase 3: Core Search & RAG** | 131 | 0 | 0.0% | 🔮 Planned |
 | **Phase 4: Advanced Features** | 89 | 0 | 0.0% | 🔮 Planned |
 | **Phase 5: Evaluation** | 34 | 0 | 0.0% | 🔮 Planned |
 | **Phase 6: Release** | 21 | 0 | 0.0% | 🔮 Planned |
-| **Total Project** | **461** | **110** | **23.9%** | **🟨 In Progress** |
+| **Total Project** | **461** | **144** | **31.2%** | **🟨 In Progress** |
 
 ---
 
@@ -33,7 +33,7 @@ This file is the living source of truth for the current build status of Drishti.
 
 ```
 Phase 1: Foundation     [████████████████████] 100.0% (Completed)
-Phase 2: Ingestion      [████████░░░░░░░░░░░░] 42.0% (In Progress)
+Phase 2: Ingestion      [█████████████░░░░░░░] 67.9% (In Progress)
 Phase 3: Search & RAG   [░░░░░░░░░░░░░░░░░░░] 0.0%  (Planned)
 Phase 4: UI & Graph     [░░░░░░░░░░░░░░░░░░░] 0.0%  (Planned)
 Phase 5: Evaluation     [░░░░░░░░░░░░░░░░░░░] 0.0%  (Planned)
@@ -94,12 +94,12 @@ Phase 6: Release        [░░░░░░░░░░░░░░░░░░�
   * [ ] **US-04.05**: OpenAPI spec endpoint parser
 
 #### EPIC-05: Embedding & Vector Storage (Priority: P0)
-* **Points**: 34 | **Status**: 🔮 Planned (0%)
+* **Points**: 34 | **Status**: 🟩 Completed (100%)
 * **Stories**:
-  * [ ] **US-05.01**: OpenAI dense embedding integration (`text-embedding-3-small`)
-  * [ ] **US-05.02**: Sparse embedding (BM25 tokenizer)
-  * [ ] **US-05.03**: Qdrant database client initialization and index schemas
-  * [ ] **US-05.04**: Payload-based metadata filter compilation
+  * [x] **US-05.01**: OpenAI dense embedding integration (`text-embedding-3-small`)
+  * [x] **US-05.02**: Sparse embedding (BM25 tokenizer)
+  * [x] **US-05.03**: Qdrant database client initialization and index schemas
+  * [x] **US-05.04**: Payload-based metadata filter compilation
 
 ---
 
@@ -203,3 +203,7 @@ Once a User Story is implemented, the corresponding code files must be registere
 | US-03.08 | [ast/metadata.py](file:///Users/abhishek/Dev/Drishti/src/drishti/ingestion/ast/metadata.py) | 🟩 Completed | [test_metadata_enrichment.py](file:///Users/abhishek/Dev/Drishti/tests/unit/test_metadata_enrichment.py) |
 | US-03.09 | [symbols.py](file:///Users/abhishek/Dev/Drishti/src/drishti/ingestion/symbols.py), [ast/metadata.py](file:///Users/abhishek/Dev/Drishti/src/drishti/ingestion/ast/metadata.py) | 🟩 Completed | [test_metadata_enrichment.py](file:///Users/abhishek/Dev/Drishti/tests/unit/test_metadata_enrichment.py) |
 | US-03.10 | [git_changes.py](file:///Users/abhishek/Dev/Drishti/src/drishti/ingestion/git_changes.py), [incremental.py](file:///Users/abhishek/Dev/Drishti/src/drishti/ingestion/incremental.py), [index_state.py](file:///Users/abhishek/Dev/Drishti/src/drishti/ingestion/index_state.py), [chunk_index.py](file:///Users/abhishek/Dev/Drishti/src/drishti/ingestion/chunk_index.py) | 🟩 Completed | [test_git_incremental.py](file:///Users/abhishek/Dev/Drishti/tests/unit/test_git_incremental.py) |
+| US-05.01 | [dense.py](file:///Users/abhishek/Dev/Drishti/src/drishti/embedding/dense.py) | 🟩 Completed | [test_dense_embedding.py](file:///Users/abhishek/Dev/Drishti/tests/unit/test_dense_embedding.py) |
+| US-05.02 | [sparse.py](file:///Users/abhishek/Dev/Drishti/src/drishti/embedding/sparse.py) | 🟩 Completed | [test_sparse_embedding.py](file:///Users/abhishek/Dev/Drishti/tests/unit/test_sparse_embedding.py) |
+| US-05.03 | [schema.py](file:///Users/abhishek/Dev/Drishti/src/drishti/storage/schema.py), [qdrant_store.py](file:///Users/abhishek/Dev/Drishti/src/drishti/storage/qdrant_store.py), [pipeline.py](file:///Users/abhishek/Dev/Drishti/src/drishti/embedding/pipeline.py) | 🟩 Completed | [test_qdrant_chunk_store.py](file:///Users/abhishek/Dev/Drishti/tests/integration/test_qdrant_chunk_store.py), [test_embedding_pipeline.py](file:///Users/abhishek/Dev/Drishti/tests/unit/test_embedding_pipeline.py) |
+| US-05.04 | [filters.py](file:///Users/abhishek/Dev/Drishti/src/drishti/storage/filters.py) | 🟩 Completed | [test_storage_filters.py](file:///Users/abhishek/Dev/Drishti/tests/unit/test_storage_filters.py) |
