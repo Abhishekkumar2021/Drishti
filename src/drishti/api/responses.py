@@ -44,3 +44,43 @@ class ErrorResponse(BaseModel):
     """Top-level error response envelope."""
 
     error: ErrorDetail
+
+
+class SearchResultItem(BaseModel):
+    """A single hybrid search hit."""
+
+    chunk_id: str
+    file_path: str
+    content: str
+    score: float
+    start_line: int | None = None
+    end_line: int | None = None
+    language: str | None = None
+    name: str | None = None
+    node_type: str | None = None
+
+
+class SearchResponse(BaseModel):
+    """Hybrid search response payload."""
+
+    query: str
+    results: list[SearchResultItem]
+
+
+class CitationItem(BaseModel):
+    """Structured citation reference."""
+
+    citation_tag: str
+    file_path: str
+    start_line: int | None = None
+    end_line: int | None = None
+    valid: bool = True
+
+
+class AskResponse(BaseModel):
+    """Non-streaming RAG answer."""
+
+    question: str
+    answer: str
+    citations: list[CitationItem]
+    sources: list[SearchResultItem]

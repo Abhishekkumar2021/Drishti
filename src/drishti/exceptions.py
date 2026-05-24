@@ -61,6 +61,13 @@ class SearchError(DrishtiError):
         super().__init__(message, code="SEARCH_ERROR")
 
 
+class GenerationError(DrishtiError):
+    """Raised when LLM text generation or RAG assembly fails."""
+
+    def __init__(self, message: str) -> None:
+        super().__init__(message, code="GENERATION_ERROR")
+
+
 class ServiceUnavailableError(DrishtiError):
     """Raised when a required downstream service is unavailable."""
 

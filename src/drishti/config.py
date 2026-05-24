@@ -69,6 +69,11 @@ class Settings(BaseSettings):
     rerank_min_score: float = 0.0
     max_context_chunks: int = 15
 
+    # ─── RAG / Generation ────────────────────────
+    llm_temperature: float = 0.1
+    llm_max_tokens: int = 4096
+    rag_max_context_chars: int = 120_000
+
     @field_validator("cors_origins", "ingestion_allowed_roots", mode="before")
     @classmethod
     def parse_comma_separated_list(cls, value: object) -> list[str]:
