@@ -20,12 +20,12 @@ This file is the living source of truth for the current build status of Drishti.
 | Component | Total Points | Completed | Progress % | Status |
 |-----------|--------------|-----------|------------|--------|
 | **Phase 1: Foundation** | 55 | 55 | 100.0% | 🟩 Completed |
-| **Phase 2: Ingestion** | 131 | 21 | 16.0% | 🟨 In Progress |
+| **Phase 2: Ingestion** | 131 | 29 | 22.1% | 🟨 In Progress |
 | **Phase 3: Core Search & RAG** | 131 | 0 | 0.0% | 🔮 Planned |
 | **Phase 4: Advanced Features** | 89 | 0 | 0.0% | 🔮 Planned |
 | **Phase 5: Evaluation** | 34 | 0 | 0.0% | 🔮 Planned |
 | **Phase 6: Release** | 21 | 0 | 0.0% | 🔮 Planned |
-| **Total Project** | **461** | **76** | **16.5%** | **🟨 In Progress** |
+| **Total Project** | **461** | **84** | **18.2%** | **🟨 In Progress** |
 
 ---
 
@@ -71,12 +71,12 @@ Phase 6: Release        [░░░░░░░░░░░░░░░░░░�
 ### Phase 2: Ingestion & Storage (Epics 03–05)
 
 #### EPIC-03: Code Ingestion Pipeline (Priority: P0)
-* **Points**: 55 | **Status**: 🟨 In Progress (38.2%)
+* **Points**: 55 | **Status**: 🟨 In Progress (52.7%)
 * **Stories**:
   * [x] **US-03.01**: File walk and programming language detection
   * [x] **US-03.02**: Python Tree-sitter integration
   * [x] **US-03.03**: Java Tree-sitter integration
-  * [ ] **US-03.04**: JavaScript/TypeScript Tree-sitter integration
+  * [x] **US-03.04**: JavaScript/TypeScript Tree-sitter integration
   * [ ] **US-03.05**: Go Tree-sitter integration
   * [ ] **US-03.06**: AST node extraction rule engine
   * [ ] **US-03.07**: Metadata enrichment (parameters, complexity, docstrings)
@@ -196,3 +196,4 @@ Once a User Story is implemented, the corresponding code files must be registere
 | US-03.01 | [walker.py](file:///Users/abhishek/Dev/Drishti/src/drishti/ingestion/walker.py), [language.py](file:///Users/abhishek/Dev/Drishti/src/drishti/utils/language.py), [gitignore.py](file:///Users/abhishek/Dev/Drishti/src/drishti/ingestion/gitignore.py), [base.py](file:///Users/abhishek/Dev/Drishti/src/drishti/ingestion/base.py), [schemas.py](file:///Users/abhishek/Dev/Drishti/src/drishti/api/schemas.py) | 🟩 Completed | [test_walker.py](file:///Users/abhishek/Dev/Drishti/tests/unit/test_walker.py), [test_language.py](file:///Users/abhishek/Dev/Drishti/tests/unit/test_language.py), [test_gitignore.py](file:///Users/abhishek/Dev/Drishti/tests/unit/test_gitignore.py) |
 | US-03.02 | [ast/base.py](file:///Users/abhishek/Dev/Drishti/src/drishti/ingestion/ast/base.py), [ast/python.py](file:///Users/abhishek/Dev/Drishti/src/drishti/ingestion/ast/python.py), [ast/registry.py](file:///Users/abhishek/Dev/Drishti/src/drishti/ingestion/ast/registry.py), [queries/python.scm](file:///Users/abhishek/Dev/Drishti/src/drishti/ingestion/queries/python.scm) | 🟩 Completed | [test_python_parser.py](file:///Users/abhishek/Dev/Drishti/tests/unit/test_python_parser.py) |
 | US-03.03 | [ast/java.py](file:///Users/abhishek/Dev/Drishti/src/drishti/ingestion/ast/java.py), [queries/java.scm](file:///Users/abhishek/Dev/Drishti/src/drishti/ingestion/queries/java.scm) | 🟩 Completed | [test_java_parser.py](file:///Users/abhishek/Dev/Drishti/tests/unit/test_java_parser.py) |
+| US-03.04 | [ast/ecmascript.py](file:///Users/abhishek/Dev/Drishti/src/drishti/ingestion/ast/ecmascript.py), [ast/javascript.py](file:///Users/abhishek/Dev/Drishti/src/drishti/ingestion/ast/javascript.py), [ast/typescript.py](file:///Users/abhishek/Dev/Drishti/src/drishti/ingestion/ast/typescript.py), [queries/javascript.scm](file:///Users/abhishek/Dev/Drishti/src/drishti/ingestion/queries/javascript.scm), [queries/typescript.scm](file:///Users/abhishek/Dev/Drishti/src/drishti/ingestion/queries/typescript.scm) | 🟩 Completed | [test_javascript_parser.py](file:///Users/abhishek/Dev/Drishti/tests/unit/test_javascript_parser.py), [test_typescript_parser.py](file:///Users/abhishek/Dev/Drishti/tests/unit/test_typescript_parser.py) |

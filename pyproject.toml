@@ -141,6 +141,7 @@ ignore = [
 [tool.ruff.lint.per-file-ignores]
 "tests/**/*.py" = ["D101", "D102", "D103", "TC001", "TC003"]
 "tests/integration/**/*.py" = ["TC002"]
+"src/drishti/ingestion/ast/*.py" = ["TC002"]
 "src/drishti/api/schemas.py" = ["TC003", "D102"]
 "src/drishti/config.py" = ["D102"]
 "src/drishti/exceptions.py" = ["D107"]

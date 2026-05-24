@@ -63,9 +63,9 @@ This epic covers the repository walking, AST parsing using Tree-sitter, language
 **Complexity**: 8 SP | **Priority**: P0
 
 **Acceptance Criteria**
-1. [ ] Tree-sitter parses `.js`, `.jsx`, `.ts`, `.tsx` files.
-2. [ ] Extracts interfaces, type aliases, ES6 classes, arrow functions, and react components.
-3. [ ] Captures export annotations and modules.
+1. [x] Tree-sitter parses `.js`, `.jsx`, `.ts`, `.tsx` files.
+2. [x] Extracts interfaces, type aliases, ES6 classes, arrow functions, and react components.
+3. [x] Captures export annotations and modules.
 
 ---
 

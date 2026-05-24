@@ -79,6 +79,7 @@ class TreeSitterParser(BaseParser, ABC):
         source_id = hashlib.sha256(file_content).hexdigest()
         indexed_at = last_modified if last_modified is not None else datetime.now(UTC)
         package_name = self._extract_package_name(tree.root_node, file_content)
+        parse_context = self._prepare_parse_context(tree.root_node, file_content)
 
         for _pattern_index, capture_map in cursor.matches(tree.root_node):
             chunk_nodes = capture_map.get(self._CHUNK_NODE_CAPTURE, [])
@@ -102,6 +103,13 @@ class TreeSitterParser(BaseParser, ABC):
                     continue
                 seen_spans.add(span_key)
 
+                symbol_metadata = self._symbol_chunk_metadata(
+                    definition_node,
+                    file_content,
+                    parse_context,
+                )
+                exports_val = symbol_metadata.get("exports", [])
+                dependencies_val = symbol_metadata.get("dependencies", [])
                 chunks.append(
                     self._build_chunk(
                         file_content=file_content,
@@ -113,6 +121,8 @@ class TreeSitterParser(BaseParser, ABC):
                         source_id=source_id,
                         indexed_at=indexed_at,
                         package_name=package_name,
+                        exports=exports_val if isinstance(exports_val, list) else [],
+                        dependencies=dependencies_val if isinstance(dependencies_val, list) else [],
                     )
                 )
 
@@ -130,6 +140,8 @@ class TreeSitterParser(BaseParser, ABC):
         source_id: str,
         indexed_at: datetime,
         package_name: str | None = None,
+        exports: list[str] | None = None,
+        dependencies: list[str] | None = None,
     ) -> UniversalChunk:
         content = self._node_text(file_content, span_node)
         start_line = span_node.start_point[0] + 1
@@ -152,6 +164,8 @@ class TreeSitterParser(BaseParser, ABC):
             parent_class=parent_class,
             package_name=package_name,
             decorators=decorators,
+            exports=exports or [],
+            dependencies=dependencies or [],
             last_modified=indexed_at,
         )
 
@@ -169,6 +183,19 @@ class TreeSitterParser(BaseParser, ABC):
         if name_node is None:
             return None
         return cls._node_text(source, name_node)
+
+    def _prepare_parse_context(self, root: Node, source: bytes) -> dict[str, object]:
+        """Build per-file context shared across symbols (override in language parsers)."""
+        return {}
+
+    def _symbol_chunk_metadata(
+        self,
+        definition_node: Node,
+        source: bytes,
+        parse_context: dict[str, object],
+    ) -> dict[str, object]:
+        """Return extra ``UniversalChunk`` fields for a captured symbol."""
+        return {}
 
     @classmethod
     def _extract_package_name(cls, root: Node, source: bytes) -> str | None:
