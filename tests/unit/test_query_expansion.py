@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-from types import SimpleNamespace
 from unittest.mock import MagicMock
 
 import pytest
@@ -37,9 +36,9 @@ class TestStaticQueryExpander:
 class TestAnthropicQueryExpander:
     def test_parses_json_synonyms(self) -> None:
         mock_client = MagicMock()
-        mock_client.messages.create.return_value = SimpleNamespace(
-            content=[SimpleNamespace(text='["JWT", "bearer", "authenticate"]')]
-        )
+        mock_stream = MagicMock()
+        mock_stream.text_stream = iter(['["JWT", "bearer", "authenticate"]'])
+        mock_client.messages.stream.return_value.__enter__.return_value = mock_stream
         settings = Settings(anthropic_api_key="test-key", llm_provider="anthropic")
         expander = AnthropicQueryExpander(settings, client=mock_client)
 

@@ -155,6 +155,7 @@ ignore = [
 "src/drishti/search/expansion.py" = ["TC001", "TC003", "ANN401", "D107"]
 "src/drishti/search/rerank.py" = ["TC001", "TC003", "ANN401"]
 "src/drishti/search/rrf.py" = ["TC001"]
+"src/drishti/embedding/dense.py" = ["TC002"]
 "src/drishti/embedding/factory.py" = ["TC003"]
 "src/drishti/embedding/cohere_dense.py" = ["TC003", "ANN401", "D102", "D107"]
 "src/drishti/embedding/ollama_dense.py" = ["TC003", "D102", "D107"]

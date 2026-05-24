@@ -6,7 +6,6 @@ import pytest
 
 from drishti.config import Settings, get_settings
 from drishti.exceptions import ConfigurationError
-from drishti.exceptions import ConfigurationError
 
 pytestmark = pytest.mark.unit
 

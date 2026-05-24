@@ -7,7 +7,6 @@ from pathlib import Path
 from qdrant_client import QdrantClient
 
 from drishti.config import Settings
-from drishti.embedding.dense import DenseEmbedder
 from drishti.embedding.factory import create_dense_embedder
 from drishti.embedding.pipeline import ChunkEmbeddingPipeline
 from drishti.embedding.sparse import BM25SparseEncoder
