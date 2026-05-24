@@ -7,12 +7,14 @@ on:
     paths:
       - "tests/integration/**"
       - "src/**"
+      - "scripts/wait-for-services.sh"
       - ".github/workflows/integration-ci.yml"
   pull_request:
     branches: [main, develop]
     paths:
       - "tests/integration/**"
       - "src/**"
+      - "scripts/wait-for-services.sh"
       - ".github/workflows/integration-ci.yml"
 
 concurrency:
@@ -24,13 +26,15 @@ permissions:
 
 env:
   PYTHON_VERSION: "3.12"
+  QDRANT_HOST: localhost
+  QDRANT_PORT: "6333"
+  REDIS_URL: redis://localhost:6379/0
 
 jobs:
   integration:
     name: Python · Integration tests
     runs-on: ubuntu-latest
-    # Skip until integration tests are implemented (EPIC-05+).
-    if: false
+    timeout-minutes: 15
     services:
       qdrant:
         image: qdrant/qdrant:v1.12.4
@@ -67,9 +71,8 @@ jobs:
       - name: Install dependencies
         run: uv sync --frozen --extra dev
 
+      - name: Wait for service containers
+        run: bash scripts/wait-for-services.sh
+
       - name: Run integration tests
-        env:
-          QDRANT_HOST: localhost
-          QDRANT_PORT: 6333
-          REDIS_URL: redis://localhost:6379/0
-        run: uv run pytest tests/integration/ -v -m integration
+        run: uv run pytest tests/integration/ -v -m integration --tb=short

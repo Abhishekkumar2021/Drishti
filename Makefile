@@ -54,6 +54,7 @@ test-unit: ## Run unit tests only (no external dependencies)
 	uv run pytest tests/unit/ -v -m unit
 
 test-integration: ## Run integration tests (requires Docker services)
+	@bash scripts/wait-for-services.sh
 	uv run pytest tests/integration/ -v -m integration
 
 test-e2e: ## Run end-to-end tests (full pipeline)
