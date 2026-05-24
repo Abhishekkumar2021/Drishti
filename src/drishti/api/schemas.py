@@ -59,6 +59,10 @@ class UniversalChunk(BaseModel):
         None,
         description="Name of the enclosing class scope if applicable",
     )
+    package_name: str | None = Field(
+        None,
+        description="Java package or namespace path when applicable",
+    )
     decorators: list[str] = Field(
         default_factory=list,
         description="Decorator names applied to the symbol (e.g. dataclass, property)",

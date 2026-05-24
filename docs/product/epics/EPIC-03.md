@@ -49,9 +49,9 @@ This epic covers the repository walking, AST parsing using Tree-sitter, language
 **Complexity**: 8 SP | **Priority**: P0
 
 **Acceptance Criteria**
-1. [ ] Tree-sitter parses Java files.
-2. [ ] Extracts packages, interfaces, class definitions, and methods.
-3. [ ] Preserves class member fields and method signatures.
+1. [x] Tree-sitter parses Java files.
+2. [x] Extracts packages, interfaces, class definitions, and methods.
+3. [x] Preserves class member fields and method signatures.
 
 ---
 
