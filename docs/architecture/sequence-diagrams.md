@@ -73,7 +73,7 @@ sequenceDiagram
     API-->>C: job summary + counts
 ```
 
-> Embedding and Qdrant upsert are implemented (`ChunkEmbeddingPipeline`, `QdrantChunkStore`) but **not yet wired to the HTTP API** (EPIC-08).
+> Ingestion (`ChunkEmbeddingPipeline`, `QdrantChunkStore`) and hybrid search (`HybridSearchPipeline`) are implemented but **not yet wired to the HTTP API** (EPIC-08).
 
 ---
 

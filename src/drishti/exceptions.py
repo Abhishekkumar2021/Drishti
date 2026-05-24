@@ -54,6 +54,13 @@ class EmbeddingError(DrishtiError):
         super().__init__(message, code="EMBEDDING_ERROR")
 
 
+class SearchError(DrishtiError):
+    """Raised when hybrid search, reranking, or query expansion fails."""
+
+    def __init__(self, message: str) -> None:
+        super().__init__(message, code="SEARCH_ERROR")
+
+
 class ServiceUnavailableError(DrishtiError):
     """Raised when a required downstream service is unavailable."""
 

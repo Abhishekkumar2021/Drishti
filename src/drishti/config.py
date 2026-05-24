@@ -64,7 +64,9 @@ class Settings(BaseSettings):
 
     # ─── Search Defaults ─────────────────────────
     search_top_k: int = 10
+    search_retrieval_limit: int = 50
     rrf_k: int = 60
+    rerank_min_score: float = 0.0
     max_context_chunks: int = 15
 
     @field_validator("cors_origins", "ingestion_allowed_roots", mode="before")

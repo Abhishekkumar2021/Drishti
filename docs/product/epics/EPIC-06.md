@@ -7,7 +7,7 @@ This epic covers building the retrieval engine that merges keyword and semantic 
 ## Epic Metadata
 * **Complexity**: 55 Story Points
 * **Priority**: P0 (Critical Blocker)
-* **Status**: Planned
+* **Status**: Completed
 
 ---
 
@@ -21,9 +21,9 @@ This epic covers building the retrieval engine that merges keyword and semantic 
 **Complexity**: 8 SP | **Priority**: P0
 
 **Acceptance Criteria**
-1. [ ] Embeds the incoming user query.
-2. [ ] Performs a k-nearest neighbor (k-NN) search against the Qdrant dense collection.
-3. [ ] Returns top K candidate chunks with their cosine similarity scores.
+1. [x] Embeds the incoming user query.
+2. [x] Performs a k-nearest neighbor (k-NN) search against the Qdrant dense collection.
+3. [x] Returns top K candidate chunks with their cosine similarity scores.
 
 ---
 
@@ -35,9 +35,9 @@ This epic covers building the retrieval engine that merges keyword and semantic 
 **Complexity**: 8 SP | **Priority**: P0
 
 **Acceptance Criteria**
-1. [ ] Converts queries into sparse term vectors.
-2. [ ] Executes a sparse vector search in Qdrant.
-3. [ ] Returns top K candidates with matching BM25 keyword scores.
+1. [x] Converts queries into sparse term vectors.
+2. [x] Executes a sparse vector search in Qdrant.
+3. [x] Returns top K candidates with matching BM25 keyword scores.
 
 ---
 
@@ -49,9 +49,9 @@ This epic covers building the retrieval engine that merges keyword and semantic 
 **Complexity**: 13 SP | **Priority**: P0
 
 **Acceptance Criteria**
-1. [ ] Implements the RRF formula: `score = sum(1 / (60 + rank_i))`.
-2. [ ] Merges and de-duplicates documents retrieved from both dense and sparse sources.
-3. [ ] Returns a single unified list ranked by RRF score.
+1. [x] Implements the RRF formula: `score = sum(1 / (60 + rank_i))`.
+2. [x] Merges and de-duplicates documents retrieved from both dense and sparse sources.
+3. [x] Returns a single unified list ranked by RRF score.
 
 ---
 
@@ -63,9 +63,9 @@ This epic covers building the retrieval engine that merges keyword and semantic 
 **Complexity**: 13 SP | **Priority**: P0
 
 **Acceptance Criteria**
-1. [ ] Sends candidates to Cohere rerank API.
-2. [ ] Re-orders chunks based on cross-encoder relevance scores.
-3. [ ] Filters out chunks below a minimum relevance threshold.
+1. [x] Sends candidates to Cohere rerank API.
+2. [x] Re-orders chunks based on cross-encoder relevance scores.
+3. [x] Filters out chunks below a minimum relevance threshold.
 
 ---
 
@@ -77,5 +77,5 @@ This epic covers building the retrieval engine that merges keyword and semantic 
 **Complexity**: 13 SP | **Priority**: P0
 
 **Acceptance Criteria**
-1. [ ] Uses a fast LLM prompt to generate technical synonyms (e.g. `auth` → `token`, `sign_in`, `authenticate`).
-2. [ ] Combines original query and expanded terms in the retrieval request.
+1. [x] Uses a fast LLM prompt to generate technical synonyms (e.g. `auth` → `token`, `sign_in`, `authenticate`).
+2. [x] Combines original query and expanded terms in the retrieval request.

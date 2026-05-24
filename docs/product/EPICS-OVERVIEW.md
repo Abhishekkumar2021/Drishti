@@ -68,7 +68,7 @@ The estimation follows standard Fibonacci story points (1, 2, 3, 5, 8, 13) where
 | **[EPIC-03](file:///Users/abhishek/Dev/Drishti/docs/product/epics/EPIC-03.md)** | Code Ingestion Pipeline | P0 | 55 | Tree-sitter parsers, AST extraction | 🟩 Done |
 | **[EPIC-04](file:///Users/abhishek/Dev/Drishti/docs/product/epics/EPIC-04.md)** | Document Ingestion Pipeline | P1 | 42 | PDF layouts, Markdown headings, Vision | 🔮 Planned |
 | **[EPIC-05](file:///Users/abhishek/Dev/Drishti/docs/product/epics/EPIC-05.md)** | Embedding & Vector Storage | P0 | 34 | OpenAI & BM25 embeddings, Qdrant | 🟩 Done |
-| **[EPIC-06](file:///Users/abhishek/Dev/Drishti/docs/product/epics/EPIC-06.md)** | Hybrid Search Engine | P0 | 55 | RRF fusion, Cohere re-ranking | 🔮 Planned |
+| **[EPIC-06](file:///Users/abhishek/Dev/Drishti/docs/product/epics/EPIC-06.md)** | Hybrid Search Engine | P0 | 55 | RRF fusion, Cohere re-ranking | 🟩 Done |
 | **[EPIC-07](file:///Users/abhishek/Dev/Drishti/docs/product/epics/EPIC-07.md)** | RAG Pipeline & Generation | P0 | 42 | Context builder, LLM integration, Citations | 🔮 Planned |
 | **[EPIC-08](file:///Users/abhishek/Dev/Drishti/docs/product/epics/EPIC-08.md)** | API & Backend Service | P0 | 34 | FastAPI routing, validation schemas | 🔮 Planned |
 | **[EPIC-09](file:///Users/abhishek/Dev/Drishti/docs/product/epics/EPIC-09.md)** | Dependency Graph & Impact Analysis | P2 | 34 | Neo4j graph, import extraction | 🔮 Planned |
