@@ -129,6 +129,10 @@ ignore = [
     "ANN102", # Missing type annotation for cls
 ]
 
+[tool.ruff.lint.per-file-ignores]
+"tests/**/*.py" = ["D101", "D102", "D103", "TC001", "TC003"]
+"src/drishti/api/schemas.py" = ["TC003"]
+
 [tool.ruff.lint.pydocstyle]
 convention = "google"
 

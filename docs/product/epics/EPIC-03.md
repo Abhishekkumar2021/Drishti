@@ -7,7 +7,7 @@ This epic covers the repository walking, AST parsing using Tree-sitter, language
 ## Epic Metadata
 * **Complexity**: 55 Story Points
 * **Priority**: P0 (Critical Blocker)
-* **Status**: Planned
+* **Status**: In Progress
 
 ---
 
@@ -21,9 +21,9 @@ This epic covers the repository walking, AST parsing using Tree-sitter, language
 **Complexity**: 5 SP | **Priority**: P0
 
 **Acceptance Criteria**
-1. [ ] Scans files recursively, ignoring patterns listed in `.gitignore`.
-2. [ ] Detects language based on extension and magic bytes (e.g. `.py` → Python, `.ts` → TypeScript).
-3. [ ] Integrates with a language registry interface.
+1. [x] Scans files recursively, ignoring patterns listed in `.gitignore`.
+2. [x] Detects language based on extension and magic bytes (e.g. `.py` → Python, `.ts` → TypeScript).
+3. [x] Integrates with a language registry interface.
 
 ---
 

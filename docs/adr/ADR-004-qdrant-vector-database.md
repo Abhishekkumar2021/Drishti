@@ -1,5 +1,8 @@
 # ADR-004: Qdrant Vector Database
 
+## Status
+Approved
+
 ## Context & Problem Statement
 We need a storage system capable of holding millions of text and code chunks with their vectors. The database must support fast semantic search, keyword search, payload filtering (scoping queries to files/directories), and hybrid search (combining dense and sparse vector spaces).
 

@@ -1,5 +1,8 @@
 # ADR-010: Next.js Frontend
 
+## Status
+Approved
+
 ## Context & Problem Statement
 We need an interactive, responsive web user interface that displays a chat panel, streams responses, renders source code with syntax highlighting, and provides interactive dependency graphs.
 

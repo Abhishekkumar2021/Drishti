@@ -1,5 +1,8 @@
 # ADR-006: Claude API for Generation
 
+## Status
+Approved
+
 ## Context & Problem Statement
 We need a generative model to synthesize retrieved codebase chunks, documentation files, and diagrams into a cohesive, markdown-formatted response containing accurate source citations. The model must excel at complex code reasoning and respect structure constraints.
 

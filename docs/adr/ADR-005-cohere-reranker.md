@@ -1,5 +1,8 @@
 # ADR-005: Cohere Re-ranking Engine
 
+## Status
+Approved
+
 ## Context & Problem Statement
 Vector databases return chunks based on cosine similarities, which may contain irrelevant noise. To improve LLM answer quality and prevent context window pollution, we need a high-accuracy cross-encoder model to re-score and filter the retrieved candidates.
 

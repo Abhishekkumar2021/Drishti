@@ -1,5 +1,8 @@
 # ADR-008: Neo4j Dependency Graph Storage
 
+## Status
+Approved
+
 ## Context & Problem Statement
 To trace dependencies and execute change impact analysis ("If I change this method, what breaks?"), we need to query relationships. Vector searches are inadequate for multi-hop relationship traversals (e.g. Method A calls Method B, which calls Method C).
 

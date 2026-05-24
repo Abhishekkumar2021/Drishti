@@ -19,21 +19,21 @@ This file is the living source of truth for the current build status of Drishti.
 
 | Component | Total Points | Completed | Progress % | Status |
 |-----------|--------------|-----------|------------|--------|
-| **Phase 1: Foundation** | 55 | 38 | 69.1% | 🟨 In Progress |
-| **Phase 2: Ingestion** | 131 | 0 | 0.0% | 🔮 Planned |
+| **Phase 1: Foundation** | 55 | 55 | 100.0% | 🟩 Completed |
+| **Phase 2: Ingestion** | 131 | 5 | 3.8% | 🟨 In Progress |
 | **Phase 3: Core Search & RAG** | 131 | 0 | 0.0% | 🔮 Planned |
 | **Phase 4: Advanced Features** | 89 | 0 | 0.0% | 🔮 Planned |
 | **Phase 5: Evaluation** | 34 | 0 | 0.0% | 🔮 Planned |
 | **Phase 6: Release** | 21 | 0 | 0.0% | 🔮 Planned |
-| **Total Project** | **461** | **38** | **8.2%** | **🟨 In Progress** |
+| **Total Project** | **461** | **60** | **13.0%** | **🟨 In Progress** |
 
 ---
 
 ## 2. Phase Progression
 
 ```
-Phase 1: Foundation     [██████████████░░░░░] 69.1% (In Progress)
-Phase 2: Ingestion      [░░░░░░░░░░░░░░░░░░░] 0.0%  (Planned)
+Phase 1: Foundation     [████████████████████] 100.0% (Completed)
+Phase 2: Ingestion      [█░░░░░░░░░░░░░░░░░░] 3.8%  (In Progress)
 Phase 3: Search & RAG   [░░░░░░░░░░░░░░░░░░░] 0.0%  (Planned)
 Phase 4: UI & Graph     [░░░░░░░░░░░░░░░░░░░] 0.0%  (Planned)
 Phase 5: Evaluation     [░░░░░░░░░░░░░░░░░░░] 0.0%  (Planned)
@@ -56,12 +56,12 @@ Phase 6: Release        [░░░░░░░░░░░░░░░░░░�
   * [x] **US-01.05**: Community documents (CONTRIBUTING.md, AGENTS.md, CODE_OF_CONDUCT.md, SECURITY.md)
 
 #### EPIC-02: Documentation & Process (Priority: P0)
-* **Points**: 34 | **Status**: 🟨 In Progress (50%)
+* **Points**: 34 | **Status**: 🟩 Completed (100%)
 * **Stories**:
   * [x] **US-02.01**: PRODUCT-VISION.md
   * [x] **US-02.02**: EPICS-OVERVIEW.md
-  * [ ] **US-02.03**: 12 Epic detailed documents (in `docs/product/epics/`)
-  * [ ] **US-02.04**: 10 Tech ADRs (in `docs/adr/`)
+  * [x] **US-02.03**: 12 Epic detailed documents (in `docs/product/epics/`)
+  * [x] **US-02.04**: 10 Tech ADRs (in `docs/adr/`)
   * [x] **US-02.05**: High-Level Architecture (HLA) document
   * [x] **US-02.06**: Initalize IMPLEMENTATION_STATUS.md
   * [x] **US-02.07**: RELEASE-PLAN.md
@@ -71,9 +71,9 @@ Phase 6: Release        [░░░░░░░░░░░░░░░░░░�
 ### Phase 2: Ingestion & Storage (Epics 03–05)
 
 #### EPIC-03: Code Ingestion Pipeline (Priority: P0)
-* **Points**: 55 | **Status**: 🔮 Planned (0%)
+* **Points**: 55 | **Status**: 🟨 In Progress (9.1%)
 * **Stories**:
-  * [ ] **US-03.01**: File walk and programming language detection
+  * [x] **US-03.01**: File walk and programming language detection
   * [ ] **US-03.02**: Python Tree-sitter integration
   * [ ] **US-03.03**: Java Tree-sitter integration
   * [ ] **US-03.04**: JavaScript/TypeScript Tree-sitter integration
@@ -188,6 +188,9 @@ Once a User Story is implemented, the corresponding code files must be registere
 | US-01.05 | [AGENTS.md](file:///Users/abhishek/Dev/Drishti/AGENTS.md), [CONTRIBUTING.md](file:///Users/abhishek/Dev/Drishti/CONTRIBUTING.md), [CODE_OF_CONDUCT.md](file:///Users/abhishek/Dev/Drishti/CODE_OF_CONDUCT.md), [SECURITY.md](file:///Users/abhishek/Dev/Drishti/SECURITY.md) | 🟩 Completed | - |
 | US-02.01 | [PRODUCT-VISION.md](file:///Users/abhishek/Dev/Drishti/docs/product/PRODUCT-VISION.md) | 🟩 Completed | - |
 | US-02.02 | [EPICS-OVERVIEW.md](file:///Users/abhishek/Dev/Drishti/docs/product/EPICS-OVERVIEW.md) | 🟩 Completed | - |
+| US-02.03 | [docs/product/epics/](file:///Users/abhishek/Dev/Drishti/docs/product/epics/) | 🟩 Completed | - |
+| US-02.04 | [docs/adr/](file:///Users/abhishek/Dev/Drishti/docs/adr/) | 🟩 Completed | - |
 | US-02.05 | [high-level-architecture.md](file:///Users/abhishek/Dev/Drishti/docs/architecture/high-level-architecture.md) | 🟩 Completed | - |
 | US-02.06 | [IMPLEMENTATION_STATUS.md](file:///Users/abhishek/Dev/Drishti/docs/IMPLEMENTATION_STATUS.md) | 🟩 Completed | - |
 | US-02.07 | [RELEASE-PLAN.md](file:///Users/abhishek/Dev/Drishti/docs/product/releases/RELEASE-PLAN.md) | 🟩 Completed | - |
+| US-03.01 | [walker.py](file:///Users/abhishek/Dev/Drishti/src/drishti/ingestion/walker.py), [language.py](file:///Users/abhishek/Dev/Drishti/src/drishti/utils/language.py), [gitignore.py](file:///Users/abhishek/Dev/Drishti/src/drishti/ingestion/gitignore.py), [base.py](file:///Users/abhishek/Dev/Drishti/src/drishti/ingestion/base.py), [schemas.py](file:///Users/abhishek/Dev/Drishti/src/drishti/api/schemas.py) | 🟩 Completed | [test_walker.py](file:///Users/abhishek/Dev/Drishti/tests/unit/test_walker.py), [test_language.py](file:///Users/abhishek/Dev/Drishti/tests/unit/test_language.py), [test_gitignore.py](file:///Users/abhishek/Dev/Drishti/tests/unit/test_gitignore.py) |

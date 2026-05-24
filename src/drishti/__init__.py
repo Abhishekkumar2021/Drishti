@@ -1,4 +1,4 @@
-"""Drishti — दृष्टि
+"""Drishti — दृष्टि.
 
 Multi-modal, AST-aware RAG system for code & document understanding.
 
