@@ -20,12 +20,12 @@ This file is the living source of truth for the current build status of Drishti.
 | Component | Total Points | Completed | Progress % | Status |
 |-----------|--------------|-----------|------------|--------|
 | **Phase 1: Foundation** | 55 | 55 | 100.0% | 🟩 Completed |
-| **Phase 2: Ingestion** | 131 | 29 | 22.1% | 🟨 In Progress |
+| **Phase 2: Ingestion** | 131 | 37 | 28.2% | 🟨 In Progress |
 | **Phase 3: Core Search & RAG** | 131 | 0 | 0.0% | 🔮 Planned |
 | **Phase 4: Advanced Features** | 89 | 0 | 0.0% | 🔮 Planned |
 | **Phase 5: Evaluation** | 34 | 0 | 0.0% | 🔮 Planned |
 | **Phase 6: Release** | 21 | 0 | 0.0% | 🔮 Planned |
-| **Total Project** | **461** | **84** | **18.2%** | **🟨 In Progress** |
+| **Total Project** | **461** | **92** | **20.0%** | **🟨 In Progress** |
 
 ---
 
@@ -71,14 +71,14 @@ Phase 6: Release        [░░░░░░░░░░░░░░░░░░�
 ### Phase 2: Ingestion & Storage (Epics 03–05)
 
 #### EPIC-03: Code Ingestion Pipeline (Priority: P0)
-* **Points**: 55 | **Status**: 🟨 In Progress (52.7%)
+* **Points**: 55 | **Status**: 🟨 In Progress (67.3%)
 * **Stories**:
   * [x] **US-03.01**: File walk and programming language detection
   * [x] **US-03.02**: Python Tree-sitter integration
   * [x] **US-03.03**: Java Tree-sitter integration
   * [x] **US-03.04**: JavaScript/TypeScript Tree-sitter integration
-  * [ ] **US-03.05**: Go Tree-sitter integration
-  * [ ] **US-03.06**: AST node extraction rule engine
+  * [x] **US-03.05**: Go Tree-sitter integration
+  * [x] **US-03.06**: AST node extraction rule engine
   * [ ] **US-03.07**: Metadata enrichment (parameters, complexity, docstrings)
   * [ ] **US-03.08**: Parent/child relationship linking (method → class)
   * [ ] **US-03.09**: Dependency/import extraction
@@ -197,3 +197,5 @@ Once a User Story is implemented, the corresponding code files must be registere
 | US-03.02 | [ast/base.py](file:///Users/abhishek/Dev/Drishti/src/drishti/ingestion/ast/base.py), [ast/python.py](file:///Users/abhishek/Dev/Drishti/src/drishti/ingestion/ast/python.py), [ast/registry.py](file:///Users/abhishek/Dev/Drishti/src/drishti/ingestion/ast/registry.py), [queries/python.scm](file:///Users/abhishek/Dev/Drishti/src/drishti/ingestion/queries/python.scm) | 🟩 Completed | [test_python_parser.py](file:///Users/abhishek/Dev/Drishti/tests/unit/test_python_parser.py) |
 | US-03.03 | [ast/java.py](file:///Users/abhishek/Dev/Drishti/src/drishti/ingestion/ast/java.py), [queries/java.scm](file:///Users/abhishek/Dev/Drishti/src/drishti/ingestion/queries/java.scm) | 🟩 Completed | [test_java_parser.py](file:///Users/abhishek/Dev/Drishti/tests/unit/test_java_parser.py) |
 | US-03.04 | [ast/ecmascript.py](file:///Users/abhishek/Dev/Drishti/src/drishti/ingestion/ast/ecmascript.py), [ast/javascript.py](file:///Users/abhishek/Dev/Drishti/src/drishti/ingestion/ast/javascript.py), [ast/typescript.py](file:///Users/abhishek/Dev/Drishti/src/drishti/ingestion/ast/typescript.py), [queries/javascript.scm](file:///Users/abhishek/Dev/Drishti/src/drishti/ingestion/queries/javascript.scm), [queries/typescript.scm](file:///Users/abhishek/Dev/Drishti/src/drishti/ingestion/queries/typescript.scm) | 🟩 Completed | [test_javascript_parser.py](file:///Users/abhishek/Dev/Drishti/tests/unit/test_javascript_parser.py), [test_typescript_parser.py](file:///Users/abhishek/Dev/Drishti/tests/unit/test_typescript_parser.py) |
+| US-03.05 | [ast/go.py](file:///Users/abhishek/Dev/Drishti/src/drishti/ingestion/ast/go.py), [queries/go.scm](file:///Users/abhishek/Dev/Drishti/src/drishti/ingestion/queries/go.scm) | 🟩 Completed | [test_go_parser.py](file:///Users/abhishek/Dev/Drishti/tests/unit/test_go_parser.py) |
+| US-03.06 | [ast/rules.py](file:///Users/abhishek/Dev/Drishti/src/drishti/ingestion/ast/rules.py), [ast/catalog.py](file:///Users/abhishek/Dev/Drishti/src/drishti/ingestion/ast/catalog.py), [queries/parser_rules.json](file:///Users/abhishek/Dev/Drishti/src/drishti/ingestion/queries/parser_rules.json) | 🟩 Completed | [test_parser_rules.py](file:///Users/abhishek/Dev/Drishti/tests/unit/test_parser_rules.py) |

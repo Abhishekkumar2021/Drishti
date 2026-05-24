@@ -28,6 +28,7 @@ class TreeSitterParser(BaseParser, ABC):
         query_scm: str,
         *,
         language_name: str,
+        min_chunk_lines: int = 3,
     ) -> None:
         """Initialize parser with a Tree-sitter language and query.
 
@@ -35,9 +36,11 @@ class TreeSitterParser(BaseParser, ABC):
             language: Compiled Tree-sitter language.
             query_scm: Query source (S-expression).
             language_name: Human-readable language label for chunks.
+            min_chunk_lines: Minimum line span required for nested symbol chunks.
 
         """
         self._language_name = language_name
+        self._min_chunk_lines = max(1, min_chunk_lines)
         self._parser = Parser(language)
         self._query = Query(language, query_scm)
 
@@ -110,6 +113,13 @@ class TreeSitterParser(BaseParser, ABC):
                 )
                 exports_val = symbol_metadata.get("exports", [])
                 dependencies_val = symbol_metadata.get("dependencies", [])
+                parent_override = symbol_metadata.get("parent_class")
+                resolved_parent = parent_override if isinstance(parent_override, str) else None
+                start_line = span_node.start_point[0] + 1
+                end_line = self._inclusive_end_line(span_node)
+                if not self._should_emit_chunk(end_line - start_line + 1, resolved_parent):
+                    continue
+
                 chunks.append(
                     self._build_chunk(
                         file_content=file_content,
@@ -121,6 +131,7 @@ class TreeSitterParser(BaseParser, ABC):
                         source_id=source_id,
                         indexed_at=indexed_at,
                         package_name=package_name,
+                        parent_class=resolved_parent,
                         exports=exports_val if isinstance(exports_val, list) else [],
                         dependencies=dependencies_val if isinstance(dependencies_val, list) else [],
                     )
@@ -140,13 +151,18 @@ class TreeSitterParser(BaseParser, ABC):
         source_id: str,
         indexed_at: datetime,
         package_name: str | None = None,
+        parent_class: str | None = None,
         exports: list[str] | None = None,
         dependencies: list[str] | None = None,
     ) -> UniversalChunk:
         content = self._node_text(file_content, span_node)
         start_line = span_node.start_point[0] + 1
         end_line = self._inclusive_end_line(span_node)
-        parent_class = self._enclosing_scope_name(definition_node, file_content)
+        resolved_parent = (
+            parent_class
+            if parent_class is not None
+            else self._resolve_parent_scope(definition_node, file_content)
+        )
 
         return UniversalChunk(
             id=str(uuid.uuid4()),
@@ -161,7 +177,7 @@ class TreeSitterParser(BaseParser, ABC):
             page_number=None,
             node_type=definition_node.type,
             name=symbol_name,
-            parent_class=parent_class,
+            parent_class=resolved_parent,
             package_name=package_name,
             decorators=decorators,
             exports=exports or [],
@@ -183,6 +199,12 @@ class TreeSitterParser(BaseParser, ABC):
         if name_node is None:
             return None
         return cls._node_text(source, name_node)
+
+    def _should_emit_chunk(self, line_count: int, parent_class: str | None) -> bool:
+        """Apply configured minimum line threshold (nested symbols merge into parent context)."""
+        if line_count >= self._min_chunk_lines:
+            return True
+        return parent_class is None
 
     def _prepare_parse_context(self, root: Node, source: bytes) -> dict[str, object]:
         """Build per-file context shared across symbols (override in language parsers)."""
@@ -251,6 +273,11 @@ class TreeSitterParser(BaseParser, ABC):
         if "(" in text:
             return text.split("(", maxsplit=1)[0].strip()
         return text
+
+    @classmethod
+    def _resolve_parent_scope(cls, node: Node, source: bytes) -> str | None:
+        """Return the enclosing scope name for a symbol (override in language parsers)."""
+        return cls._enclosing_scope_name(node, source)
 
     @classmethod
     def _enclosing_scope_name(cls, node: Node, source: bytes) -> str | None:

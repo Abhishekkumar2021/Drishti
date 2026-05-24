@@ -77,8 +77,8 @@ This epic covers the repository walking, AST parsing using Tree-sitter, language
 **Complexity**: 8 SP | **Priority**: P0
 
 **Acceptance Criteria**
-1. [ ] Tree-sitter parses `.go` files.
-2. [ ] Extracts structs, interfaces, functions, receiver methods, and imports.
+1. [x] Tree-sitter parses `.go` files.
+2. [x] Extracts structs, interfaces, functions, receiver methods, and imports.
 
 ---
 
@@ -90,8 +90,8 @@ This epic covers the repository walking, AST parsing using Tree-sitter, language
 **Complexity**: 5 SP | **Priority**: P0
 
 **Acceptance Criteria**
-1. [ ] Parser queries syntax nodes based on a configuration file.
-2. [ ] Ignores nodes below a specific line threshold (e.g. functions < 3 lines merged with parent).
+1. [x] Parser queries syntax nodes based on a configuration file.
+2. [x] Ignores nodes below a specific line threshold (e.g. functions < 3 lines merged with parent).
 
 ---
 
