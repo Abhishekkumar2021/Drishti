@@ -107,7 +107,7 @@ sequenceDiagram
 
 ---
 
-## Incremental Indexing (Planned — US-03.10)
+## Incremental Indexing (Implemented — US-03.10)
 
 ```mermaid
 sequenceDiagram

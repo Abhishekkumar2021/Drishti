@@ -57,17 +57,17 @@ erDiagram
 | `decorators` | `list[str]` | no | 🟩 | Normalized decorator / annotation names |
 | `exports` | `list[str]` | no | 🟩 | e.g. `export`, `default` |
 | `dependencies` | `list[str]` | no | 🟩 | Module import paths |
-| `docstring` | `str?` | no | 🟨 | US-03.07 — leading doc / comment block |
-| `parameters` | `list[str]` | no | 🟨 | US-03.07 — formal parameter descriptors |
-| `return_type` | `str?` | no | 🟨 | US-03.07 — declared return type |
-| `cyclomatic_complexity` | `int?` | no | 🟨 | US-03.07 — McCabe score (≥1) |
-| `parent_module` | `str?` | no | 🟨 | US-03.08 — module / package id |
-| `context_path` | `str?` | no | 🟨 | US-03.08 — `file::Scope::symbol` |
-| `imported_symbols` | `list[str]` | no | 🟨 | US-03.09 — symbols imported in file |
-| `definition_file_path` | `str?` | no | 🟨 | US-03.09 — defining file for symbol |
+| `docstring` | `str?` | no | 🟩 | Leading doc / comment block (US-03.07) |
+| `parameters` | `list[str]` | no | 🟩 | Formal parameter descriptors (US-03.07) |
+| `return_type` | `str?` | no | 🟩 | Declared return type (US-03.07) |
+| `cyclomatic_complexity` | `int?` | no | 🟩 | McCabe score ≥1 (US-03.07) |
+| `parent_module` | `str?` | no | 🟩 | Module / package id (US-03.08) |
+| `context_path` | `str?` | no | 🟩 | `file::Scope::symbol` (US-03.08) |
+| `imported_symbols` | `list[str]` | no | 🟩 | Symbols imported in file (US-03.09) |
+| `definition_file_path` | `str?` | no | 🟩 | Defining file for symbol (US-03.09) |
 | `last_modified` | `datetime` | yes | 🟩 | Index timestamp |
 
-Legend: 🟩 on `develop` · 🟨 specified / in flight (US-03.07–09) · 🔮 not implemented
+Legend: 🟩 implemented on `develop` · 🔮 planned (e.g. PDF `page_number`)
 
 ---
 

@@ -143,6 +143,6 @@ This epic covers the repository walking, AST parsing using Tree-sitter, language
 **Complexity**: 5 SP | **Priority**: P0
 
 **Acceptance Criteria**
-1. [ ] Queries git diff hashes between the workspace and the indexed state.
-2. [ ] Detects deleted, modified, and created files.
-3. [ ] Removes deleted file chunks from the index database.
+1. [x] Queries git diff hashes between the workspace and the indexed state.
+2. [x] Detects deleted, modified, and created files.
+3. [x] Removes deleted file chunks from the index database.

@@ -40,6 +40,13 @@ class PathValidationError(DrishtiError):
         super().__init__(message, code="PATH_VALIDATION_ERROR")
 
 
+class GitRepositoryError(DrishtiError):
+    """Raised when git operations fail or the path is not a repository."""
+
+    def __init__(self, message: str) -> None:
+        super().__init__(message, code="GIT_REPOSITORY_ERROR")
+
+
 class ServiceUnavailableError(DrishtiError):
     """Raised when a required downstream service is unavailable."""
 

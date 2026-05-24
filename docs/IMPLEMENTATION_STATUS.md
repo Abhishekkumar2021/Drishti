@@ -20,12 +20,12 @@ This file is the living source of truth for the current build status of Drishti.
 | Component | Total Points | Completed | Progress % | Status |
 |-----------|--------------|-----------|------------|--------|
 | **Phase 1: Foundation** | 55 | 55 | 100.0% | 🟩 Completed |
-| **Phase 2: Ingestion** | 131 | 37 | 28.2% | 🟨 In Progress |
+| **Phase 2: Ingestion** | 131 | 55 | 42.0% | 🟨 In Progress |
 | **Phase 3: Core Search & RAG** | 131 | 0 | 0.0% | 🔮 Planned |
 | **Phase 4: Advanced Features** | 89 | 0 | 0.0% | 🔮 Planned |
 | **Phase 5: Evaluation** | 34 | 0 | 0.0% | 🔮 Planned |
 | **Phase 6: Release** | 21 | 0 | 0.0% | 🔮 Planned |
-| **Total Project** | **461** | **92** | **20.0%** | **🟨 In Progress** |
+| **Total Project** | **461** | **110** | **23.9%** | **🟨 In Progress** |
 
 ---
 
@@ -33,7 +33,7 @@ This file is the living source of truth for the current build status of Drishti.
 
 ```
 Phase 1: Foundation     [████████████████████] 100.0% (Completed)
-Phase 2: Ingestion      [█░░░░░░░░░░░░░░░░░░] 3.8%  (In Progress)
+Phase 2: Ingestion      [████████░░░░░░░░░░░░] 42.0% (In Progress)
 Phase 3: Search & RAG   [░░░░░░░░░░░░░░░░░░░] 0.0%  (Planned)
 Phase 4: UI & Graph     [░░░░░░░░░░░░░░░░░░░] 0.0%  (Planned)
 Phase 5: Evaluation     [░░░░░░░░░░░░░░░░░░░] 0.0%  (Planned)
@@ -71,7 +71,7 @@ Phase 6: Release        [░░░░░░░░░░░░░░░░░░�
 ### Phase 2: Ingestion & Storage (Epics 03–05)
 
 #### EPIC-03: Code Ingestion Pipeline (Priority: P0)
-* **Points**: 55 | **Status**: 🟨 In Progress (67.3%)
+* **Points**: 55 | **Status**: 🟩 Completed (100%)
 * **Stories**:
   * [x] **US-03.01**: File walk and programming language detection
   * [x] **US-03.02**: Python Tree-sitter integration
@@ -82,7 +82,7 @@ Phase 6: Release        [░░░░░░░░░░░░░░░░░░�
   * [x] **US-03.07**: Metadata enrichment (parameters, complexity, docstrings)
   * [x] **US-03.08**: Parent/child relationship linking (method → class)
   * [x] **US-03.09**: Dependency/import extraction
-  * [ ] **US-03.10**: Repository git walker (incremental indexing via diffs)
+  * [x] **US-03.10**: Repository git walker (incremental indexing via diffs)
 
 #### EPIC-04: Document Ingestion Pipeline (Priority: P1)
 * **Points**: 42 | **Status**: 🔮 Planned (0%)
@@ -202,3 +202,4 @@ Once a User Story is implemented, the corresponding code files must be registere
 | US-03.07 | [ast/metadata.py](file:///Users/abhishek/Dev/Drishti/src/drishti/ingestion/ast/metadata.py), [schemas.py](file:///Users/abhishek/Dev/Drishti/src/drishti/api/schemas.py) | 🟩 Completed | [test_metadata_enrichment.py](file:///Users/abhishek/Dev/Drishti/tests/unit/test_metadata_enrichment.py) |
 | US-03.08 | [ast/metadata.py](file:///Users/abhishek/Dev/Drishti/src/drishti/ingestion/ast/metadata.py) | 🟩 Completed | [test_metadata_enrichment.py](file:///Users/abhishek/Dev/Drishti/tests/unit/test_metadata_enrichment.py) |
 | US-03.09 | [symbols.py](file:///Users/abhishek/Dev/Drishti/src/drishti/ingestion/symbols.py), [ast/metadata.py](file:///Users/abhishek/Dev/Drishti/src/drishti/ingestion/ast/metadata.py) | 🟩 Completed | [test_metadata_enrichment.py](file:///Users/abhishek/Dev/Drishti/tests/unit/test_metadata_enrichment.py) |
+| US-03.10 | [git_changes.py](file:///Users/abhishek/Dev/Drishti/src/drishti/ingestion/git_changes.py), [incremental.py](file:///Users/abhishek/Dev/Drishti/src/drishti/ingestion/incremental.py), [index_state.py](file:///Users/abhishek/Dev/Drishti/src/drishti/ingestion/index_state.py), [chunk_index.py](file:///Users/abhishek/Dev/Drishti/src/drishti/ingestion/chunk_index.py) | 🟩 Completed | [test_git_incremental.py](file:///Users/abhishek/Dev/Drishti/tests/unit/test_git_incremental.py) |
