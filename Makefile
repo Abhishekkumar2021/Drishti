@@ -39,9 +39,9 @@ setup: ## First-time project setup
 dev: ## Start FastAPI development server with hot reload
 	uv run uvicorn drishti.main:app --reload --host 0.0.0.0 --port 8000
 
-dev-web: ## Start Next.js frontend dev server (EPIC-10 — not yet implemented)
-	@echo "Frontend (web/) is planned in EPIC-10 and is not available yet."
-	@exit 1
+dev-web: ## Start Next.js frontend dev server (port 3000)
+	@test -d web/node_modules || (cd web && npm install)
+	cd web && npm run dev
 
 # ═══════════════════════════════════════
 # Testing

@@ -1,0 +1,17 @@
+@import "highlight.js/styles/github-dark.min.css";
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+}
+
+body {
+  @apply bg-surface text-slate-100 antialiased;
+}
+
+.hljs {
+  @apply rounded-lg bg-surface-raised p-3 text-sm;
+}

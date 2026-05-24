@@ -282,7 +282,7 @@ Engineering foundation (pyproject, CI, Docker)     █████████�
 Code ingestion (Tree-sitter, EPIC-03)               ████████████████████  100%
 Core pipeline (embedding → search → RAG)           ░░░░░░░░░░░░░░░░░░░░   0%
 RAG generation (context → LLM → citations)         ░░░░░░░░░░░░░░░░░░░░   0%
-Frontend UI (Next.js + Monaco)                     ░░░░░░░░░░░░░░░░░░░░   0%
+Frontend UI (Next.js + Monaco)                     █████████████████░░░  85%
 Evaluation & benchmarks                            ░░░░░░░░░░░░░░░░░░░░   0%
 ```
 
