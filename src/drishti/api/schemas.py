@@ -67,6 +67,10 @@ class UniversalChunk(BaseModel):
         default_factory=list,
         description="Decorator names applied to the symbol (e.g. dataclass, property)",
     )
+    exports: list[str] = Field(
+        default_factory=list,
+        description="Export modifiers for the symbol (e.g. export, default)",
+    )
     dependencies: list[str] = Field(
         default_factory=list,
         description="Extracted import or calling dependency references",

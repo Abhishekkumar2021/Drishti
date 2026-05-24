@@ -145,6 +145,7 @@ class UniversalChunk(BaseModel):
     parent_class: str | None         # Enclosing class context
     package_name: str | None         # Java package path when applicable
     decorators: list[str] = []       # Decorator names (e.g. dataclass, property)
+    exports: list[str] = []          # Export modifiers (e.g. export, default)
     dependencies: list[str] = []     # External symbol imports
     last_modified: datetime          # Git commit datetime or file datetime
 ```
