@@ -92,6 +92,8 @@ def register_exception_handlers(app: FastAPI) -> None:
             status_code = 401
         elif exc.code == "AUTHORIZATION_ERROR":
             status_code = 403
+        elif exc.code == "GENERATION_ERROR":
+            status_code = 502
         elif exc.code == "SERVICE_UNAVAILABLE":
             status_code = 503
 

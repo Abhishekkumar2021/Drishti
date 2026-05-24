@@ -21,11 +21,11 @@ This file is the living source of truth for the current build status of Drishti.
 |-----------|--------------|-----------|------------|--------|
 | **Phase 1: Foundation** | 55 | 55 | 100.0% | 🟩 Completed |
 | **Phase 2: Ingestion** | 131 | 89 | 67.9% | 🟨 In Progress |
-| **Phase 3: Core Search & RAG** | 131 | 55 | 42.0% | 🟨 In Progress |
+| **Phase 3: Core Search & RAG** | 131 | 97 | 74.0% | 🟨 In Progress |
 | **Phase 4: Advanced Features** | 89 | 0 | 0.0% | 🔮 Planned |
 | **Phase 5: Evaluation** | 34 | 0 | 0.0% | 🔮 Planned |
 | **Phase 6: Release** | 21 | 0 | 0.0% | 🔮 Planned |
-| **Total Project** | **461** | **199** | **43.2%** | **🟨 In Progress** |
+| **Total Project** | **461** | **241** | **52.3%** | **🟨 In Progress** |
 
 ---
 
@@ -34,7 +34,7 @@ This file is the living source of truth for the current build status of Drishti.
 ```
 Phase 1: Foundation     [████████████████████] 100.0% (Completed)
 Phase 2: Ingestion      [█████████████░░░░░░░] 67.9% (In Progress)
-Phase 3: Search & RAG   [████████░░░░░░░░░░░░] 42.0% (In Progress)
+Phase 3: Search & RAG   [██████████████░░░░░░] 74.0% (In Progress)
 Phase 4: UI & Graph     [░░░░░░░░░░░░░░░░░░░] 0.0%  (Planned)
 Phase 5: Evaluation     [░░░░░░░░░░░░░░░░░░░] 0.0%  (Planned)
 Phase 6: Release        [░░░░░░░░░░░░░░░░░░░] 0.0%  (Planned)
@@ -115,12 +115,12 @@ Phase 6: Release        [░░░░░░░░░░░░░░░░░░�
   * [x] **US-06.05**: LLM query expansion implementation
 
 #### EPIC-07: RAG Pipeline & Generation (Priority: P0)
-* **Points**: 42 | **Status**: 🔮 Planned (0%)
+* **Points**: 42 | **Status**: 🟩 Completed (100%)
 * **Stories**:
-  * [ ] **US-07.01**: Prompt template compiler & context builder
-  * [ ] **US-07.02**: LLM client integration (Claude API)
-  * [ ] **US-07.03**: Streaming response mechanism
-  * [ ] **US-07.04**: Citation parser & line reference generator
+  * [x] **US-07.01**: Prompt template compiler & context builder
+  * [x] **US-07.02**: LLM client integration (`create_chat_llm`, Anthropic/OpenAI)
+  * [x] **US-07.03**: Streaming response mechanism (SSE events)
+  * [x] **US-07.04**: Citation parser & line reference generator
 
 #### EPIC-08: API & Backend Service (Priority: P0)
 * **Points**: 34 | **Status**: 🔮 Planned (0%)
@@ -213,3 +213,7 @@ Once a User Story is implemented, the corresponding code files must be registere
 | US-06.04 | [rerank.py](file:///Users/abhishek/Dev/Drishti/src/drishti/search/rerank.py) | 🟩 Completed | [test_search_rerank.py](file:///Users/abhishek/Dev/Drishti/tests/unit/test_search_rerank.py) |
 | US-06.05 | [expansion.py](file:///Users/abhishek/Dev/Drishti/src/drishti/search/expansion.py) | 🟩 Completed | [test_query_expansion.py](file:///Users/abhishek/Dev/Drishti/tests/unit/test_query_expansion.py) |
 | US-06.* | [pipeline.py](file:///Users/abhishek/Dev/Drishti/src/drishti/search/pipeline.py), [factory.py](file:///Users/abhishek/Dev/Drishti/src/drishti/search/factory.py) | 🟩 Completed | [test_hybrid_search_pipeline.py](file:///Users/abhishek/Dev/Drishti/tests/unit/test_hybrid_search_pipeline.py), [test_hybrid_search.py](file:///Users/abhishek/Dev/Drishti/tests/integration/test_hybrid_search.py) |
+| US-07.01 | [generation/context.py](file:///Users/abhishek/Dev/Drishti/src/drishti/generation/context.py), [generation/prompts.py](file:///Users/abhishek/Dev/Drishti/src/drishti/generation/prompts.py) | 🟩 Completed | [test_context_builder.py](file:///Users/abhishek/Dev/Drishti/tests/unit/test_context_builder.py) |
+| US-07.02 | [generation/llm.py](file:///Users/abhishek/Dev/Drishti/src/drishti/generation/llm.py), [generation/factory.py](file:///Users/abhishek/Dev/Drishti/src/drishti/generation/factory.py) | 🟩 Completed | [test_generation_llm.py](file:///Users/abhishek/Dev/Drishti/tests/unit/test_generation_llm.py) |
+| US-07.03 | [generation/streaming.py](file:///Users/abhishek/Dev/Drishti/src/drishti/generation/streaming.py), [generation/pipeline.py](file:///Users/abhishek/Dev/Drishti/src/drishti/generation/pipeline.py) | 🟩 Completed | [test_rag_pipeline.py](file:///Users/abhishek/Dev/Drishti/tests/unit/test_rag_pipeline.py) |
+| US-07.04 | [generation/citations.py](file:///Users/abhishek/Dev/Drishti/src/drishti/generation/citations.py) | 🟩 Completed | [test_citations.py](file:///Users/abhishek/Dev/Drishti/tests/unit/test_citations.py) |

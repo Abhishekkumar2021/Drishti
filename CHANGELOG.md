@@ -19,6 +19,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - OpenAI dense embeddings with batching/retries; `HashingDenseEmbedder` for tests
   - BM25 sparse encoder and `ChunkEmbeddingPipeline`
   - `QdrantChunkStore` with hybrid dense+sparse vectors, payload indexes, and filter compilation
+- EPIC-07 RAG pipeline and generation (US-07.01–07.04)
+  - `ContextBuilder`, `RAGPipeline`, citation parser, SSE streaming helpers
+  - `create_chat_llm` (Anthropic/OpenAI) and `build_rag_pipeline` factory
 - EPIC-06 hybrid search engine (US-06.01–06.05)
   - Dense and sparse Qdrant retrievers, RRF fusion, Cohere reranker, Anthropic query expansion
   - `HybridSearchPipeline` and `build_hybrid_search_pipeline` factory; `LexicalReranker` for local/tests

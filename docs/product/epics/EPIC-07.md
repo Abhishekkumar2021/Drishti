@@ -7,7 +7,7 @@ This epic covers assembling context from search results, prompting the LLM, mana
 ## Epic Metadata
 * **Complexity**: 42 Story Points
 * **Priority**: P0 (Critical Blocker)
-* **Status**: Planned
+* **Status**: Completed
 
 ---
 
@@ -21,9 +21,9 @@ This epic covers assembling context from search results, prompting the LLM, mana
 **Complexity**: 8 SP | **Priority**: P0
 
 **Acceptance Criteria**
-1. [ ] Assembles context using a system instructions template.
-2. [ ] Wraps each context chunk in clear delimiters (e.g. `<context file="path" start="1" end="10">...</context>`).
-3. [ ] Computes and limits token count to avoid context overflow.
+1. [x] Assembles context using a system instructions template.
+2. [x] Wraps each context chunk in clear delimiters (e.g. `<context file="path" start="1" end="10">...</context>`).
+3. [x] Computes and limits token count to avoid context overflow.
 
 ---
 
@@ -35,9 +35,9 @@ This epic covers assembling context from search results, prompting the LLM, mana
 **Complexity**: 8 SP | **Priority**: P0
 
 **Acceptance Criteria**
-1. [ ] Configures anthropic-sdk client.
-2. [ ] Configures temperature, max tokens, and system prompts.
-3. [ ] Gracefully catches and reports API connectivity failures.
+1. [x] Configures anthropic-sdk client.
+2. [x] Configures temperature, max tokens, and system prompts.
+3. [x] Gracefully catches and reports API connectivity failures.
 
 ---
 
@@ -49,8 +49,8 @@ This epic covers assembling context from search results, prompting the LLM, mana
 **Complexity**: 13 SP | **Priority**: P0
 
 **Acceptance Criteria**
-1. [ ] Server streams tokens via Server-Sent Events (SSE) or FastAPI StreamingResponse.
-2. [ ] Connection cleanup is performed when the client terminates early.
+1. [x] Server streams tokens via Server-Sent Events (SSE) or FastAPI StreamingResponse.
+2. [x] Connection cleanup is performed when the client terminates early.
 
 ---
 
@@ -62,6 +62,6 @@ This epic covers assembling context from search results, prompting the LLM, mana
 **Complexity**: 13 SP | **Priority**: P0
 
 **Acceptance Criteria**
-1. [ ] Prompt forces the LLM to output citations in a standardized format, e.g. `[src/auth.py:L10-15]`.
-2. [ ] Backend validates that the cited files and lines actually exist in the retrieved context to prevent hallucination.
-3. [ ] Parses citations into structured JSON references alongside the text tokens.
+1. [x] Prompt forces the LLM to output citations in a standardized format, e.g. `[src/auth.py:L10-15]`.
+2. [x] Backend validates that the cited files and lines actually exist in the retrieved context to prevent hallucination.
+3. [x] Parses citations into structured JSON references alongside the text tokens.
