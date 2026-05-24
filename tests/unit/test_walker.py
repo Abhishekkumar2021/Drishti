@@ -82,6 +82,19 @@ class TestFileWalker:
         assert discovered[0].relative_path == "run"
         assert discovered[0].language == "python"
 
+    def test_skips_symlink_outside_repository(self, tmp_path: Path) -> None:
+        repo = tmp_path / "repo"
+        outside = tmp_path / "outside"
+        repo.mkdir()
+        outside.mkdir()
+        (outside / "secret.py").write_text("secret\n", encoding="utf-8")
+        (repo / "link.py").symlink_to(outside / "secret.py")
+
+        walker = FileWalker(repo)
+        paths = {item.relative_path for item in walker.discover()}
+
+        assert "link.py" not in paths
+
     def test_non_recursive_walk_only_scans_root(self, tmp_path: Path) -> None:
         repo = tmp_path / "repo"
         repo.mkdir()

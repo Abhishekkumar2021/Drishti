@@ -3,9 +3,20 @@
 from __future__ import annotations
 
 from datetime import datetime
+from pathlib import Path
 from typing import Literal
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
+
+from drishti.exceptions import PathValidationError
+from drishti.utils.paths import resolve_repo_path
+
+
+class ChatMessage(BaseModel):
+    """A single message in a RAG conversation history."""
+
+    role: Literal["user", "assistant", "system"]
+    content: str = Field(..., min_length=1)
 
 
 class UniversalChunk(BaseModel):
@@ -56,10 +67,18 @@ class IngestionRequest(BaseModel):
     repo_path: str = Field(
         ...,
         description="Absolute local directory path of repository to index",
+        min_length=1,
     )
     branch: str | None = Field("main", description="Target Git branch")
     recursive: bool = Field(True, description="Recursively walk subdirectories")
     force_reindex: bool = Field(False, description="Ignore state hash and re-index all files")
+
+    def resolved_repo_path(self, *, allowed_roots: list[Path] | None = None) -> Path:
+        """Validate and resolve the repository path."""
+        try:
+            return resolve_repo_path(self.repo_path, allowed_roots=allowed_roots)
+        except PathValidationError as exc:
+            raise ValueError(str(exc)) from exc
 
 
 class SearchRequest(BaseModel):
@@ -76,9 +95,17 @@ class SearchRequest(BaseModel):
 class AskRequest(BaseModel):
     """Payload request schema for Q&A (RAG) prompts."""
 
-    question: str = Field(..., description="User query for RAG pipeline")
-    conversation_history: list[dict[str, str]] = Field(
+    question: str = Field(..., min_length=1, description="User query for RAG pipeline")
+    conversation_history: list[ChatMessage] = Field(
         default_factory=list,
-        description="List of prior messages formatted as [{'role': 'user', 'content': '...'}]",
+        description="Prior conversation turns",
     )
     filters: dict[str, str] | None = Field(None, description="Metadata scope filters")
+
+    @field_validator("conversation_history")
+    @classmethod
+    def validate_history_length(cls, value: list[ChatMessage]) -> list[ChatMessage]:
+        if len(value) > 50:
+            msg = "conversation_history must not exceed 50 messages"
+            raise ValueError(msg)
+        return value

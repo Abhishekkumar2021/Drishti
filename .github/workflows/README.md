@@ -2,8 +2,9 @@
 
 | Workflow | File | When it runs | Purpose |
 |----------|------|--------------|---------|
-| **Python CI** | `ci.yml` | PR/push to `main`/`develop` (Python paths) | Ruff lint/format, mypy, unit tests with coverage, Docker build |
+| **Python CI** | `ci.yml` | PR/push to `main`/`develop` (Python paths) | Ruff lint/format, mypy, unit tests with coverage gate, Docker build |
 | **Integration CI** | `integration-ci.yml` | PR/push when integration tests exist | Qdrant + Redis service containers (disabled until tests land) |
+| **Security** | `security.yml` | PR/push + weekly | Bandit SAST, pip-audit dependency scan |
 | **Pull Request** | `pull-request.yml` | Every PR to `main`/`develop` | Conventional title, doc link check, size guard |
 
 ## Required status checks (branch protection)
@@ -15,6 +16,8 @@ After enabling branch protection on `develop`, prefer these **job names**:
 - `Python · Code quality`
 - `Python · Tests`
 - `Docker · Build`
+- `Security · Bandit (SAST)`
+- `Security · pip-audit`
 
 **All PRs**
 
