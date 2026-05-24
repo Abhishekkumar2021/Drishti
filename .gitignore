@@ -1,0 +1,69 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg-info/
+*.egg
+dist/
+build/
+.eggs/
+*.whl
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.cursor/
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+.mypy_cache/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Node (frontend)
+web/node_modules/
+web/.next/
+web/out/
+
+# Docker
+*.log
+
+# Qdrant data
+qdrant_data/
+
+# Redis
+dump.rdb
+
+# Model artifacts
+models/*.bin
+models/*.pt
+models/*.onnx
+
+# Benchmark results (keep templates, ignore generated)
+benchmarks/results/*.json
+!benchmarks/results/.gitkeep
+
+# Scratch files
+scratch/
