@@ -1,17 +1,24 @@
 #!/usr/bin/env bash
-# Exit immediately if a command exits with a non-zero status
-set -e
+# Fast local checks before commit (unit tests only; no Docker required).
+set -euo pipefail
+
+cd "$(dirname "$0")/.."
 
 echo "Running pre-commit validation checks..."
 
-echo "Running ruff checks..."
+echo "▶ Ruff (src, tests, scripts)"
 uv run ruff check src/ tests/ scripts/
 uv run ruff format --check src/ tests/ scripts/
 
-echo "Running type checks (mypy)..."
+echo "▶ Mypy"
 uv run mypy src/
 
-echo "Running unit tests..."
-uv run pytest tests/unit/ -m unit --cov=src/drishti --cov-fail-under=70
+echo "▶ Unit tests + coverage ≥70%"
+uv run pytest tests/unit/ -m unit \
+  --cov=src/drishti \
+  --cov-report=term-missing \
+  --cov-fail-under=70
 
-echo "All pre-commit checks passed."
+echo ""
+echo "✅ Pre-commit checks passed."
+echo "   Before opening a PR, also run: make ci-precheck"

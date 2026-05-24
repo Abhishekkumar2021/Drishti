@@ -144,6 +144,24 @@ Every PR must fill out the [PR template](.github/PULL_REQUEST_TEMPLATE.md).
 | Bug fix | Regression test proving the fix |
 | Configuration | Test default values and overrides |
 
+### Integration tests
+
+Integration tests live in `tests/integration/` and require Qdrant and Redis:
+
+```bash
+make docker-up
+make test-integration
+```
+
+CI runs them in `.github/workflows/integration-ci.yml` with service containers. Unit tests (`make pre-commit`) do not start Docker.
+
+Before opening a pull request, run the full CI parity suite:
+
+```bash
+make docker-up    # if integration tests need local services
+make ci-precheck  # lint, mypy, unit tests, bandit, pip-audit, Docker build, integration
+```
+
 ---
 
 ## Documentation
