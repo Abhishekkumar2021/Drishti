@@ -7,7 +7,7 @@ This epic covers generating dense and sparse vector embeddings for chunks and in
 ## Epic Metadata
 * **Complexity**: 34 Story Points
 * **Priority**: P0 (Critical Blocker)
-* **Status**: Planned
+* **Status**: Completed
 
 ---
 
@@ -21,9 +21,9 @@ This epic covers generating dense and sparse vector embeddings for chunks and in
 **Complexity**: 8 SP | **Priority**: P0
 
 **Acceptance Criteria**
-1. [ ] Client generates embeddings for text/code chunks.
-2. [ ] Handles API rate limits, retries, and batch requests.
-3. [ ] Embeddings generated are 1536-dimensional float arrays.
+1. [x] Client generates embeddings for text/code chunks.
+2. [x] Handles API rate limits, retries, and batch requests.
+3. [x] Embeddings generated are 1536-dimensional float arrays.
 
 ---
 
@@ -35,9 +35,9 @@ This epic covers generating dense and sparse vector embeddings for chunks and in
 **Complexity**: 8 SP | **Priority**: P0
 
 **Acceptance Criteria**
-1. [ ] Builds token frequencies for vocabulary.
-2. [ ] Computes sparse vectors representing term importances.
-3. [ ] Integrated directly into Qdrant sparse vectors collection.
+1. [x] Builds token frequencies for vocabulary.
+2. [x] Computes sparse vectors representing term importances.
+3. [x] Integrated directly into Qdrant sparse vectors collection.
 
 ---
 
@@ -49,9 +49,9 @@ This epic covers generating dense and sparse vector embeddings for chunks and in
 **Complexity**: 13 SP | **Priority**: P0
 
 **Acceptance Criteria**
-1. [ ] Establishes Qdrant collection configured with dense (1536 dims, cosine similarity) and sparse vector parameters.
-2. [ ] Configures payload indexes for quick metadata filtering (by file path, language, content type).
-3. [ ] Write integration test validating write/read cycles.
+1. [x] Establishes Qdrant collection configured with dense (1536 dims, cosine similarity) and sparse vector parameters.
+2. [x] Configures payload indexes for quick metadata filtering (by file path, language, content type).
+3. [x] Write integration test validating write/read cycles.
 
 ---
 
@@ -63,5 +63,5 @@ This epic covers generating dense and sparse vector embeddings for chunks and in
 **Complexity**: 5 SP | **Priority**: P0
 
 **Acceptance Criteria**
-1. [ ] Maps parameters like `language: python` or `file_path: src/auth/*` into valid Qdrant filter payloads.
-2. [ ] Supports logical AND/OR operations on filters.
+1. [x] Maps parameters like `language: python` or `file_path: src/auth/*` into valid Qdrant filter payloads.
+2. [x] Supports logical AND/OR operations on filters.

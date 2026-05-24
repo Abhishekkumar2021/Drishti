@@ -27,7 +27,7 @@ class ChunkIndex(ABC):
 
 
 class InMemoryChunkIndex(ChunkIndex):
-    """In-memory chunk index used in tests and local pipelines before Qdrant (EPIC-05)."""
+    """In-memory chunk index used in tests; production uses ``QdrantChunkStore``."""
 
     def __init__(self) -> None:
         """Initialize an empty in-memory chunk index."""

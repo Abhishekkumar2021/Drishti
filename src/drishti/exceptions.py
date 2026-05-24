@@ -47,6 +47,13 @@ class GitRepositoryError(DrishtiError):
         super().__init__(message, code="GIT_REPOSITORY_ERROR")
 
 
+class EmbeddingError(DrishtiError):
+    """Raised when dense or sparse embedding generation fails."""
+
+    def __init__(self, message: str) -> None:
+        super().__init__(message, code="EMBEDDING_ERROR")
+
+
 class ServiceUnavailableError(DrishtiError):
     """Raised when a required downstream service is unavailable."""
 
