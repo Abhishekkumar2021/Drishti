@@ -11,7 +11,7 @@ from drishti.generation.streaming import citation_event, context_event, done_eve
 
 
 async def iter_sse_from_graph_stream(
-    graph_stream: AsyncIterator[tuple[str, Any]],
+    graph_stream: AsyncIterator[Any],
     *,
     started_perf: float,
     token_count_start: int = 0,
@@ -21,7 +21,10 @@ async def iter_sse_from_graph_stream(
 
     token_count = token_count_start
 
-    async for mode, payload in graph_stream:
+    async for chunk in graph_stream:
+        if not isinstance(chunk, tuple) or len(chunk) != 2:
+            continue
+        mode, payload = chunk[0], chunk[1]
         if mode == "custom" and isinstance(payload, dict):
             if payload.get("event") == "token":
                 text = str(payload.get("text", ""))

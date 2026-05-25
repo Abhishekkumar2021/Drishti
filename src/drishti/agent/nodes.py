@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import json
 import re
-from collections.abc import Callable
 from typing import TYPE_CHECKING
 
 from langgraph.config import get_stream_writer
@@ -39,54 +38,50 @@ or {{"tool": null}} if no tool is needed.
 """
 
 
-def run_agent_tools(tools: list[BaseTool], llm: ChatLLM) -> Callable[[AgentState], AgentState]:
+def invoke_agent_tools(tools: list[BaseTool], llm: ChatLLM, state: AgentState) -> AgentState:
     """LLM-select at most one LangChain tool and append its output to workspace memory."""
+    if state.get("tools_invoked") or not tools:
+        return {"tools_invoked": True}
 
-    def node(state: AgentState) -> AgentState:
-        if state.get("tools_invoked") or not tools:
-            return {"tools_invoked": True}
+    by_name = {tool.name: tool for tool in tools}
+    tool_lines = "\n".join(f"- {tool.name}: {tool.description or ''}" for tool in tools)
+    prompt = _TOOL_CALL_PROMPT.format(
+        tool_lines=tool_lines,
+        question=state.get("question", "").strip(),
+    )
+    raw = llm.complete(
+        prompt,
+        system="You are a tool router. Output JSON only.",
+        max_tokens=512,
+    )
+    selection = _parse_tool_call_json(raw)
+    if selection is None:
+        return {"tools_invoked": True}
 
-        by_name = {tool.name: tool for tool in tools}
-        tool_lines = "\n".join(f"- {tool.name}: {tool.description or ''}" for tool in tools)
-        prompt = _TOOL_CALL_PROMPT.format(
-            tool_lines=tool_lines,
-            question=state.get("question", "").strip(),
-        )
-        raw = llm.complete(
-            prompt,
-            system="You are a tool router. Output JSON only.",
-            max_tokens=512,
-        )
-        selection = _parse_tool_call_json(raw)
-        if selection is None:
-            return {"tools_invoked": True}
+    tool_name = str(selection.get("tool", "")).strip()
+    tool = by_name.get(tool_name)
+    if tool is None:
+        return {"tools_invoked": True}
 
-        tool_name = str(selection.get("tool", "")).strip()
-        tool = by_name.get(tool_name)
-        if tool is None:
-            return {"tools_invoked": True}
+    arguments = selection.get("arguments")
+    if not isinstance(arguments, dict):
+        arguments = {}
 
-        arguments = selection.get("arguments")
-        if not isinstance(arguments, dict):
-            arguments = {}
+    try:
+        output = tool.invoke(arguments)
+    except Exception as exc:
+        output = json.dumps({"error": str(exc)}, ensure_ascii=False)
+    else:
+        if not isinstance(output, str):
+            output = json.dumps(output, ensure_ascii=False, default=str)
 
-        try:
-            output = tool.invoke(arguments)
-        except Exception as exc:
-            output = json.dumps({"error": str(exc)}, ensure_ascii=False)
-        else:
-            if not isinstance(output, str):
-                output = json.dumps(output, ensure_ascii=False, default=str)
-
-        prior = state.get("workspace_memory", "")
-        appendix = f"\n\n[Tool {tool_name} result]\n{output}"
-        logger.info("agent_tool_invoked", tool=tool_name)
-        return {
-            "tools_invoked": True,
-            "workspace_memory": f"{prior}{appendix}".strip(),
-        }
-
-    return node
+    prior = state.get("workspace_memory", "")
+    appendix = f"\n\n[Tool {tool_name} result]\n{output}"
+    logger.info("agent_tool_invoked", tool=tool_name)
+    return {
+        "tools_invoked": True,
+        "workspace_memory": f"{prior}{appendix}".strip(),
+    }
 
 
 def _parse_tool_call_json(text: str) -> dict[str, object] | None:

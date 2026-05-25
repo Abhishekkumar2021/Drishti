@@ -9,8 +9,8 @@ from langgraph.graph import StateGraph
 from drishti.agent.nodes import (
     expand_query,
     generate_answer,
+    invoke_agent_tools,
     retrieve_context,
-    run_agent_tools,
 )
 from drishti.agent.state import AgentState
 from drishti.generation.llm import ChatLLM
@@ -54,7 +54,11 @@ def build_rag_graph(
     graph.add_node("generate", generate)
     graph.add_node("expand_query", expand)
     if tool_list:
-        graph.add_node("tools", run_agent_tools(tool_list, llm))
+
+        def tool_router(state: AgentState) -> AgentState:
+            return invoke_agent_tools(tool_list, llm, state)
+
+        graph.add_node("tools", tool_router)
         graph.add_edge("tools", "retrieve")
         graph.set_entry_point("tools")
     else:
