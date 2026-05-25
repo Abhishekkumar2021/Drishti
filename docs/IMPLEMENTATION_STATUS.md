@@ -180,7 +180,7 @@ Phase 6: Release        [░░░░░░░░░░░░░░░░░░�
 * **Stories**:
   * [x] Retrieve → generate → grade graph — `agent/graph.py`, `agent/runner.py`, `agent/nodes.py`
   * [x] Single LangGraph agent path for all `/ask` endpoints
-  * [ ] Postgres checkpointer for multi-turn agent state
+  * [x] Postgres checkpointer for multi-turn agent state — `agent/checkpointer.py`
 
 #### EPIC-15: Data platform (Priority: P0)
 * **Points**: 34 | **Status**: 🟨 In Progress (~55%)
@@ -189,7 +189,7 @@ Phase 6: Release        [░░░░░░░░░░░░░░░░░░�
   * [x] `PlatformService` (Postgres + filesystem fallback)
   * [x] MinIO artifact storage — `storage/artifacts.py` (`ENABLE_MINIO=true`)
   * [x] Arq ingest worker — `worker/tasks.py`
-  * [ ] Full migration off Redis conversation index
+  * [x] Conversations use Postgres when `DATABASE_URL` set (Redis store disabled)
 
 #### EPIC-16: Auth, RBAC, observability (Priority: P1)
 * **Points**: 21 | **Status**: 🟨 In Progress (~35%)

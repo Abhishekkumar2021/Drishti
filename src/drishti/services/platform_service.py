@@ -72,7 +72,7 @@ class PlatformService:
             conversation_store=ConversationStore(
                 settings.redis_url,
                 ttl_seconds=settings.conversation_ttl_seconds,
-                enabled=settings.cache_enabled,
+                enabled=settings.cache_enabled and not settings.postgres_enabled,
             ),
             memory_store=WorkspaceMemoryStore(
                 settings.redis_url,

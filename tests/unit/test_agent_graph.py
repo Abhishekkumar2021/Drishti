@@ -5,6 +5,7 @@ from __future__ import annotations
 from unittest.mock import MagicMock
 
 import pytest
+from langgraph.checkpoint.memory import MemorySaver
 
 from drishti.agent.runner import AgentRunner
 from drishti.config import Settings
@@ -61,3 +62,30 @@ def test_agent_stream_emits_sse_events() -> None:
     assert any("event: context" in line for line in formatted)
     assert any("event: token" in line for line in formatted)
     assert any("event: done" in line for line in formatted)
+
+
+@pytest.mark.unit
+def test_agent_ask_with_thread_checkpointer() -> None:
+    rag = MagicMock()
+    rag.settings = Settings(agent_max_retrieval_loops=1)
+    rag.llm = MagicMock()
+    rag.llm.complete.return_value = "Answer with [src/a.py:L1-2]."
+    rag.prepare_context.return_value = (
+        (
+            ContextChunk(
+                chunk_id="c1",
+                file_path="src/a.py",
+                content="code",
+                start_line=1,
+                end_line=2,
+            ),
+        ),
+        "prompt",
+    )
+    rag.extract_citations.return_value = []
+
+    runner = AgentRunner(rag, rag.settings, checkpointer=MemorySaver())
+    first = runner.ask("first question", thread_id="conv-abc")
+    second = runner.ask("follow-up", thread_id="conv-abc")
+    assert first.answer
+    assert second.answer
