@@ -170,3 +170,25 @@ class AskRequest(BaseModel):
             msg = "conversation_history must not exceed 50 messages"
             raise ValueError(msg)
         return value
+
+
+class SourceReadRequest(BaseModel):
+    """Request body for reading a repository source file (Monaco / citations)."""
+
+    repo_path: str = Field(
+        ...,
+        min_length=1,
+        description="Absolute path to indexed repository root",
+    )
+    file_path: str = Field(
+        ...,
+        min_length=1,
+        description="Repository-relative file path",
+    )
+
+    def resolved_repo_path(self, *, allowed_roots: list[Path] | None = None) -> Path:
+        """Validate and resolve the repository root."""
+        try:
+            return resolve_repo_path(self.repo_path, allowed_roots=allowed_roots)
+        except PathValidationError as exc:
+            raise ValueError(str(exc)) from exc

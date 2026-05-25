@@ -28,8 +28,15 @@ from drishti.api.responses import (
     IngestResponse,
     SearchResponse,
     SearchResultItem,
+    SourceReadResponse,
 )
-from drishti.api.schemas import AskRequest, ChatMessage, IngestionRequest, SearchRequest
+from drishti.api.schemas import (
+    AskRequest,
+    ChatMessage,
+    IngestionRequest,
+    SearchRequest,
+    SourceReadRequest,
+)
 from drishti.config import Settings
 from drishti.exceptions import (
     DrishtiError,
@@ -44,6 +51,8 @@ from drishti.generation.streaming import citation_event, done_event, format_sse_
 from drishti.search.pipeline import HybridSearchPipeline
 from drishti.services.query_cache import CachedAskAnswer, QueryCache
 from drishti.services.wiring import create_incremental_indexer
+from drishti.utils.language import LanguageRegistry
+from drishti.utils.paths import is_path_within_root
 
 logger = logging.getLogger(__name__)
 
@@ -243,4 +252,40 @@ async def _store_cache(cache: QueryCache, key: str, response: AskResponse) -> No
             citations=[item.model_dump() for item in response.citations],
             sources=[item.model_dump() for item in response.sources],
         ),
+    )
+
+
+@router.post("/source/read", response_model=SourceReadResponse)
+async def read_source_file(
+    body: SourceReadRequest,
+    settings: Settings = Depends(get_app_settings),
+) -> SourceReadResponse:
+    """Read a file from an indexed repository for Monaco citation navigation."""
+    allowed_roots = [Path(root) for root in settings.ingestion_root_allowlist()]
+    try:
+        repo_root = body.resolved_repo_path(allowed_roots=allowed_roots or None)
+    except ValueError as exc:
+        raise PathValidationError(str(exc)) from exc
+
+    relative = body.file_path.strip().lstrip("/")
+    if not relative or ".." in Path(relative).parts:
+        raise PathValidationError("file_path must be a safe relative path")
+
+    absolute = (repo_root / relative).resolve()
+    if not is_path_within_root(absolute, repo_root):
+        raise PathValidationError("file_path escapes repository root")
+
+    if not absolute.is_file():
+        msg = f"Source file not found: {relative}"
+        raise PathValidationError(msg)
+
+    content = absolute.read_text(encoding="utf-8", errors="replace")
+    language = LanguageRegistry().detect(relative)
+    line_count = content.count("\n") + (1 if content else 0)
+
+    return SourceReadResponse(
+        file_path=relative,
+        content=content,
+        language=language,
+        line_count=line_count,
     )

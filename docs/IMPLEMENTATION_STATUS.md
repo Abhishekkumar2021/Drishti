@@ -22,10 +22,10 @@ This file is the living source of truth for the current build status of Drishti.
 | **Phase 1: Foundation** | 55 | 55 | 100.0% | 🟩 Completed |
 | **Phase 2: Ingestion** | 131 | 89 | 67.9% | 🟨 In Progress |
 | **Phase 3: Core Search & RAG** | 131 | 131 | 100.0% | 🟩 Completed |
-| **Phase 4: Advanced Features** | 89 | 0 | 0.0% | 🔮 Planned |
+| **Phase 4: Advanced Features** | 89 | 47 | 52.8% | 🟨 In Progress |
 | **Phase 5: Evaluation** | 34 | 0 | 0.0% | 🔮 Planned |
 | **Phase 6: Release** | 21 | 0 | 0.0% | 🔮 Planned |
-| **Total Project** | **461** | **275** | **59.7%** | **🟨 In Progress** |
+| **Total Project** | **461** | **322** | **69.8%** | **🟨 In Progress** |
 
 ---
 
@@ -35,7 +35,7 @@ This file is the living source of truth for the current build status of Drishti.
 Phase 1: Foundation     [████████████████████] 100.0% (Completed)
 Phase 2: Ingestion      [█████████████░░░░░░░] 67.9% (In Progress)
 Phase 3: Search & RAG   [████████████████████] 100.0% (Completed)
-Phase 4: UI & Graph     [░░░░░░░░░░░░░░░░░░░] 0.0%  (Planned)
+Phase 4: UI & Graph     [██████████░░░░░░░░░░] 52.8% (In Progress)
 Phase 5: Evaluation     [░░░░░░░░░░░░░░░░░░░] 0.0%  (Planned)
 Phase 6: Release        [░░░░░░░░░░░░░░░░░░░] 0.0%  (Planned)
 ```
@@ -143,13 +143,13 @@ Phase 6: Release        [░░░░░░░░░░░░░░░░░░�
   * [ ] **US-09.04**: Change impact analysis endpoint (`/api/v1/impact-analysis`)
 
 #### EPIC-10: Frontend UI (Priority: P1)
-* **Points**: 55 | **Status**: 🔮 Planned (0%)
+* **Points**: 55 | **Status**: 🟨 In Progress (85% — US-10.05 deferred)
 * **Stories**:
-  * [ ] **US-10.01**: Next.js 14 layout & landing page
-  * [ ] **US-10.02**: Chat interface with streaming responses
-  * [ ] **US-10.03**: Monaco Editor component for source code rendering
-  * [ ] **US-10.04**: Citation mapping (clicking citation opens file to specific line)
-  * [ ] **US-10.05**: Interactive dependency graph view
+  * [x] **US-10.01**: Next.js 14 layout & landing page
+  * [x] **US-10.02**: Chat interface with streaming responses
+  * [x] **US-10.03**: Monaco Editor component for source code rendering
+  * [x] **US-10.04**: Citation mapping (clicking citation opens file to specific line)
+  * [ ] **US-10.05**: Interactive dependency graph view (requires EPIC-09)
 
 ---
 
@@ -221,3 +221,4 @@ Once a User Story is implemented, the corresponding code files must be registere
 | US-08.02 | [api/schemas.py](file:///Users/abhishek/Dev/Drishti/src/drishti/api/schemas.py), [api/responses.py](file:///Users/abhishek/Dev/Drishti/src/drishti/api/responses.py) | 🟩 Completed | [test_schemas.py](file:///Users/abhishek/Dev/Drishti/tests/unit/test_schemas.py) |
 | US-08.03 | [services/query_cache.py](file:///Users/abhishek/Dev/Drishti/src/drishti/services/query_cache.py) | 🟩 Completed | [test_query_cache.py](file:///Users/abhishek/Dev/Drishti/tests/unit/test_query_cache.py) |
 | US-08.04 | [middleware/rate_limit.py](file:///Users/abhishek/Dev/Drishti/src/drishti/middleware/rate_limit.py) | 🟩 Completed | [test_rate_limit.py](file:///Users/abhishek/Dev/Drishti/tests/unit/test_rate_limit.py) |
+| US-10.01–04 | [web/](file:///Users/abhishek/Dev/Drishti/web/), [api/routes.py](file:///Users/abhishek/Dev/Drishti/src/drishti/api/routes.py) (`/source/read`) | 🟩 Completed | [test_source_read.py](file:///Users/abhishek/Dev/Drishti/tests/unit/test_source_read.py), `npm run build` in `web/` |

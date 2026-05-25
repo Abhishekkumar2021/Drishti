@@ -31,6 +31,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - EPIC-06 hybrid search engine (US-06.01–06.05)
   - Dense and sparse Qdrant retrievers, RRF fusion, Cohere reranker, Anthropic query expansion
   - `HybridSearchPipeline` and `build_hybrid_search_pipeline` factory; `LexicalReranker` for local/tests
+- EPIC-10 frontend UI (US-10.01–10.04)
+  - Next.js 14 app in `web/` with dark layout, repo indexing sidebar, SSE chat, Monaco editor
+  - Clickable citations via `POST /api/v1/source/read`; `make dev-web` for local UI
 - EPIC-08 API and backend service (US-08.01–08.04)
   - `/api/v1/ingest`, `/api/v1/search`, `/api/v1/ask` (SSE) routes wired to pipelines
   - Redis `QueryCache` with TTL and invalidation on ingest

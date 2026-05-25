@@ -7,7 +7,7 @@ This epic covers building the interactive web application using Next.js 14, comp
 ## Epic Metadata
 * **Complexity**: 55 Story Points
 * **Priority**: P1 (High Priority)
-* **Status**: Planned
+* **Status**: Completed (US-10.01–10.04); US-10.05 deferred to EPIC-09
 
 ---
 
@@ -21,9 +21,9 @@ This epic covers building the interactive web application using Next.js 14, comp
 **Complexity**: 8 SP | **Priority**: P1
 
 **Acceptance Criteria**
-1. [ ] Built with Next.js 14 with a responsive dark-themed sidebar.
-2. [ ] Contains panels for repository indexing configuration (e.g. entering repository URL or local paths).
-3. [ ] Integrates clean state management tracking selected repository.
+1. [x] Built with Next.js 14 with a responsive dark-themed sidebar.
+2. [x] Contains panels for repository indexing configuration (e.g. entering repository URL or local paths).
+3. [x] Integrates clean state management tracking selected repository.
 
 ---
 
@@ -35,9 +35,9 @@ This epic covers building the interactive web application using Next.js 14, comp
 **Complexity**: 13 SP | **Priority**: P1
 
 **Acceptance Criteria**
-1. [ ] Implements a clean chat window with user and AI messages.
-2. [ ] Integrates SSE/Fetch stream API to display tokens in real-time.
-3. [ ] Renders code blocks inside answers with syntax highlighting.
+1. [x] Implements a clean chat window with user and AI messages.
+2. [x] Integrates SSE/Fetch stream API to display tokens in real-time.
+3. [x] Renders code blocks inside answers with syntax highlighting.
 
 ---
 
@@ -49,9 +49,9 @@ This epic covers building the interactive web application using Next.js 14, comp
 **Complexity**: 13 SP | **Priority**: P1
 
 **Acceptance Criteria**
-1. [ ] Embeds `@monaco-editor/react` in a right-hand detail pane.
-2. [ ] Supports syntax highlighting and line numbering for Python, Java, TS, and Go.
-3. [ ] Editor is read-only.
+1. [x] Embeds `@monaco-editor/react` in a right-hand detail pane.
+2. [x] Supports syntax highlighting and line numbering for Python, Java, TS, and Go.
+3. [x] Editor is read-only.
 
 ---
 
@@ -63,9 +63,9 @@ This epic covers building the interactive web application using Next.js 14, comp
 **Complexity**: 13 SP | **Priority**: P1
 
 **Acceptance Criteria**
-1. [ ] Parses citation tags (e.g. `[src/main.py:L10-15]`) in response text and renders them as clickable links.
-2. [ ] Clicking a link loads the target file contents via API.
-3. [ ] Scrolls Monaco Editor view to highlight lines 10 to 15.
+1. [x] Parses citation tags (e.g. `[src/main.py:L10-15]`) in response text and renders them as clickable links.
+2. [x] Clicking a link loads the target file contents via API.
+3. [x] Scrolls Monaco Editor view to highlight lines 10 to 15.
 
 ---
 
@@ -80,3 +80,5 @@ This epic covers building the interactive web application using Next.js 14, comp
 1. [ ] Integrates a graph visualization library (like React Flow or D3).
 2. [ ] Displays class and method dependencies visually.
 3. [ ] Clicking a graph node loads its corresponding code in the Monaco Editor.
+
+> **Note:** Deferred until EPIC-09 (Neo4j dependency graph) is implemented.

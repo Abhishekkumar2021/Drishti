@@ -98,3 +98,12 @@ class IngestResponse(BaseModel):
     chunks_indexed: int = 0
     chunks_removed: int = 0
     files_parsed: int = 0
+
+
+class SourceReadResponse(BaseModel):
+    """Source file contents for the web Monaco editor."""
+
+    file_path: str
+    content: str
+    language: str | None = None
+    line_count: int = 0
