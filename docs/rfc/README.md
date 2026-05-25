@@ -10,13 +10,13 @@ An RFC is a proposal for a major architectural change, feature addition, or desi
 
 ### The RFC Flow
 
-```
-1. Write Proposal  ──▶ 2. Peer Review  ──▶ 3. Decision
-   (RFC Draft)           (Discussions)       (Approve / Decline)
-                                                   │
-                                                   ▼
-                                           4. Document Decision
-                                              (Write ADR)
+```mermaid
+flowchart LR
+  A["1. Write proposal (RFC draft)"]
+  B["2. Peer review (discussions)"]
+  C["3. Decision (approve / decline)"]
+  D["4. Document decision (write ADR)"]
+  A --> B --> C --> D
 ```
 
 For simple library selections or straightforward changes, developers may bypass the RFC step and write an ADR directly. RFCs are reserved for complex, multi-component design challenges (e.g. implementing AST-aware parsers, vector database indexing structures, frontend state flows).

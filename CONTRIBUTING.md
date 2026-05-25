@@ -6,14 +6,24 @@ Thank you for your interest in contributing to Drishti! This document provides g
 
 ## Branch Strategy
 
-```
-main           ─────●──────────●──────────●──────
-                    │          ▲           ▲
-develop        ─────●──●───●───●──●───●───●──────
-                       │       │      │
-feature/...    ────────●───●───┘      │
-                                      │
-docs/...       ───────────────────●───┘
+```mermaid
+gitGraph
+   commit id: "main"
+   branch develop
+   checkout develop
+   commit id: "integrate"
+   branch feature/EPIC-NN-desc
+   checkout feature/EPIC-NN-desc
+   commit id: "feature work"
+   checkout develop
+   merge feature/EPIC-NN-desc
+   branch docs/sync-readme
+   checkout docs/sync-readme
+   commit id: "docs only"
+   checkout develop
+   merge docs/sync-readme
+   checkout main
+   merge develop tag: "release"
 ```
 
 | Branch | Purpose | Merges Into |

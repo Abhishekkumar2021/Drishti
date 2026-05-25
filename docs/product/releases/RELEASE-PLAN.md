@@ -18,18 +18,20 @@ This release plan outlines the progression of Drishti from initial developer pre
 
 The Drishti release cycle is split into three milestones designed to systematically derisk components.
 
-```
-┌──────────────────────────────────────────────────────────────┐
-│                    DRISHTI MILESTONES                        │
-├───────────────────────┬────────────────────────┬─────────────┤
-│     ALPHA             │      BETA              │   v1.0      │
-│   (Local CLI MVP)     │  (Web & API Platform)  │(Production) │
-├───────────────────────┼────────────────────────┼─────────────┤
-│ • AST-aware parsers   │ • FastAPI server       │ • Neo4j graph│
-│ • Local Qdrant store  │ • Next.js Web UI       │ • RAGAS eval │
-│ • Simple retrieval    │ • Hybrid Search (RRF)  │ • Golden Q&A │
-│ • CLI Q&A interface   │ • Monaco Editor        │ • Benchmarks │
-└───────────────────────┴────────────────────────┴─────────────┘
+```mermaid
+timeline
+    title Drishti milestones
+    section Alpha (local MVP)
+        AST-aware parsers : Tree-sitter multi-language
+        Local Qdrant + hybrid retrieval : Dense + BM25
+    section Beta (web & API)
+        FastAPI + LangGraph agent : Streaming SSE Q&A
+        Next.js + Monaco : Citations and source read
+        Platform V2 scaffold : Postgres, MinIO, workspaces
+    section v1.0 (production)
+        Neo4j impact graph : EPIC-09
+        RAGAS golden set in CI : EPIC-11
+        Enterprise auth + Helm : EPIC-16
 ```
 
 ---

@@ -29,6 +29,6 @@ An Architecture Decision Record (ADR) is a short document that captures a signif
 | **[ADR-008](file:///Users/abhishek/Dev/Drishti/docs/adr/ADR-008-neo4j-dependency-graph.md)** | Neo4j dependency graph storage | 🟩 Approved | Relationship Engine |
 | **[ADR-009](file:///Users/abhishek/Dev/Drishti/docs/adr/ADR-009-redis-caching.md)** | Redis cache and rate limiting | 🟩 Approved | Infrastructure |
 | **[ADR-010](file:///Users/abhishek/Dev/Drishti/docs/adr/ADR-010-nextjs-frontend.md)** | Next.js frontend web interface | 🟩 Approved | UI Application |
-| **[ADR-011](file:///Users/abhishek/Dev/Drishti/docs/adr/ADR-011-langgraph-agent-orchestration.md)** | LangGraph agent orchestration | 🟨 Proposed | Agent Runtime |
-| **[ADR-012](file:///Users/abhishek/Dev/Drishti/docs/adr/ADR-012-postgresql-system-of-record.md)** | PostgreSQL system of record | 🟨 Proposed | Data Platform |
-| **[ADR-013](file:///Users/abhishek/Dev/Drishti/docs/adr/ADR-013-minio-object-storage.md)** | MinIO object storage | 🟨 Proposed | Artifacts |
+| **[ADR-011](file:///Users/abhishek/Dev/Drishti/docs/adr/ADR-011-langgraph-agent-orchestration.md)** | LangGraph agent orchestration | 🟩 Approved | Agent Runtime |
+| **[ADR-012](file:///Users/abhishek/Dev/Drishti/docs/adr/ADR-012-postgresql-system-of-record.md)** | PostgreSQL system of record | 🟩 Approved | Data Platform |
+| **[ADR-013](file:///Users/abhishek/Dev/Drishti/docs/adr/ADR-013-minio-object-storage.md)** | MinIO object storage | 🟩 Approved | Artifacts |

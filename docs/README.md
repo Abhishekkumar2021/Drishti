@@ -66,7 +66,7 @@ This repository is **documentation-first**: architecture, ADRs, product epics, L
 
 | Directory | Description |
 |-----------|-------------|
-| [adr/](adr/README.md) | Architecture Decision Records (001–010) |
+| [adr/](adr/README.md) | Architecture Decision Records (001–013) |
 | [rfc/](rfc/README.md) | RFC process for proposed features |
 
 ### Deep-Dives & Evaluation

@@ -40,53 +40,67 @@ It also ingests PDFs, Markdown docs, diagrams, and API specs, enabling **cross-m
 
 ## Architecture Overview
 
-```
-┌──────────────────────────────────────────────────────────────────────┐
-│                      INGESTION PIPELINE                             │
-│                                                                      │
-│  Git Repo ──┐                                                        │
-│  PDF Files ─┤   ┌──────────────────┐   ┌──────────────────┐         │
-│  Markdown ──┼──▶│  Parser Registry │──▶│ Universal Chunk  │         │
-│  Images ────┤   │  (Tree-sitter,   │   │ Schema + Metadata│         │
-│  OpenAPI ───┘   │   PyMuPDF, etc.) │   └────────┬─────────┘         │
-│                 └──────────────────┘            │                    │
-│                                      ┌─────────┴──────────┐         │
-│                                      ▼                    ▼         │
-│                               Dense Embedding       BM25 Sparse     │
-│                         (configurable provider)      (tokenizer)    │
-│                                      │                    │         │
-│                                      └────────┬───────────┘         │
-│                                               ▼                     │
-│                                      ┌────────────────┐             │
-│                                      │  Qdrant Vector │             │
-│                                      │  Database      │             │
-│                                      └────────────────┘             │
-└──────────────────────────────────────────────────────────────────────┘
+### End-to-end flow
 
-┌──────────────────────────────────────────────────────────────────────┐
-│                        QUERY PIPELINE                               │
-│                                                                      │
-│  "Where is auth handled?"                                            │
-│       │                                                              │
-│       ▼                                                              │
-│  Query Expansion (LLM) → "auth, login, JWT, middleware"              │
-│       │                                                              │
-│  ┌────┴────┐                                                         │
-│  ▼         ▼                                                         │
-│ BM25    Vector      ──▶  RRF Fusion  ──▶  Cohere Re-rank            │
-│ Search  Search                                   │                   │
-│                                                  ▼                   │
-│                                          Context Builder             │
-│                                          (file paths, class          │
-│                                           hierarchy, deps)          │
-│                                                  │                   │
-│                                                  ▼                   │
-│                                    LLM (configurable provider)       │
-│                                          → Answer with citations     │
-│                                          → Code snippets             │
-│                                          → File paths + line nums   │
-└──────────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TB
+  subgraph ingest [Ingestion]
+    direction TB
+    S1[Git · PDF · Markdown · OpenAPI]
+    S2[ContentRouter + parsers]
+    S3[Universal chunks + metadata]
+    S4[Dense + BM25 embeddings]
+    S1 --> S2 --> S3 --> S4
+  end
+
+  Qdrant[(Qdrant hybrid index)]
+  S4 --> Qdrant
+
+  subgraph agent [LangGraph agent — sole Q&A path]
+    direction TB
+    A1[retrieve: hybrid search + context]
+    A2[generate: LLM + citations]
+    A3{grade}
+    A4[expand_query]
+    A1 --> A2 --> A3
+    A3 -->|empty context| A1
+    A3 -->|low confidence| A4 --> A1
+    A3 -->|ok| Done[Answer + citations]
+  end
+
+  Qdrant --> A1
+
+  subgraph platform [Platform — optional]
+    direction LR
+    P1[(PostgreSQL)]
+    P2[(MinIO)]
+    P3[(Redis)]
+    API[FastAPI + Arq workers]
+    API --- P1
+    API --- P2
+    API --- P3
+  end
+
+  agent --> API
+  UI[Next.js + Monaco] -->|SSE / REST| API
 ```
+
+### LangGraph agent graph
+
+```mermaid
+stateDiagram-v2
+  [*] --> retrieve
+  retrieve --> generate
+  generate --> grade: citations validated
+  grade --> [*]: sufficient
+  grade --> retrieve: no chunks, retries left
+  grade --> expand_query: low confidence, not expanded yet
+  expand_query --> retrieve
+```
+
+Registered **LangChain tools** (for future tool-calling nodes): `hybrid_search`, `read_source`, `ingest_status`. With `DATABASE_URL` set, conversation `thread_id` persists via **Postgres checkpointer**.
+
+Further reading: [Platform V2](docs/architecture/platform-v2-agentic.md) · [C4 model](docs/architecture/c4-model.md) · [Sequence diagrams](docs/architecture/sequence-diagrams.md)
 
 ---
 
@@ -106,13 +120,17 @@ It also ingests PDFs, Markdown docs, diagrams, and API specs, enabling **cross-m
 | **Hybrid Search** | BM25 + dense vectors, RRF fusion (`HybridSearchPipeline`) | 🟩 Implemented |
 | **Re-ranking** | Cohere rerank or lexical fallback (configurable) | 🟩 Implemented |
 | **Provider-agnostic models** | Any embedding/LLM via `EMBEDDING_PROVIDER`, `LLM_PROVIDER` | 🟩 Implemented |
-| **Cross-Modal Q&A** | Query code + docs + diagrams together | 🔮 Planned |
-| **Streaming Answers** | LLM streaming + citations (EPIC-07) | 🟩 Implemented |
-| **Production platform** | Workspaces, uploads, Postgres, MinIO, structured logs | 🟨 In Progress |
-| **LangGraph agent** | Retrieve-grade-generate (sole Q&A path) | 🟩 Implemented |
-| **Impact Analysis** | "What breaks if I change X?" via dependency graph | 🔮 Planned |
-| **Code Navigation** | Click citation → file path + line number | 🔮 Planned |
-| **RAG Evaluation** | RAGAS metrics: precision, recall, faithfulness | 🔮 Planned |
+| **Cross-Modal Q&A** | Scoped search over code + docs in a workspace/repo | 🟩 Implemented |
+| **Streaming Answers** | SSE: `token`, `context`, `citation`, `done` | 🟩 Implemented |
+| **Workspaces & uploads** | Platform APIs, artifact ingest, git snapshots | 🟩 Implemented |
+| **PostgreSQL / MinIO** | Optional SoR + object storage | 🟩 Implemented |
+| **LangGraph agent** | Retrieve → generate → grade; `expand_query` retry | 🟩 Implemented |
+| **Agent tools** | `hybrid_search`, `read_source`, `ingest_status` | 🟩 Implemented |
+| **Postgres checkpointer** | LangGraph state per conversation | 🟩 Implemented |
+| **SSE via graph** | `astream_events` (US-14.04) | 🟨 Planned |
+| **Impact Analysis** | Neo4j + `graph_impact` tool (EPIC-09) | 🔮 Planned |
+| **Code navigation UI** | Citation → Monaco + `/source/read` | 🟩 Implemented |
+| **RAG Evaluation** | RAGAS golden set in CI (EPIC-11) | 🔮 Planned |
 
 ---
 
@@ -132,7 +150,7 @@ It also ingests PDFs, Markdown docs, diagrams, and API specs, enabling **cross-m
 | **Cache** | Redis | Query result caching |
 | **System of record** | PostgreSQL (optional) | Workspaces, conversations, jobs |
 | **Object storage** | MinIO (optional) | Durable artifact uploads |
-| **Agent** | LangGraph | Retrieve → grade → generate (all `/ask` flows) |
+| **Agent** | LangGraph + langchain-core tools | Checkpointer + grade / expand loop |
 | **Workers** | Arq + Redis | Background ingest jobs |
 | **Observability** | structlog (JSON logs) | Request correlation, production logs |
 | **Frontend** | Next.js 14 + Monaco | Code highlighting, navigation |
@@ -178,23 +196,24 @@ make docker-up
 #   ENABLE_MINIO=true
 #   make db-migrate
 
-# Start the API server (and optional worker: make worker)
-make dev
-# API: http://localhost:8000
-# Docs: http://localhost:8000/docs
+# One-shot local stack (infra + migrate + API)
+make dev-ready
+
+# Or step-by-step:
+make docker-up
+# With DATABASE_URL in .env:
+make db-migrate
+make dev          # API — http://localhost:8000/docs
+make worker       # optional Arq ingest worker
 ```
 
 ### Build and Test
 
 ```bash
-# Run all tests
 make test
-
-# Lint + type check
 make lint
 make type-check
-
-# Full pre-commit check
+make ci-precheck  # lint + tests (CI parity)
 make pre-commit
 
 # Run RAG evaluation benchmarks
@@ -215,10 +234,10 @@ Drishti/
 │   ├── README.md                      # Documentation index
 │   ├── IMPLEMENTATION_STATUS.md       # What's built vs. planned
 │   ├── architecture/                  # High-level architecture
-│   ├── adr/                           # Architecture Decision Records (10)
+│   ├── adr/                           # Architecture Decision Records (13)
 │   ├── rfc/                           # Request for Comments
 │   ├── lld/                           # Low-Level Design docs (5)
-│   ├── product/                       # Vision, epics (12), release plan
+│   ├── product/                       # Vision, epics (01–17), release plan
 │   ├── design/                        # API contracts, model providers
 │   ├── evaluation/                    # RAG metrics & baselines
 │   ├── deep-dives/                    # Technical deep-dives (5 chapters)
@@ -228,8 +247,13 @@ Drishti/
 │   ├── embedding/                     # Dense + sparse embeddings
 │   ├── storage/                       # Qdrant + Neo4j stores
 │   ├── search/                        # Hybrid search + RRF + rerank
-│   ├── generation/                    # Context builder + LLM client
-│   ├── api/                           # FastAPI routes
+│   ├── generation/                    # Context + citations (agent uses RAG prep)
+│   ├── agent/                         # LangGraph graph, nodes, tools, checkpointer
+│   ├── db/                            # SQLAlchemy models + session
+│   ├── services/                      # Platform, ingest, conversation stores
+│   ├── worker/                        # Arq background jobs
+│   ├── observability/                 # Structured logging
+│   ├── api/                           # REST routes (core + platform)
 │   └── utils/                         # Language detection, git utils
 ├── tests/                             # Unit, integration, e2e tests
 ├── benchmarks/                        # RAG evaluation scripts
@@ -249,7 +273,8 @@ Drishti/
 |----------|-------------|
 | **[Implementation Status](docs/IMPLEMENTATION_STATUS.md)** | **What is built in this repo (update with each feature)** |
 | [Product Vision](docs/product/PRODUCT-VISION.md) | Mission, users, differentiators |
-| [Epics Overview](docs/product/EPICS-OVERVIEW.md) | 12 epics, ~120 user stories |
+| [Epics Overview](docs/product/EPICS-OVERVIEW.md) | Epics 01–17, user stories |
+| [Platform V2](docs/architecture/platform-v2-agentic.md) | LangGraph, Postgres, MinIO, delivery plan |
 | [Release Plan](docs/product/releases/RELEASE-PLAN.md) | Alpha → Beta → v1.0 roadmap |
 
 ### Architecture & Design
@@ -262,7 +287,7 @@ Drishti/
 | [High-Level Architecture](docs/architecture/high-level-architecture.md) | Target system design |
 | [As-Built Ingestion](docs/architecture/as-built-code-ingestion.md) | Implemented Tree-sitter pipeline |
 | [Universal Chunk Schema](docs/design/universal-chunk-schema.md) | Chunk fields + ER diagram |
-| [ADR Index](docs/adr/README.md) | 10 Architecture Decision Records |
+| [ADR Index](docs/adr/README.md) | 13 Architecture Decision Records |
 | [API Contracts](docs/design/api-contracts.md) | REST API + WebSocket specs |
 | [Model Providers](docs/design/model-providers.md) | Embedding, LLM, rerank configuration |
 | [LLD Index](docs/lld/README.md) | Design patterns, data models, search pipeline |
@@ -291,15 +316,24 @@ Drishti/
 
 ## Project Status
 
+**~70% overall** (322 / 461 story points). Platform V2 epics 13–17 are in progress on `develop`.
+
+```mermaid
+xychart-beta
+    title "Phase completion (%)"
+    x-axis ["Foundation", "Ingestion", "Search & RAG", "UI & Platform", "Evaluation", "Release"]
+    y-axis "Percent" 0 --> 100
+    bar [100, 68, 100, 53, 0, 0]
 ```
-Documentation (architecture, ADRs, product, LLD)  ████████████████████ 100%
-Engineering foundation (pyproject, CI, Docker)     ████████████████████ 100%
-Code ingestion (Tree-sitter, EPIC-03)               ████████████████████  100%
-Core pipeline (embedding → search → RAG)           ░░░░░░░░░░░░░░░░░░░░   0%
-RAG generation (context → LLM → citations)         ░░░░░░░░░░░░░░░░░░░░   0%
-Frontend UI (Next.js + Monaco)                     █████████████████░░░  85%
-Evaluation & benchmarks                            ░░░░░░░░░░░░░░░░░░░░   0%
-```
+
+| Area | Status |
+|------|--------|
+| Documentation, CI, Docker | Complete |
+| Code + document ingestion (EPIC-03–05) | Ingestion ~68%; code path complete |
+| Hybrid search + RAG prep (EPIC-06–07) | Complete |
+| LangGraph agent + tools (EPIC-14) | ~65% — SSE via graph pending |
+| Postgres / MinIO / workers (EPIC-15) | ~55% |
+| Frontend (EPIC-10) | Complete (graph viz needs EPIC-09) |
 
 Details: **[docs/IMPLEMENTATION_STATUS.md](docs/IMPLEMENTATION_STATUS.md)**
 
@@ -324,7 +358,7 @@ Details: **[docs/IMPLEMENTATION_STATUS.md](docs/IMPLEMENTATION_STATUS.md)**
 | Re-ranking | Cohere over cross-encoder | Production API quality, free tier available |
 | PDF parsing | PyMuPDF over PyPDF2 | Layout-aware, tables, images, 10x faster |
 
-See the [ADR Index](docs/adr/README.md) for all 10 decisions with context and trade-offs.
+See the [ADR Index](docs/adr/README.md) for all 13 decisions with context and trade-offs.
 
 ---
 
