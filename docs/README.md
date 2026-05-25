@@ -11,6 +11,7 @@ This repository is **documentation-first**: architecture, ADRs, product epics, L
 | I want to… | Go to |
 |------------|-------|
 | Understand the mission | [Product Vision](product/PRODUCT-VISION.md) |
+| **Plan Platform V2 (LangGraph, MinIO, Postgres)** | **[Platform V2 — Agentic](architecture/platform-v2-agentic.md)** |
 | See system diagrams (C4, sequences, deployment) | [Architecture README](architecture/README.md) |
 | Know what's built vs planned | [IMPLEMENTATION_STATUS.md](IMPLEMENTATION_STATUS.md) |
 | Set up locally | [Onboarding](onboarding/README.md) · [Operations](operations/README.md) |
@@ -35,6 +36,7 @@ This repository is **documentation-first**: architecture, ADRs, product epics, L
 |----------|-------------|
 | [architecture/README.md](architecture/README.md) | **Hub** — diagram index, reading order |
 | [architecture/high-level-architecture.md](architecture/high-level-architecture.md) | Target HLA: ingestion, storage, search, NFRs |
+| [architecture/platform-v2-agentic.md](architecture/platform-v2-agentic.md) | **V2 plan:** LangGraph, Postgres, MinIO, memory, UX |
 | [architecture/c4-model.md](architecture/c4-model.md) | C4 Context / Container / Component (Mermaid) |
 | [architecture/as-built-code-ingestion.md](architecture/as-built-code-ingestion.md) | Implemented Tree-sitter pipeline (EPIC-03) |
 | [architecture/sequence-diagrams.md](architecture/sequence-diagrams.md) | Health, parse, ingest, search sequences |

@@ -99,12 +99,17 @@ It also ingests PDFs, Markdown docs, diagrams, and API specs, enabling **cross-m
 | **Parser rule engine** | JSON-driven queries + `min_chunk_lines` | 🟩 Implemented |
 | **Chunk metadata** | Docstrings, params, complexity, context paths | 🟩 Implemented |
 | **Incremental git indexing** | Diff-based re-index via `IncrementalIndexer` | 🟩 Implemented |
-| **PDF Ingestion** | Layout-aware parsing: text blocks, tables, images | 🔮 Planned |
+| **Markdown ingestion** | Header-hierarchy chunks (`.md`, `.mdx`) | 🟩 Implemented |
+| **PDF Ingestion** | Layout-aware parsing: text blocks, tables | 🟩 Implemented |
+| **OpenAPI ingestion** | Per-endpoint chunks from OpenAPI/Swagger specs | 🟩 Implemented |
+| **PDF diagram vision** | Claude Vision for images in PDFs | 🔮 Planned |
 | **Hybrid Search** | BM25 + dense vectors, RRF fusion (`HybridSearchPipeline`) | 🟩 Implemented |
 | **Re-ranking** | Cohere rerank or lexical fallback (configurable) | 🟩 Implemented |
 | **Provider-agnostic models** | Any embedding/LLM via `EMBEDDING_PROVIDER`, `LLM_PROVIDER` | 🟩 Implemented |
 | **Cross-Modal Q&A** | Query code + docs + diagrams together | 🔮 Planned |
-| **Streaming Answers** | LLM streaming + citations (EPIC-07) | 🔮 Planned |
+| **Streaming Answers** | LLM streaming + citations (EPIC-07) | 🟩 Implemented |
+| **Production platform** | Workspaces, uploads, Postgres, MinIO, structured logs | 🟨 In Progress |
+| **LangGraph agent** | Retrieve-grade-generate (sole Q&A path) | 🟩 Implemented |
 | **Impact Analysis** | "What breaks if I change X?" via dependency graph | 🔮 Planned |
 | **Code Navigation** | Click citation → file path + line number | 🔮 Planned |
 | **RAG Evaluation** | RAGAS metrics: precision, recall, faithfulness | 🔮 Planned |
@@ -125,6 +130,11 @@ It also ingests PDFs, Markdown docs, diagrams, and API specs, enabling **cross-m
 | **PDF Parsing** | PyMuPDF | Layout-aware, tables, images |
 | **Graph DB** | Neo4j (optional) | Dependency graph traversal |
 | **Cache** | Redis | Query result caching |
+| **System of record** | PostgreSQL (optional) | Workspaces, conversations, jobs |
+| **Object storage** | MinIO (optional) | Durable artifact uploads |
+| **Agent** | LangGraph | Retrieve → grade → generate (all `/ask` flows) |
+| **Workers** | Arq + Redis | Background ingest jobs |
+| **Observability** | structlog (JSON logs) | Request correlation, production logs |
 | **Frontend** | Next.js 14 + Monaco | Code highlighting, navigation |
 
 ---
@@ -160,10 +170,15 @@ make setup
 cp .env.example .env
 # Edit .env with your API keys
 
-# Start infrastructure (Qdrant, Redis)
+# Start infrastructure (Qdrant, Redis, Postgres, MinIO, Ollama)
 make docker-up
 
-# Start the API server
+# Optional: enable production platform in .env
+#   DATABASE_URL=postgresql+asyncpg://drishti@localhost:5432/drishti
+#   ENABLE_MINIO=true
+#   make db-migrate
+
+# Start the API server (and optional worker: make worker)
 make dev
 # API: http://localhost:8000
 # Docs: http://localhost:8000/docs

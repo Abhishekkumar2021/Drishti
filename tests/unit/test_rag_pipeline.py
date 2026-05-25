@@ -1,4 +1,4 @@
-"""Unit tests for RAG pipeline orchestration."""
+"""Unit tests for RAG context preparation."""
 
 from __future__ import annotations
 
@@ -9,15 +9,15 @@ import pytest
 from drishti.config import Settings
 from drishti.generation.context import ContextBuilder
 from drishti.generation.llm import MockChatLLM
+from drishti.generation.models import ContextChunk
 from drishti.generation.pipeline import RAGPipeline
-from drishti.generation.streaming import format_sse_event
 from drishti.search.models import SearchHit
 
 pytestmark = pytest.mark.unit
 
 
 class TestRAGPipeline:
-    def test_ask_returns_answer_with_valid_citation(self) -> None:
+    def test_prepare_context_builds_prompt_from_hits(self) -> None:
         search = MagicMock()
         search.search.return_value = [
             SearchHit(
@@ -35,39 +35,37 @@ class TestRAGPipeline:
         settings = Settings()
         pipeline = RAGPipeline(
             search=search,
-            llm=MockChatLLM(response="Auth is in [src/auth.py:L1-5]."),
+            llm=MockChatLLM(response="unused"),
             context_builder=ContextBuilder(),
             settings=settings,
         )
 
-        answer = pipeline.ask("Where is auth?")
+        chunks, prompt = pipeline.prepare_context(
+            "Where is auth?",
+            filters=None,
+            conversation_history=None,
+        )
 
-        assert "Auth is in" in answer.answer
-        assert len(answer.citations) == 1
-        assert answer.citations[0].valid is True
+        assert len(chunks) == 1
+        assert "Where is auth?" in prompt
+        assert "src/auth.py" in prompt
 
-    def test_ask_stream_emits_sse_events(self) -> None:
+    def test_extract_citations_validates_against_chunks(self) -> None:
         search = MagicMock()
-        search.search.return_value = [
-            SearchHit(
-                chunk_id="c1",
-                score=0.9,
-                content="code",
-                payload={"file_path": "src/a.py", "start_line": 1, "end_line": 2},
-                source="rerank",
-            )
-        ]
         settings = Settings()
         pipeline = RAGPipeline(
             search=search,
-            llm=MockChatLLM(response="Hi [src/a.py:L1-2]"),
+            llm=MockChatLLM(response="unused"),
             context_builder=ContextBuilder(),
             settings=settings,
         )
-
-        events = list(pipeline.ask_stream("question"))
-        formatted = [format_sse_event(event) for event in events]
-
-        assert any(line.startswith("event: context") for line in formatted)
-        assert any("event: token" in line for line in formatted)
-        assert any("event: done" in line for line in formatted)
+        chunk = ContextChunk(
+            chunk_id="c1",
+            file_path="src/auth.py",
+            content="code",
+            start_line=1,
+            end_line=5,
+        )
+        citations = pipeline.extract_citations("See [src/auth.py:L1-5].", (chunk,))
+        assert len(citations) == 1
+        assert citations[0].valid is True

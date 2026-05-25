@@ -28,9 +28,9 @@ class TestLanguageRegistry:
         content = b"\xca\xfe\xba\xbe" + b"\x00" * 20
         assert registry.detect("build/App.class", content) == "java"
 
-    def test_returns_none_for_unknown_extension(self) -> None:
+    def test_detects_markdown_by_extension(self) -> None:
         registry = LanguageRegistry()
-        assert registry.detect("README.md") is None
+        assert registry.detect("README.md") == "markdown"
 
     def test_has_parser_extension_when_parser_registered(self) -> None:
         registry = LanguageRegistry()

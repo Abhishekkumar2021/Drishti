@@ -52,6 +52,16 @@ class ParserRegistry:
             clean_ext = f".{clean_ext}"
         self._parsers[clean_ext] = parser
 
+    def get_parser_for_extension(self, extension: str) -> BaseParser:
+        """Return the parser registered for an extension (e.g. ``.pdf``)."""
+        clean_ext = extension.strip().lower()
+        if not clean_ext.startswith("."):
+            clean_ext = f".{clean_ext}"
+        if clean_ext not in self._parsers:
+            msg = f"No parser strategy registered for file extension: {clean_ext}"
+            raise ValueError(msg)
+        return self._parsers[clean_ext]
+
     def get_parser(self, file_path: str) -> BaseParser:
         """Return the parser strategy registered for a file path.
 

@@ -23,10 +23,13 @@ def api_client(tmp_path: Path) -> TestClient:
     (repo / "src" / "auth.py").write_text("def login():\n    pass\n", encoding="utf-8")
 
     settings = Settings(
+        _env_file=None,
         api_token="",
         debug=True,
         cache_enabled=False,
         rate_limit_enabled=False,
+        embedding_provider="hashing",
+        llm_provider="mock",
         ingestion_allowed_roots=[str(tmp_path)],
     )
     services = {
@@ -38,8 +41,8 @@ def api_client(tmp_path: Path) -> TestClient:
     with (
         patch("drishti.main.probe_dependencies", new=AsyncMock(return_value=services)),
         patch("drishti.main.create_qdrant_client", return_value=MagicMock()),
+        patch("drishti.main.create_rag_pipeline", return_value=MagicMock()),
         patch("drishti.api.deps.create_hybrid_search", return_value=mock_search),
-        patch("drishti.api.deps.create_rag_pipeline", return_value=MagicMock()),
     ):
         app = create_app(settings)
         with TestClient(app, raise_server_exceptions=True) as client:

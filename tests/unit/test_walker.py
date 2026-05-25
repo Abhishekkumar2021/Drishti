@@ -74,8 +74,7 @@ class TestFileWalker:
         )
         discovered = {item.relative_path: item.has_registered_parser for item in walker.discover()}
 
-        assert discovered["src/main.py"] is True
-        assert discovered["src/App.tsx"] is False
+        assert discovered == {"src/main.py": True}
 
     def test_detects_extensionless_python_via_shebang(self, tmp_path: Path) -> None:
         repo = tmp_path / "repo"

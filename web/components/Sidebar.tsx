@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-import { ingestRepository } from "@/lib/api";
+import { formatIngestStatus, ingestRepository } from "@/lib/api";
 import { useAppStore } from "@/lib/store";
 
 export function Sidebar() {
@@ -19,9 +19,7 @@ export function Sidebar() {
     setIngestStatus("Indexing…");
     try {
       const result = await ingestRepository(repoPath.trim(), forceReindex);
-      setIngestStatus(
-        `Indexed ${result.chunks_indexed} chunks from ${result.files_parsed} files (${result.head_commit.slice(0, 8)})`,
-      );
+      setIngestStatus(formatIngestStatus(result));
     } catch (error) {
       setIngestStatus(error instanceof Error ? error.message : "Ingest failed");
     } finally {
@@ -53,7 +51,7 @@ export function Sidebar() {
           onChange={(event) => setForceReindex(event.target.checked)}
           className="rounded border-surface-border"
         />
-        Force full re-index
+        Force full re-index (rebuild all chunks)
       </label>
 
       <button

@@ -28,19 +28,30 @@ class TestSettings:
         assert settings.cors_origins == ["http://a.test", "http://b.test"]
 
     def test_collection_name_default(self) -> None:
-        settings = Settings()
+        settings = Settings(_env_file=None)
         assert settings.qdrant_collection_name == "drishti_chunks"
 
-    def test_default_embedding_provider_is_openai(self) -> None:
-        settings = Settings()
+    def test_default_embedding_provider_is_openai(
+        self,
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        monkeypatch.delenv("EMBEDDING_PROVIDER", raising=False)
+        settings = Settings(_env_file=None)
         assert settings.embedding_provider == "openai"
 
-    def test_default_llm_provider_is_anthropic(self) -> None:
-        settings = Settings()
+    def test_default_llm_provider_is_anthropic(
+        self,
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        monkeypatch.delenv("LLM_PROVIDER", raising=False)
+        settings = Settings(_env_file=None)
         assert settings.llm_provider == "anthropic"
 
-    def test_legacy_openai_embedding_model_fallback(self) -> None:
-        settings = Settings(openai_embedding_model="text-embedding-3-large")
+    def test_openai_embedding_model_fallback(self) -> None:
+        settings = Settings(
+            _env_file=None,
+            openai_embedding_model="text-embedding-3-large",
+        )
         assert settings.resolved_embedding_model() == "text-embedding-3-large"
 
     def test_runtime_summary_excludes_secrets(self) -> None:

@@ -11,10 +11,12 @@ from fastapi import APIRouter, Depends, Query
 from fastapi.responses import StreamingResponse
 from starlette.requests import Request
 
+from drishti.agent.runner import AgentRunner
 from drishti.api.deps import (
+    get_agent_runner,
     get_app_settings,
+    get_platform_service,
     get_query_cache,
-    get_rag_pipeline,
     get_search_pipeline,
 )
 from drishti.api.mappers import (
@@ -46,9 +48,9 @@ from drishti.exceptions import (
     SearchError,
 )
 from drishti.generation.models import Citation, StreamEvent
-from drishti.generation.pipeline import RAGPipeline
 from drishti.generation.streaming import citation_event, done_event, format_sse_event, token_event
 from drishti.search.pipeline import HybridSearchPipeline
+from drishti.services.platform_service import PlatformService
 from drishti.services.query_cache import CachedAskAnswer, QueryCache
 from drishti.services.wiring import create_incremental_indexer
 from drishti.utils.language import LanguageRegistry
@@ -57,6 +59,29 @@ from drishti.utils.paths import is_path_within_root
 logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/api/v1", tags=["API"])
+
+
+def _ingestion_error_message(exc: Exception, settings: Settings) -> str:
+    """Return a user-actionable message for ingestion failures."""
+    detail = str(exc).strip()
+    if settings.embedding_provider == "ollama" and (
+        "Connection refused" in detail or "ConnectError" in detail
+    ):
+        return (
+            "Ollama is not running (connection refused on "
+            f"{settings.resolved_embedding_api_base()}). "
+            "Run `make docker-ollama-up` and `make docker-ollama-pull`, "
+            "or set EMBEDDING_PROVIDER=hashing in .env for keyless local dev."
+        )
+    return f"Ingestion failed: {detail}"
+
+
+@router.get("/config/providers")
+async def get_provider_config(
+    settings: Settings = Depends(get_app_settings),
+) -> dict[str, str]:
+    """Return active model providers (no secrets) for UI diagnostics."""
+    return settings.runtime_provider_summary()
 
 
 @router.post("/ingest", response_model=IngestResponse)
@@ -83,13 +108,14 @@ async def ingest_repository(
     except GitRepositoryError:
         raise
     except Exception as exc:
-        msg = f"Ingestion failed: {exc}"
+        msg = _ingestion_error_message(exc, settings)
         raise DrishtiError(msg, code="INGESTION_ERROR") from exc
 
     cache: QueryCache = request.app.state.query_cache
     await cache.invalidate_all()
 
     return IngestResponse(
+        repo_path=str(repo_path),
         head_commit=result.head_commit,
         base_commit=result.base_commit,
         added=list(result.added),
@@ -98,6 +124,9 @@ async def ingest_repository(
         chunks_indexed=result.chunks_indexed,
         chunks_removed=result.chunks_removed,
         files_parsed=result.files_parsed,
+        total_chunks_in_store=result.total_chunks_in_store,
+        parseable_files=result.parseable_files,
+        up_to_date=result.up_to_date,
     )
 
 
@@ -122,15 +151,21 @@ async def search_chunks(
 @router.post("/ask", response_model=None)
 async def ask_question(
     body: AskRequest,
-    rag: RAGPipeline = Depends(get_rag_pipeline),
+    platform: PlatformService = Depends(get_platform_service),
+    agent: AgentRunner = Depends(get_agent_runner),
     cache: QueryCache = Depends(get_query_cache),
     stream: bool = Query(default=True, description="Stream answer via SSE when true"),
 ) -> AskResponse | StreamingResponse:
-    """Answer a question using RAG; streams tokens via SSE by default."""
+    """Answer a question using the LangGraph agent; streams tokens via SSE by default."""
+    filters, workspace_memory = await _resolve_workspace_scope(
+        platform,
+        body.workspace_id,
+        body.filters,
+    )
     cache_key = cache.cache_key(
         body.question,
         conversation_history=body.conversation_history,
-        filters=body.filters,
+        filters=filters,
     )
 
     if cache.enabled:
@@ -146,21 +181,23 @@ async def ask_question(
     if stream:
         return StreamingResponse(
             _stream_rag_with_cache(
-                rag,
+                agent,
                 cache,
                 cache_key,
                 question=body.question,
-                filters=body.filters,
+                filters=filters,
                 conversation_history=body.conversation_history,
+                workspace_memory=workspace_memory,
             ),
             media_type="text/event-stream",
         )
 
     try:
-        answer = rag.ask(
+        answer = agent.ask(
             body.question,
-            filters=body.filters,
+            filters=filters,
             conversation_history=body.conversation_history,
+            workspace_memory=workspace_memory,
         )
     except GenerationError:
         raise
@@ -206,23 +243,39 @@ async def _stream_cached_answer(cached: CachedAskAnswer) -> AsyncIterator[str]:
     yield format_sse_event(done_event(total_tokens=len(cached.answer.split()), execution_time_ms=0))
 
 
+async def _resolve_workspace_scope(
+    platform: PlatformService,
+    workspace_id: str | None,
+    filters: dict[str, str] | None,
+) -> tuple[dict[str, str] | None, str]:
+    if not workspace_id or not workspace_id.strip():
+        return filters, ""
+    wid = workspace_id.strip()
+    memory = await platform.get_memory(wid) if platform.get_workspace(wid) else ""
+    merged = dict(filters or {})
+    merged["file_path"] = f"workspaces/{wid}/*"
+    return merged, memory
+
+
 async def _stream_rag_with_cache(
-    rag: RAGPipeline,
+    agent: AgentRunner,
     cache: QueryCache,
     cache_key: str,
     *,
     question: str,
     filters: dict[str, str] | None,
     conversation_history: list[ChatMessage],
+    workspace_memory: str = "",
 ) -> AsyncIterator[str]:
     answer_parts: list[str] = []
     citations: list[CitationItem] = []
     sources: list[dict[str, object]] = []
 
-    for event in rag.ask_stream(
+    for event in agent.ask_stream(
         question,
         filters=filters,
         conversation_history=conversation_history,
+        workspace_memory=workspace_memory,
     ):
         if event.event == "token":
             answer_parts.append(str(event.data.get("text", "")))

@@ -43,7 +43,7 @@ async def check_redis(settings: Settings) -> ServiceStatus:
         decode_responses=True,
     )
     try:
-        pong = await client.ping()  # type: ignore[misc]
+        pong = await client.ping()
         if pong:
             return ServiceStatus.CONNECTED
         return ServiceStatus.DISCONNECTED
@@ -63,10 +63,63 @@ async def check_neo4j(settings: Settings) -> ServiceStatus:
     return ServiceStatus.NOT_CONFIGURED
 
 
+async def check_embedding(settings: Settings) -> ServiceStatus:
+    """Verify the configured embedding provider is reachable."""
+    if settings.embedding_provider == "hashing":
+        return ServiceStatus.CONNECTED
+
+    if settings.embedding_provider == "ollama":
+        base = settings.resolved_embedding_api_base().rstrip("/")
+        url = f"{base}/api/tags"
+        try:
+            async with httpx.AsyncClient(timeout=settings.health_check_timeout_seconds) as client:
+                response = await client.get(url)
+                response.raise_for_status()
+            return ServiceStatus.CONNECTED
+        except Exception:
+            logger.warning("Ollama embedding health check failed for %s", url, exc_info=True)
+            return ServiceStatus.DISCONNECTED
+
+    return ServiceStatus.CONNECTED
+
+
+async def check_postgres(settings: Settings) -> ServiceStatus:
+    """Ping PostgreSQL when configured."""
+    if not settings.postgres_enabled:
+        return ServiceStatus.DISABLED
+    try:
+        from sqlalchemy import text
+        from sqlalchemy.ext.asyncio import create_async_engine
+
+        engine = create_async_engine(settings.database_url, pool_pre_ping=True)
+        async with engine.connect() as conn:
+            await conn.execute(text("SELECT 1"))
+        await engine.dispose()
+        return ServiceStatus.CONNECTED
+    except Exception:
+        logger.warning("PostgreSQL health check failed", exc_info=True)
+        return ServiceStatus.DISCONNECTED
+
+
+async def check_minio(settings: Settings) -> ServiceStatus:
+    """Ping MinIO when configured."""
+    if not settings.minio_enabled:
+        return ServiceStatus.DISABLED
+    from drishti.storage.artifacts import ArtifactStorage
+
+    storage = ArtifactStorage(settings)
+    if storage.ping():
+        return ServiceStatus.CONNECTED
+    return ServiceStatus.DISCONNECTED
+
+
 async def probe_dependencies(settings: Settings) -> dict[str, ServiceStatus]:
     """Run all infrastructure health probes."""
     return {
         "qdrant": await check_qdrant(settings),
         "redis": await check_redis(settings),
+        "postgres": await check_postgres(settings),
+        "minio": await check_minio(settings),
         "neo4j": await check_neo4j(settings),
+        "embedding": await check_embedding(settings),
     }

@@ -7,6 +7,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import TYPE_CHECKING
 
+from drishti.ingestion.content_router import ContentRouter
 from drishti.ingestion.gitignore import GitignoreMatcher
 from drishti.utils.language import LanguageRegistry
 from drishti.utils.paths import is_path_within_root
@@ -30,6 +31,8 @@ class DiscoveredFile:
     language: str | None
     extension: str
     has_registered_parser: bool
+    content_kind: str | None = None
+    detection_method: str | None = None
 
 
 class FileWalker:
@@ -63,6 +66,18 @@ class FileWalker:
         self.inspect_magic_bytes = inspect_magic_bytes
         self.follow_symlinks = follow_symlinks
         self._gitignore = GitignoreMatcher(self.root)
+        routing_registry = parser_registry
+        if routing_registry is None:
+            from drishti.ingestion.ast.registry import create_default_parser_registry
+            from drishti.ingestion.documents.registry import register_document_parsers
+
+            routing_registry = create_default_parser_registry()
+            register_document_parsers(routing_registry)
+        parser_extensions = routing_registry.registered_extensions()
+        self._content_router = ContentRouter(
+            extension_map=self.language_registry.extension_map,
+            parser_extensions=parser_extensions,
+        )
 
     def walk(self) -> Iterator[DiscoveredFile]:
         """Yield discovered code files under the repository root."""
@@ -110,30 +125,20 @@ class FileWalker:
                 continue
 
             content = self._read_magic_bytes(resolved_entry) if self.inspect_magic_bytes else None
-            language = self.language_registry.detect(relative_path, content)
-            if language is None:
+            classification = self._content_router.classify(relative_path, content)
+            if classification.kind == "unknown":
                 continue
 
-            extension = self.language_registry.get_extension(relative_path) or ""
-            parser_extensions = (
-                self.parser_registry.registered_extensions()
-                if self.parser_registry is not None
-                else frozenset()
-            )
-            has_registered_parser = (
-                self.parser_registry is not None
-                and self.language_registry.has_parser_extension(
-                    relative_path,
-                    parser_extensions,
-                )
-            )
+            has_registered_parser = self._content_router.has_parser(classification)
 
             yield DiscoveredFile(
                 relative_path=relative_path,
                 absolute_path=resolved_entry,
-                language=language,
-                extension=extension,
+                language=classification.language,
+                extension=classification.effective_extension,
                 has_registered_parser=has_registered_parser,
+                content_kind=classification.kind,
+                detection_method=classification.detection_method,
             )
 
     def _read_magic_bytes(self, file_path: Path) -> bytes | None:

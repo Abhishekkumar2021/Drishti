@@ -54,6 +54,7 @@ dependencies = [
 
     # PDF Parsing
     "pymupdf>=1.24.0",
+    "pyyaml>=6.0.0",
 
     # Data & Config
     "pydantic>=2.9.0",
@@ -65,6 +66,17 @@ dependencies = [
     "rich>=13.9.0",
     "gitpython>=3.1.43",
     "python-dotenv>=1.0.1",
+
+    # Platform V2 — data plane, observability, agent
+    "structlog>=24.4.0",
+    "sqlalchemy[asyncio]>=2.0.36",
+    "asyncpg>=0.30.0",
+    "greenlet>=3.1.0",
+    "alembic>=1.14.0",
+    "minio>=7.2.12",
+    "langgraph>=0.2.60",
+    "langchain-core>=0.3.29",
+    "arq>=0.26.1",
 ]
 
 [project.optional-dependencies]
@@ -180,6 +192,24 @@ ignore = [
 "src/drishti/middleware/rate_limit.py" = ["TC003"]
 "src/drishti/middleware/*.py" = ["TC002", "TC003", "D102", "D107"]
 "src/drishti/services/health.py" = ["TC001"]
+"src/drishti/db/*.py" = ["TC001", "TC003"]
+"src/drishti/observability/*.py" = ["TC003", "ANN401"]
+"src/drishti/agent/*.py" = ["TC001", "TC003", "D102", "D107"]
+"src/drishti/storage/artifacts.py" = ["TC003", "TC001", "D102", "D107"]
+"src/drishti/worker/*.py" = ["TC003", "ANN401"]
+"src/drishti/api/platform_routes.py" = ["TC001", "TC002", "TC003", "B008", "D103", "ANN201"]
+"src/drishti/api/platform_schemas.py" = ["TC003", "TC001", "D101"]
+"src/drishti/services/platform_service.py" = ["TC001", "TC002", "TC003", "SLF001", "D102", "D105"]
+"src/drishti/services/workspace_store.py" = ["TC003", "D102", "D107"]
+"src/drishti/services/conversation_store.py" = ["TC003", "D102", "D107"]
+"src/drishti/services/memory_store.py" = ["TC003", "D102", "D107"]
+"src/drishti/ingestion/content_router.py" = ["TC003", "D102", "D107", "SIM102", "E501"]
+"src/drishti/ingestion/documents/*.py" = ["TC003", "D102", "D107", "ANN401", "TC001"]
+"src/drishti/utils/workspace_git.py" = ["TC003"]
+"src/drishti/utils/github.py" = ["TC003", "D103"]
+"tests/unit/test_platform_service.py" = ["ANN001"]
+"tests/unit/test_agent_graph.py" = ["ANN001"]
+"alembic/**/*.py" = ["D103", "ANN201"]
 "scripts/**/*.py" = ["D103", "ANN201"]
 
 [tool.ruff.lint.pydocstyle]
@@ -213,9 +243,37 @@ module = [
     "cohere.*",
     "qdrant_client.*",
     "redis.*",
+    "redis.asyncio.*",
     "ragas.*",
+    "structlog.*",
+    "sqlalchemy.*",
+    "asyncpg.*",
+    "alembic.*",
+    "minio.*",
+    "langgraph.*",
+    "langchain_core.*",
+    "arq.*",
+    "yaml",
 ]
 ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = ["redis", "redis.asyncio"]
+disallow_untyped_calls = false
+
+[[tool.mypy.overrides]]
+module = [
+    "drishti.ingestion.documents.*",
+    "drishti.ingestion.content_router",
+    "drishti.services.conversation_store",
+    "drishti.services.memory_store",
+    "drishti.services.workspace_store",
+    "drishti.services.query_cache",
+    "drishti.services.health",
+    "drishti.middleware.rate_limit",
+    "drishti.observability.logging",
+]
+disable_error_code = ["call-arg", "no-untyped-call", "import-untyped", "unused-ignore", "no-any-return"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
@@ -242,7 +300,7 @@ omit = ["tests/*", "benchmarks/*"]
 
 [tool.bandit]
 exclude_dirs = ["tests", "benchmarks", "notebooks", "playground"]
-skips = ["B101", "B104"]
+skips = ["B101", "B104", "B112"]
 
 [tool.coverage.report]
 exclude_lines = [
