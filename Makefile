@@ -12,7 +12,7 @@
 # ──────────────────────────────────────────────────────────
 
 .PHONY: help setup dev-ready dev dev-web test test-unit test-integration test-e2e lint lint-fix type-check \
-        docker-up docker-ollama-up docker-ollama-pull docker-down docker-logs seed benchmark clean pre-commit ci-precheck
+        docker-up docker-ollama-up docker-ollama-pull docker-down docker-logs db-migrate worker seed benchmark clean pre-commit ci-precheck
 
 .DEFAULT_GOAL := help
 
@@ -82,17 +82,26 @@ type-check: ## Run mypy type checking
 # Docker Infrastructure
 # ═══════════════════════════════════════
 
-docker-up: ## Start infrastructure (Qdrant, Redis, Ollama) and pull models
+docker-up: ## Start infrastructure (Qdrant, Redis, Postgres, MinIO, Ollama)
 	docker compose up -d
-	@echo "⏳ Waiting for Qdrant and Redis..."
-	@sleep 3
+	@echo "⏳ Waiting for services..."
+	@sleep 5
 	@$(MAKE) docker-ollama-pull
 	@docker compose ps
 	@echo ""
 	@echo "✅ Infrastructure ready!"
-	@echo "   Qdrant:  http://localhost:6333/dashboard"
-	@echo "   Redis:   localhost:6379"
-	@echo "   Ollama:  http://localhost:11434 (nomic-embed-text + llama3.2)"
+	@echo "   Qdrant:   http://localhost:6333/dashboard"
+	@echo "   Redis:    localhost:6379"
+	@echo "   Postgres: localhost:5432 (drishti / drishtidev)"
+	@echo "   MinIO:    http://localhost:9001 (drishti / drishtidev)"
+	@echo "   Ollama:   http://localhost:11434"
+
+db-migrate: ## Apply Alembic migrations to PostgreSQL
+	DATABASE_URL=$${DATABASE_URL:-postgresql+asyncpg://drishti:drishtidev@localhost:5432/drishti} \
+		uv run alembic upgrade head
+
+worker: ## Start Arq background worker (ingest jobs)
+	uv run arq drishti.worker.settings.WorkerSettings
 
 docker-ollama-up: ## Start Ollama and pull embedding + chat models
 	docker compose up -d ollama

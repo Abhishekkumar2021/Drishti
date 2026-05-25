@@ -107,7 +107,9 @@ It also ingests PDFs, Markdown docs, diagrams, and API specs, enabling **cross-m
 | **Re-ranking** | Cohere rerank or lexical fallback (configurable) | 🟩 Implemented |
 | **Provider-agnostic models** | Any embedding/LLM via `EMBEDDING_PROVIDER`, `LLM_PROVIDER` | 🟩 Implemented |
 | **Cross-Modal Q&A** | Query code + docs + diagrams together | 🔮 Planned |
-| **Streaming Answers** | LLM streaming + citations (EPIC-07) | 🔮 Planned |
+| **Streaming Answers** | LLM streaming + citations (EPIC-07) | 🟩 Implemented |
+| **Production platform** | Workspaces, uploads, Postgres, MinIO, structured logs | 🟨 In Progress |
+| **LangGraph agent** | Retrieve-grade-generate (sole Q&A path) | 🟩 Implemented |
 | **Impact Analysis** | "What breaks if I change X?" via dependency graph | 🔮 Planned |
 | **Code Navigation** | Click citation → file path + line number | 🔮 Planned |
 | **RAG Evaluation** | RAGAS metrics: precision, recall, faithfulness | 🔮 Planned |
@@ -128,6 +130,11 @@ It also ingests PDFs, Markdown docs, diagrams, and API specs, enabling **cross-m
 | **PDF Parsing** | PyMuPDF | Layout-aware, tables, images |
 | **Graph DB** | Neo4j (optional) | Dependency graph traversal |
 | **Cache** | Redis | Query result caching |
+| **System of record** | PostgreSQL (optional) | Workspaces, conversations, jobs |
+| **Object storage** | MinIO (optional) | Durable artifact uploads |
+| **Agent** | LangGraph | Retrieve → grade → generate (all `/ask` flows) |
+| **Workers** | Arq + Redis | Background ingest jobs |
+| **Observability** | structlog (JSON logs) | Request correlation, production logs |
 | **Frontend** | Next.js 14 + Monaco | Code highlighting, navigation |
 
 ---
@@ -163,10 +170,15 @@ make setup
 cp .env.example .env
 # Edit .env with your API keys
 
-# Start infrastructure (Qdrant, Redis)
+# Start infrastructure (Qdrant, Redis, Postgres, MinIO, Ollama)
 make docker-up
 
-# Start the API server
+# Optional: enable production platform in .env
+#   DATABASE_URL=postgresql+asyncpg://drishti:drishtidev@localhost:5432/drishti
+#   ENABLE_MINIO=true
+#   make db-migrate
+
+# Start the API server (and optional worker: make worker)
 make dev
 # API: http://localhost:8000
 # Docs: http://localhost:8000/docs

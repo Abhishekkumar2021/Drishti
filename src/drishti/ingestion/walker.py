@@ -66,11 +66,14 @@ class FileWalker:
         self.inspect_magic_bytes = inspect_magic_bytes
         self.follow_symlinks = follow_symlinks
         self._gitignore = GitignoreMatcher(self.root)
-        parser_extensions = (
-            parser_registry.registered_extensions()
-            if parser_registry is not None
-            else frozenset()
-        )
+        routing_registry = parser_registry
+        if routing_registry is None:
+            from drishti.ingestion.ast.registry import create_default_parser_registry
+            from drishti.ingestion.documents.registry import register_document_parsers
+
+            routing_registry = create_default_parser_registry()
+            register_document_parsers(routing_registry)
+        parser_extensions = routing_registry.registered_extensions()
         self._content_router = ContentRouter(
             extension_map=self.language_registry.extension_map,
             parser_extensions=parser_extensions,

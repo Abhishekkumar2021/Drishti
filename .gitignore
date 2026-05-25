@@ -24,6 +24,9 @@ ENV/
 *~
 .cursor/
 
+# Local workspace / platform cache
+.drishti/
+
 # Environment variables
 .env
 .env.local

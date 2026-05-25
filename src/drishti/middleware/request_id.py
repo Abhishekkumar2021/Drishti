@@ -24,6 +24,12 @@ class RequestIdMiddleware(BaseHTTPMiddleware):
     ) -> Response:
         request_id = request.headers.get(REQUEST_ID_HEADER) or str(uuid.uuid4())
         request.state.request_id = request_id
+        try:
+            from drishti.observability.logging import bind_context
+
+            bind_context(request_id=request_id)
+        except ImportError:
+            pass
 
         response = await call_next(request)
         response.headers[REQUEST_ID_HEADER] = request_id

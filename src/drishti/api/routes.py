@@ -12,9 +12,10 @@ from fastapi.responses import StreamingResponse
 from starlette.requests import Request
 
 from drishti.api.deps import (
+    get_agent_runner,
     get_app_settings,
+    get_platform_service,
     get_query_cache,
-    get_rag_pipeline,
     get_search_pipeline,
 )
 from drishti.api.mappers import (
@@ -46,10 +47,10 @@ from drishti.exceptions import (
     SearchError,
 )
 from drishti.generation.models import Citation, StreamEvent
-from drishti.generation.pipeline import RAGPipeline
+from drishti.agent.runner import AgentRunner
 from drishti.generation.streaming import citation_event, done_event, format_sse_event, token_event
 from drishti.search.pipeline import HybridSearchPipeline
-from drishti.services.memory_store import WorkspaceMemoryStore
+from drishti.services.platform_service import PlatformService
 from drishti.services.query_cache import CachedAskAnswer, QueryCache
 from drishti.services.wiring import create_incremental_indexer
 from drishti.utils.language import LanguageRegistry
@@ -150,14 +151,14 @@ async def search_chunks(
 @router.post("/ask", response_model=None)
 async def ask_question(
     body: AskRequest,
-    settings: Settings = Depends(get_app_settings),
-    rag: RAGPipeline = Depends(get_rag_pipeline),
+    platform: PlatformService = Depends(get_platform_service),
+    agent: AgentRunner = Depends(get_agent_runner),
     cache: QueryCache = Depends(get_query_cache),
     stream: bool = Query(default=True, description="Stream answer via SSE when true"),
 ) -> AskResponse | StreamingResponse:
-    """Answer a question using RAG; streams tokens via SSE by default."""
+    """Answer a question using the LangGraph agent; streams tokens via SSE by default."""
     filters, workspace_memory = await _resolve_workspace_scope(
-        settings,
+        platform,
         body.workspace_id,
         body.filters,
     )
@@ -180,7 +181,7 @@ async def ask_question(
     if stream:
         return StreamingResponse(
             _stream_rag_with_cache(
-                rag,
+                agent,
                 cache,
                 cache_key,
                 question=body.question,
@@ -192,7 +193,7 @@ async def ask_question(
         )
 
     try:
-        answer = rag.ask(
+        answer = agent.ask(
             body.question,
             filters=filters,
             conversation_history=body.conversation_history,
@@ -243,21 +244,21 @@ async def _stream_cached_answer(cached: CachedAskAnswer) -> AsyncIterator[str]:
 
 
 async def _resolve_workspace_scope(
-    settings: Settings,
+    platform: PlatformService,
     workspace_id: str | None,
     filters: dict[str, str] | None,
 ) -> tuple[dict[str, str] | None, str]:
     if not workspace_id or not workspace_id.strip():
         return filters, ""
-    memory_store = WorkspaceMemoryStore(settings.redis_url, enabled=settings.cache_enabled)
-    memory = await memory_store.get(workspace_id.strip())
+    wid = workspace_id.strip()
+    memory = await platform.get_memory(wid) if platform.get_workspace(wid) else ""
     merged = dict(filters or {})
-    merged["file_path"] = f"workspaces/{workspace_id.strip()}/*"
+    merged["file_path"] = f"workspaces/{wid}/*"
     return merged, memory
 
 
 async def _stream_rag_with_cache(
-    rag: RAGPipeline,
+    agent: AgentRunner,
     cache: QueryCache,
     cache_key: str,
     *,
@@ -270,7 +271,7 @@ async def _stream_rag_with_cache(
     citations: list[CitationItem] = []
     sources: list[dict[str, object]] = []
 
-    for event in rag.ask_stream(
+    for event in agent.ask_stream(
         question,
         filters=filters,
         conversation_history=conversation_history,

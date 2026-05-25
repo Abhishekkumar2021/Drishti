@@ -1,4 +1,6 @@
-# Production roadmap — from RAG demo to enterprise platform
+# Production roadmap — from RAG demo to enterprise platform (V1)
+
+> **Platform V2 (LangGraph, Postgres, MinIO, agent memory):** see **[platform-v2-agentic.md](platform-v2-agentic.md)** — this is the master plan for competing with production assistants on **grounded code/docs Q&A**.
 
 ## What we have today (honest)
 

@@ -13,8 +13,10 @@ from drishti.services.wiring import create_hybrid_search, create_rag_pipeline
 if TYPE_CHECKING:
     from qdrant_client import QdrantClient
 
+    from drishti.agent.runner import AgentRunner
     from drishti.generation.pipeline import RAGPipeline
     from drishti.search.pipeline import HybridSearchPipeline
+    from drishti.services.platform_service import PlatformService
 
 
 def get_app_settings() -> Settings:
@@ -51,6 +53,25 @@ def get_rag_pipeline(request: Request) -> RAGPipeline:
         pipeline = create_rag_pipeline(settings, client=client)
         request.app.state.rag_pipeline = pipeline
     return cast("RAGPipeline", pipeline)
+
+
+def get_platform_service(request: Request) -> PlatformService:
+    """Return the platform service from application state."""
+    platform = getattr(request.app.state, "platform_service", None)
+    if platform is None:
+        msg = "Platform service is not initialized"
+        raise RuntimeError(msg)
+    return cast("PlatformService", platform)
+
+
+def get_agent_runner(request: Request) -> AgentRunner:
+    """Return the LangGraph agent runner."""
+    runner = getattr(request.app.state, "agent_runner", None)
+    if runner is None:
+        settings = get_settings()
+        runner = AgentRunner(get_rag_pipeline(request), settings)
+        request.app.state.agent_runner = runner
+    return cast("AgentRunner", runner)
 
 
 def get_query_cache(request: Request) -> QueryCache:
