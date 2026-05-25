@@ -16,15 +16,22 @@ pytestmark = pytest.mark.unit
 
 @pytest.fixture
 def client() -> TestClient:
-    settings = Settings(api_token="", debug=True)
+    settings = Settings(
+        _env_file=None,
+        api_token="",
+        debug=True,
+        embedding_provider="hashing",
+        llm_provider="mock",
+    )
     services = {
         "qdrant": ServiceStatus.CONNECTED,
         "redis": ServiceStatus.CONNECTED,
         "neo4j": ServiceStatus.DISABLED,
     }
-    with patch(
-        "drishti.main.probe_dependencies",
-        new=AsyncMock(return_value=services),
+    with (
+        patch("drishti.main.probe_dependencies", new=AsyncMock(return_value=services)),
+        patch("drishti.main.create_qdrant_client", return_value=MagicMock()),
+        patch("drishti.main.create_rag_pipeline", return_value=MagicMock()),
     ):
         yield TestClient(create_app(settings))
 
@@ -49,8 +56,18 @@ class TestHealthEndpoints:
 
 class TestAuthentication:
     def test_protected_route_requires_token_when_enabled(self) -> None:
-        settings = Settings(api_token="prod-secret", debug=True)
-        test_client = TestClient(create_app(settings))
+        settings = Settings(
+            _env_file=None,
+            api_token="prod-secret",
+            debug=True,
+            embedding_provider="hashing",
+            llm_provider="mock",
+        )
+        with (
+            patch("drishti.main.create_qdrant_client", return_value=MagicMock()),
+            patch("drishti.main.create_rag_pipeline", return_value=MagicMock()),
+        ):
+            test_client = TestClient(create_app(settings))
         response = test_client.post(
             "/api/v1/search",
             json={"query": "auth"},
@@ -60,19 +77,21 @@ class TestAuthentication:
 
     def test_protected_route_accepts_valid_token(self) -> None:
         settings = Settings(
+            _env_file=None,
             api_token="prod-secret",
             debug=True,
             cache_enabled=False,
             rate_limit_enabled=False,
+            embedding_provider="hashing",
+            llm_provider="mock",
         )
         mock_search = MagicMock()
         mock_search.search.return_value = []
         with (
-            patch("drishti.main.create_qdrant_client") as mock_qdrant,
+            patch("drishti.main.create_qdrant_client", return_value=MagicMock()),
+            patch("drishti.main.create_rag_pipeline", return_value=MagicMock()),
             patch("drishti.api.deps.create_hybrid_search", return_value=mock_search),
-            patch("drishti.api.deps.create_rag_pipeline", return_value=MagicMock()),
         ):
-            mock_qdrant.return_value = MagicMock()
             with TestClient(create_app(settings), raise_server_exceptions=True) as test_client:
                 response = test_client.post(
                     "/api/v1/search",
