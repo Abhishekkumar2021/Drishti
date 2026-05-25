@@ -176,11 +176,14 @@ Phase 6: Release        [░░░░░░░░░░░░░░░░░░�
   * [x] Git snapshot ingest roots — `workspace_git.py`
 
 #### EPIC-14: LangGraph agent runtime (Priority: P0)
-* **Points**: 34 | **Status**: 🟨 In Progress (~40%)
+* **Points**: 34 | **Status**: 🟨 In Progress (~65%)
 * **Stories**:
   * [x] Retrieve → generate → grade graph — `agent/graph.py`, `agent/runner.py`, `agent/nodes.py`
   * [x] Single LangGraph agent path for all `/ask` endpoints
   * [x] Postgres checkpointer for multi-turn agent state — `agent/checkpointer.py`
+  * [x] LangChain tools — `agent/tools/` (`hybrid_search`, `read_source`, `ingest_status`)
+  * [x] `expand_query` node on low-confidence grade
+  * [ ] SSE via LangGraph `astream_events` (US-14.04)
 
 #### EPIC-15: Data platform (Priority: P0)
 * **Points**: 34 | **Status**: 🟨 In Progress (~55%)

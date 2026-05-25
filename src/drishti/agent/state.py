@@ -21,3 +21,5 @@ class AgentState(TypedDict, total=False):
     retrieval_pass: int
     max_passes: int
     needs_retry: bool
+    retry_mode: str
+    query_expanded: bool

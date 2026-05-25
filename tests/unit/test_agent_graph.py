@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch
 
 import pytest
 from langgraph.checkpoint.memory import MemorySaver
@@ -89,3 +89,37 @@ def test_agent_ask_with_thread_checkpointer() -> None:
     second = runner.ask("follow-up", thread_id="conv-abc")
     assert first.answer
     assert second.answer
+
+
+@pytest.mark.unit
+def test_agent_expands_query_on_low_confidence() -> None:
+    rag = MagicMock()
+    rag.settings = Settings(agent_max_retrieval_loops=2)
+    rag.llm = MagicMock()
+    rag.llm.complete.return_value = "No citations here."
+    rag.prepare_context.side_effect = [
+        ((), "prompt-empty"),
+        (
+            (
+                ContextChunk(
+                    chunk_id="c1",
+                    file_path="src/a.py",
+                    content="code",
+                    start_line=1,
+                    end_line=2,
+                ),
+            ),
+            "prompt-ok",
+        ),
+    ]
+    rag.extract_citations.return_value = []
+
+    expander = MagicMock()
+    expander.expand.return_value = ["auth module", "authentication"]
+    with patch("drishti.agent.nodes.LLMQueryExpander", return_value=expander):
+        runner = AgentRunner(rag, rag.settings)
+        result = runner.ask("where is auth?")
+
+    assert result.answer
+    assert expander.expand.called
+    assert rag.prepare_context.call_count >= 2
