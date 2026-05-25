@@ -11,14 +11,17 @@
 #   make pre-commit    Full quality check before committing
 # ──────────────────────────────────────────────────────────
 
-.PHONY: help setup dev test test-unit test-integration test-e2e lint lint-fix type-check \
-        docker-up docker-down docker-logs seed benchmark clean pre-commit ci-precheck
+.PHONY: help setup dev-ready dev dev-web test test-unit test-integration test-e2e lint lint-fix type-check \
+        docker-up docker-ollama-up docker-ollama-pull docker-down docker-logs db-migrate worker seed benchmark clean pre-commit ci-precheck
 
 .DEFAULT_GOAL := help
 
 # ═══════════════════════════════════════
 # Setup
 # ═══════════════════════════════════════
+
+dev-ready: ## Bootstrap Docker, Ollama models, wait for services
+	@bash scripts/dev-ready.sh
 
 setup: ## First-time project setup
 	@echo "🔮 Setting up Drishti..."
@@ -79,15 +82,33 @@ type-check: ## Run mypy type checking
 # Docker Infrastructure
 # ═══════════════════════════════════════
 
-docker-up: ## Start infrastructure (Qdrant, Redis)
+docker-up: ## Start infrastructure (Qdrant, Redis, Postgres, MinIO, Ollama)
 	docker compose up -d
-	@echo "⏳ Waiting for services to be healthy..."
-	@sleep 3
+	@echo "⏳ Waiting for services..."
+	@sleep 5
+	@$(MAKE) docker-ollama-pull
 	@docker compose ps
 	@echo ""
 	@echo "✅ Infrastructure ready!"
-	@echo "   Qdrant:  http://localhost:6333/dashboard"
-	@echo "   Redis:   localhost:6379"
+	@echo "   Qdrant:   http://localhost:6333/dashboard"
+	@echo "   Redis:    localhost:6379"
+	@echo "   Postgres: localhost:5432 (user drishti — set POSTGRES_PASSWORD in .env)"
+	@echo "   MinIO:    http://localhost:9001 (set MINIO_ROOT_PASSWORD in .env)"
+	@echo "   Ollama:   http://localhost:11434"
+
+db-migrate: ## Apply Alembic migrations to PostgreSQL
+	DATABASE_URL=$${DATABASE_URL:-postgresql+asyncpg://drishti@localhost:5432/drishti} \
+		uv run alembic upgrade head
+
+worker: ## Start Arq background worker (ingest jobs)
+	uv run arq drishti.worker.settings.WorkerSettings
+
+docker-ollama-up: ## Start Ollama and pull embedding + chat models
+	docker compose up -d ollama
+	@bash scripts/docker-ollama-pull.sh
+
+docker-ollama-pull: ## Pull models into running Ollama container
+	@bash scripts/docker-ollama-pull.sh
 
 docker-down: ## Stop infrastructure
 	docker compose down

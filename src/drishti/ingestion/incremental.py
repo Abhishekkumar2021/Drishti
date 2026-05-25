@@ -13,6 +13,7 @@ from drishti.ingestion.base import ParserRegistry
 if TYPE_CHECKING:
     from drishti.api.schemas import UniversalChunk
 from drishti.ingestion.chunk_index import ChunkIndex, InMemoryChunkIndex
+from drishti.ingestion.content_router import ContentRouter
 from drishti.ingestion.git_changes import (
     discover_parseable_files,
     file_content_hash,
@@ -20,6 +21,7 @@ from drishti.ingestion.git_changes import (
     resolve_changes,
 )
 from drishti.ingestion.index_state import IndexState, IndexStateStore
+from drishti.utils.language import LanguageRegistry
 
 logger = logging.getLogger(__name__)
 
@@ -36,6 +38,9 @@ class IncrementalIndexResult:
     chunks_indexed: int
     chunks_removed: int
     files_parsed: int
+    total_chunks_in_store: int
+    parseable_files: int
+    up_to_date: bool
 
 
 class IncrementalIndexer:
@@ -48,12 +53,21 @@ class IncrementalIndexer:
         parser_registry: ParserRegistry,
         chunk_index: ChunkIndex,
         state_store: IndexStateStore | None = None,
+        path_prefix: str = "",
     ) -> None:
         """Wire the indexer to a repository root and storage backends."""
         self._repo_root = repo_root.resolve()
         self._parser_registry = parser_registry
         self._chunk_index = chunk_index
         self._state_store = state_store or IndexStateStore.for_repository(self._repo_root)
+        self._path_prefix = path_prefix.strip().rstrip("/")
+        if self._path_prefix:
+            self._path_prefix = f"{self._path_prefix}/"
+        language_registry = LanguageRegistry()
+        self._content_router = ContentRouter(
+            extension_map=language_registry.extension_map,
+            parser_extensions=self._parser_registry.registered_extensions(),
+        )
 
     def run(self, *, force_full: bool = False) -> IncrementalIndexResult:
         """Run incremental indexing from stored state to HEAD."""
@@ -113,13 +127,19 @@ class IncrementalIndexer:
         )
         self._state_store.save(new_state)
 
+        total_in_store = self._chunk_index.count()
+        up_to_date = indexed_count == 0 and len(paths_to_parse) == 0 and prior_state is not None
+
         logger.info(
-            "Incremental index complete commit=%s added=%d modified=%d deleted=%d chunks=%d",
+            "Incremental index complete commit=%s added=%d modified=%d deleted=%d "
+            "new_chunks=%d total_in_store=%d up_to_date=%s",
             changes.head_commit[:8],
             len(changes.added),
             len(changes.modified),
             len(changes.deleted),
             indexed_count,
+            total_in_store,
+            up_to_date,
         )
 
         return IncrementalIndexResult(
@@ -131,11 +151,18 @@ class IncrementalIndexer:
             chunks_indexed=indexed_count,
             chunks_removed=removed,
             files_parsed=len(paths_to_parse),
+            total_chunks_in_store=total_in_store,
+            parseable_files=len(parseable),
+            up_to_date=up_to_date,
         )
 
     def _parse_file(self, relative_path: str) -> list[UniversalChunk]:
         absolute = self._repo_root / relative_path
-        parser = self._parser_registry.get_parser(relative_path)
         content = absolute.read_bytes()
+        classification = self._content_router.classify(relative_path, content)
+        parser = self._parser_registry.get_parser_for_extension(
+            classification.effective_extension,
+        )
         modified = datetime.fromtimestamp(absolute.stat().st_mtime, tz=UTC)
-        return parser.parse(content, relative_path, last_modified=modified)
+        indexed_path = f"{self._path_prefix}{relative_path}" if self._path_prefix else relative_path
+        return parser.parse(content, indexed_path, last_modified=modified)

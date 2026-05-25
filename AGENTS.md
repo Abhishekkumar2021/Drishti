@@ -13,6 +13,7 @@
 | What Drishti does | [README.md](README.md) |
 | What's built vs. planned | [docs/IMPLEMENTATION_STATUS.md](docs/IMPLEMENTATION_STATUS.md) |
 | System architecture | [docs/architecture/high-level-architecture.md](docs/architecture/high-level-architecture.md) |
+| Platform V2 (agent, Postgres, MinIO) | [docs/architecture/platform-v2-agentic.md](docs/architecture/platform-v2-agentic.md) |
 | Why a technology was chosen | [docs/adr/](docs/adr/README.md) |
 | Design patterns in use | [docs/lld/01-design-patterns.md](docs/lld/01-design-patterns.md) |
 | Data models & schemas | [docs/lld/02-data-models.md](docs/lld/02-data-models.md) |

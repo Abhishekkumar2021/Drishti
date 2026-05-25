@@ -5,7 +5,9 @@ from __future__ import annotations
 import re
 from dataclasses import dataclass, field
 
-SUPPORTED_LANGUAGES = frozenset({"python", "java", "javascript", "typescript", "go"})
+SUPPORTED_LANGUAGES = frozenset(
+    {"python", "java", "javascript", "typescript", "go", "markdown", "pdf", "openapi"},
+)
 
 _PYTHON_SHEBANG = re.compile(rb"^#!.*\bpython[23]?\b", re.IGNORECASE)
 _JAVA_CLASS_MAGIC = b"\xca\xfe\xba\xbe"
@@ -77,6 +79,11 @@ class LanguageRegistry:
         """Return all registered file extensions."""
         return frozenset(self._extension_map)
 
+    @property
+    def extension_map(self) -> dict[str, str]:
+        """Return a copy of the extension-to-language map."""
+        return dict(self._extension_map)
+
     def has_parser_extension(self, file_path: str, parser_extensions: frozenset[str]) -> bool:
         """Check whether a file path maps to a registered parser extension.
 
@@ -120,3 +127,5 @@ class LanguageRegistry:
         self.register("javascript", [".js", ".jsx", ".mjs", ".cjs"])
         self.register("typescript", [".ts", ".tsx"])
         self.register("go", [".go"])
+        self.register("markdown", [".md", ".mdx"])
+        self.register("pdf", [".pdf"])

@@ -28,7 +28,7 @@ Legacy variables (`OPENAI_API_KEY`, `ANTHROPIC_API_KEY`, `COHERE_API_KEY`, `OPEN
 EMBEDDING_PROVIDER=openai
 EMBEDDING_MODEL=text-embedding-3-small
 EMBEDDING_DIMENSIONS=1536
-OPENAI_API_KEY=sk-...
+OPENAI_API_KEY=<your-openai-api-key>
 ```
 
 Uses the OpenAI embeddings API with batching, retries, and optional dimension reduction for `text-embedding-3-*` models.
@@ -89,7 +89,7 @@ Used for **query expansion** today; the same `create_chat_llm()` factory will po
 ```bash
 LLM_PROVIDER=anthropic
 LLM_MODEL=claude-sonnet-4-20250514
-ANTHROPIC_API_KEY=sk-ant-...
+ANTHROPIC_API_KEY=<your-anthropic-api-key>
 ```
 
 ---

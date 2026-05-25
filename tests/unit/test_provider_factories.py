@@ -63,7 +63,12 @@ class TestCreateDenseEmbedder:
         assert isinstance(embedder, OllamaDenseEmbedder)
 
     def test_openai_compatible_requires_base(self) -> None:
-        settings = Settings(embedding_provider="openai_compatible", openai_api_key="key")
+        settings = Settings(
+            _env_file=None,
+            embedding_provider="openai_compatible",
+            embedding_api_base="",
+            openai_api_key="key",
+        )
         with pytest.raises(EmbeddingError, match="EMBEDDING_API_BASE"):
             create_dense_embedder(settings)
 
@@ -102,7 +107,12 @@ class TestCreateChatLLM:
         assert isinstance(llm, OllamaChatLLM)
 
     def test_openai_compatible_requires_base(self) -> None:
-        settings = Settings(llm_provider="openai_compatible", openai_api_key="key")
+        settings = Settings(
+            _env_file=None,
+            llm_provider="openai_compatible",
+            llm_api_base="",
+            openai_api_key="key",
+        )
         with pytest.raises(ConfigurationError, match="LLM_API_BASE"):
             create_chat_llm(settings)
 

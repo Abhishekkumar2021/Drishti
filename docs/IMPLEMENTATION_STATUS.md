@@ -2,7 +2,7 @@
 
 This file is the living source of truth for the current build status of Drishti. It tracks progress at the Epic and User Story levels.
 
-*Last Updated: 2026-05-25*
+*Last Updated: 2026-05-24*
 
 ---
 
@@ -85,13 +85,13 @@ Phase 6: Release        [░░░░░░░░░░░░░░░░░░�
   * [x] **US-03.10**: Repository git walker (incremental indexing via diffs)
 
 #### EPIC-04: Document Ingestion Pipeline (Priority: P1)
-* **Points**: 42 | **Status**: 🔮 Planned (0%)
+* **Points**: 42 | **Status**: 🟨 In Progress (~81% — vision deferred)
 * **Stories**:
-  * [ ] **US-04.01**: PDF layout-aware parser (PyMuPDF)
-  * [ ] **US-04.02**: PDF table structure extraction
-  * [ ] **US-04.03**: Markdown header hierarchy parser
+  * [x] **US-04.01**: PDF layout-aware parser (PyMuPDF) — `src/drishti/ingestion/documents/pdf.py`
+  * [x] **US-04.02**: PDF table structure extraction (markdown tables in PDF parser)
+  * [x] **US-04.03**: Markdown header hierarchy parser — `src/drishti/ingestion/documents/markdown.py`
   * [ ] **US-04.04**: Multi-modal image analysis (Claude Vision API)
-  * [ ] **US-04.05**: OpenAPI spec endpoint parser
+  * [x] **US-04.05**: OpenAPI spec endpoint parser — `src/drishti/ingestion/documents/openapi.py`
 
 #### EPIC-05: Embedding & Vector Storage (Priority: P0)
 * **Points**: 34 | **Status**: 🟩 Completed (100%)
@@ -143,7 +143,7 @@ Phase 6: Release        [░░░░░░░░░░░░░░░░░░�
   * [ ] **US-09.04**: Change impact analysis endpoint (`/api/v1/impact-analysis`)
 
 #### EPIC-10: Frontend UI (Priority: P1)
-* **Points**: 55 | **Status**: 🟨 In Progress (85% — US-10.05 deferred)
+* **Points**: 55 | **Status**: 🟩 Completed (US-10.05 deferred to EPIC-09)
 * **Stories**:
   * [x] **US-10.01**: Next.js 14 layout & landing page
   * [x] **US-10.02**: Chat interface with streaming responses
@@ -161,6 +161,47 @@ Phase 6: Release        [░░░░░░░░░░░░░░░░░░�
   * [ ] **US-11.01**: Golden Q&A dataset curation
   * [ ] **US-11.02**: RAGAS evaluation runner script
   * [ ] **US-11.03**: Comparative dashboard (AST vs Naive chunking)
+
+---
+
+### Phase 4b: Production Platform V2 (Epics 13–17)
+
+> Master plan: [platform-v2-agentic.md](architecture/platform-v2-agentic.md)
+
+#### EPIC-13: Intelligent routing & workspaces (Priority: P0)
+* **Points**: 34 | **Status**: 🟨 In Progress (~70%)
+* **Stories**:
+  * [x] Content router (magic bytes + path heuristics) — `content_router.py`
+  * [x] Workspace / upload / conversation APIs — `platform_routes.py`
+  * [x] Git snapshot ingest roots — `workspace_git.py`
+
+#### EPIC-14: LangGraph agent runtime (Priority: P0)
+* **Points**: 34 | **Status**: 🟨 In Progress (~40%)
+* **Stories**:
+  * [x] Retrieve → generate → grade graph — `agent/graph.py`, `agent/runner.py`, `agent/nodes.py`
+  * [x] Single LangGraph agent path for all `/ask` endpoints
+  * [ ] Postgres checkpointer for multi-turn agent state
+
+#### EPIC-15: Data platform (Priority: P0)
+* **Points**: 34 | **Status**: 🟨 In Progress (~55%)
+* **Stories**:
+  * [x] PostgreSQL models + Alembic — `db/models.py`, `alembic/versions/001_*`
+  * [x] `PlatformService` (Postgres + filesystem fallback)
+  * [x] MinIO artifact storage — `storage/artifacts.py` (`ENABLE_MINIO=true`)
+  * [x] Arq ingest worker — `worker/tasks.py`
+  * [ ] Full migration off Redis conversation index
+
+#### EPIC-16: Auth, RBAC, observability (Priority: P1)
+* **Points**: 21 | **Status**: 🟨 In Progress (~35%)
+* **Stories**:
+  * [x] Structured JSON logging (structlog) — `observability/logging.py`
+  * [x] Request ID + log correlation — `middleware/request_id.py`, `logging_context.py`
+  * [x] Health probes for Postgres + MinIO
+  * [ ] OIDC / enterprise SSO
+  * [ ] OpenTelemetry traces
+
+#### EPIC-17: UI parity (Priority: P1)
+* **Points**: 21 | **Status**: 🔮 Planned (0%)
 
 ---
 
@@ -222,3 +263,6 @@ Once a User Story is implemented, the corresponding code files must be registere
 | US-08.03 | [services/query_cache.py](file:///Users/abhishek/Dev/Drishti/src/drishti/services/query_cache.py) | 🟩 Completed | [test_query_cache.py](file:///Users/abhishek/Dev/Drishti/tests/unit/test_query_cache.py) |
 | US-08.04 | [middleware/rate_limit.py](file:///Users/abhishek/Dev/Drishti/src/drishti/middleware/rate_limit.py) | 🟩 Completed | [test_rate_limit.py](file:///Users/abhishek/Dev/Drishti/tests/unit/test_rate_limit.py) |
 | US-10.01–04 | [web/](file:///Users/abhishek/Dev/Drishti/web/), [api/routes.py](file:///Users/abhishek/Dev/Drishti/src/drishti/api/routes.py) (`/source/read`) | 🟩 Completed | [test_source_read.py](file:///Users/abhishek/Dev/Drishti/tests/unit/test_source_read.py), `npm run build` in `web/` |
+| EPIC-14 | [agent/](file:///Users/abhishek/Dev/Drishti/src/drishti/agent/), [ADR-011](file:///Users/abhishek/Dev/Drishti/docs/adr/ADR-011-langgraph-agent-orchestration.md) | 🟨 In Progress | [test_agent_graph.py](file:///Users/abhishek/Dev/Drishti/tests/unit/test_agent_graph.py) |
+| EPIC-15 | [db/](file:///Users/abhishek/Dev/Drishti/src/drishti/db/), [platform_service.py](file:///Users/abhishek/Dev/Drishti/src/drishti/services/platform_service.py), [alembic/](file:///Users/abhishek/Dev/Drishti/alembic/) | 🟨 In Progress | [test_platform_service.py](file:///Users/abhishek/Dev/Drishti/tests/unit/test_platform_service.py) |
+| EPIC-16 | [observability/](file:///Users/abhishek/Dev/Drishti/src/drishti/observability/) | 🟨 In Progress | [test_structured_logging.py](file:///Users/abhishek/Dev/Drishti/tests/unit/test_structured_logging.py) |

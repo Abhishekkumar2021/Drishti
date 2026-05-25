@@ -23,7 +23,12 @@ class TestOpenAIDenseEmbeddingClient:
                 SimpleNamespace(index=1, embedding=[0.2] * 1536),
             ]
         )
-        settings = Settings(openai_api_key="test-key", openai_embedding_dimensions=1536)
+        settings = Settings(
+            _env_file=None,
+            embedding_provider="openai",
+            openai_api_key="test-key",
+            openai_embedding_dimensions=1536,
+        )
         client = OpenAIDenseEmbeddingClient(settings, client=mock_client)
 
         vectors = client.embed_texts(["alpha", "beta"])
@@ -33,7 +38,7 @@ class TestOpenAIDenseEmbeddingClient:
         mock_client.embeddings.create.assert_called_once()
 
     def test_requires_api_key_when_client_not_injected(self) -> None:
-        settings = Settings(openai_api_key="")
+        settings = Settings(_env_file=None, embedding_provider="openai", openai_api_key="")
         with pytest.raises(EmbeddingError, match=r"API key"):
             OpenAIDenseEmbeddingClient(settings)
 
@@ -49,6 +54,8 @@ class TestOpenAIDenseEmbeddingClient:
             ),
         ]
         settings = Settings(
+            _env_file=None,
+            embedding_provider="openai",
             openai_api_key="test-key",
             openai_embedding_dimensions=8,
         )

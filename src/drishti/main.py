@@ -5,7 +5,6 @@ Multi-modal, AST-aware RAG system for code & document understanding.
 
 from __future__ import annotations
 
-import logging
 from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
 
@@ -15,45 +14,69 @@ from fastapi.responses import JSONResponse
 from starlette.responses import Response
 
 from drishti import __version__
+from drishti.agent.runner import AgentRunner
+from drishti.api.platform_routes import router as platform_router
 from drishti.api.responses import ErrorDetail, ErrorResponse, HealthResponse, LivenessResponse
 from drishti.api.routes import router as api_router
 from drishti.config import Settings, get_settings
 from drishti.exceptions import DrishtiError
 from drishti.middleware.auth import BearerAuthMiddleware
+from drishti.middleware.logging_context import LoggingContextMiddleware
 from drishti.middleware.rate_limit import RateLimitMiddleware
 from drishti.middleware.request_id import RequestIdMiddleware
+from drishti.observability.logging import configure_structured_logging, get_logger
 from drishti.services.health import ServiceStatus, probe_dependencies
+from drishti.services.platform_service import PlatformService
 from drishti.services.query_cache import QueryCache
-from drishti.services.wiring import create_qdrant_client
+from drishti.services.wiring import create_qdrant_client, create_rag_pipeline
 
-logger = logging.getLogger(__name__)
+log = get_logger(__name__)
 
 
-def configure_logging(level: str) -> None:
-    """Configure application-wide logging."""
-    logging.basicConfig(
-        level=level,
-        format="%(asctime)s %(levelname)s [%(name)s] %(message)s",
-    )
+def configure_logging(settings: Settings) -> None:
+    """Configure structured or plain logging."""
+    if settings.structured_logging:
+        configure_structured_logging(
+            level=settings.log_level,
+            json_logs=settings.log_json,
+            service_name=settings.otel_service_name,
+        )
+    else:
+        import logging
+
+        logging.basicConfig(
+            level=settings.log_level,
+            format="%(asctime)s %(levelname)s [%(name)s] %(message)s",
+        )
 
 
 def create_app(settings: Settings | None = None) -> FastAPI:
     """Application factory for Drishti."""
     app_settings = settings or get_settings()
-    configure_logging(app_settings.log_level)
+    configure_logging(app_settings)
 
     @asynccontextmanager
     async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
-        logger.info("Drishti v%s starting", __version__)
+        log.info("drishti_starting", version=__version__)
         app_settings.validate_runtime_configuration()
         for key, value in app_settings.runtime_provider_summary().items():
-            logger.info("Config %s=%s", key, value)
-        logger.info("Qdrant: %s", app_settings.qdrant_url)
-        logger.info("Collection: %s", app_settings.qdrant_collection_name)
+            log.info("config", key=key, value=value)
+        if app_settings.llm_provider == "mock":
+            log.warning(
+                "llm_mock_enabled",
+                hint="Set LLM_PROVIDER=ollama or anthropic in .env for real Q&A",
+            )
+        log.info(
+            "infrastructure",
+            qdrant=app_settings.qdrant_url,
+            collection=app_settings.qdrant_collection_name,
+            postgres=app_settings.postgres_enabled,
+            minio=app_settings.minio_enabled,
+        )
         if app_settings.api_auth_enabled:
-            logger.info("API authentication enabled")
+            log.info("api_auth_enabled")
         else:
-            logger.warning("API authentication disabled — set API_TOKEN for production")
+            log.warning("api_auth_disabled", hint="Set API_TOKEN for production")
 
         qdrant_client = create_qdrant_client(app_settings)
         app.state.qdrant_client = qdrant_client
@@ -62,11 +85,15 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             ttl_seconds=app_settings.cache_ttl_seconds,
             enabled=app_settings.cache_enabled,
         )
+        app.state.platform_service = PlatformService.create(app_settings)
+        rag = create_rag_pipeline(app_settings, client=qdrant_client)
+        app.state.rag_pipeline = rag
+        app.state.agent_runner = AgentRunner(rag, app_settings)
 
         yield
 
         qdrant_client.close()
-        logger.info("Drishti shutting down")
+        log.info("drishti_shutdown")
 
     docs_url = "/docs" if app_settings.enable_openapi_docs else None
     redoc_url = "/redoc" if app_settings.enable_openapi_docs else None
@@ -84,6 +111,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         lifespan=lifespan,
     )
 
+    application.add_middleware(LoggingContextMiddleware)
     application.add_middleware(RequestIdMiddleware)
     application.add_middleware(RateLimitMiddleware, settings=app_settings)
     application.add_middleware(BearerAuthMiddleware, settings=app_settings)
@@ -98,6 +126,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     register_exception_handlers(application)
     register_health_routes(application, app_settings)
     application.include_router(api_router)
+    application.include_router(platform_router)
     return application
 
 
@@ -121,6 +150,13 @@ def register_exception_handlers(app: FastAPI) -> None:
         elif exc.code == "SERVICE_UNAVAILABLE":
             status_code = 503
 
+        log.warning(
+            "drishti_error",
+            code=exc.code,
+            message=exc.message,
+            request_id=request_id,
+            status_code=status_code,
+        )
         payload = ErrorResponse(
             error=ErrorDetail(
                 code=exc.code,
@@ -133,7 +169,7 @@ def register_exception_handlers(app: FastAPI) -> None:
     @app.exception_handler(Exception)
     async def unhandled_error_handler(request: Request, exc: Exception) -> JSONResponse:
         request_id = getattr(request.state, "request_id", None)
-        logger.exception("Unhandled error [request_id=%s]", request_id)
+        log.exception("unhandled_error", request_id=request_id, error=str(exc))
         payload = ErrorResponse(
             error=ErrorDetail(
                 code="INTERNAL_ERROR",

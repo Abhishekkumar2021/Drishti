@@ -66,16 +66,23 @@ The estimation follows standard Fibonacci story points (1, 2, 3, 5, 8, 13) where
 | **[EPIC-01](file:///Users/abhishek/Dev/Drishti/docs/product/epics/EPIC-01.md)** | Project Setup & Documentation | P0 | 21 | Scaffold, Docker, CI/CD, Makefile | 🟩 Done |
 | **[EPIC-02](file:///Users/abhishek/Dev/Drishti/docs/product/epics/EPIC-02.md)** | Documentation & Process | P0 | 34 | ADRs, HLA, Vision, LLD | 🟨 In Progress |
 | **[EPIC-03](file:///Users/abhishek/Dev/Drishti/docs/product/epics/EPIC-03.md)** | Code Ingestion Pipeline | P0 | 55 | Tree-sitter parsers, AST extraction | 🟩 Done |
-| **[EPIC-04](file:///Users/abhishek/Dev/Drishti/docs/product/epics/EPIC-04.md)** | Document Ingestion Pipeline | P1 | 42 | PDF layouts, Markdown headings, Vision | 🔮 Planned |
+| **[EPIC-04](file:///Users/abhishek/Dev/Drishti/docs/product/epics/EPIC-04.md)** | Document Ingestion Pipeline | P1 | 42 | PDF layouts, Markdown headings, Vision | 🟨 In Progress |
 | **[EPIC-05](file:///Users/abhishek/Dev/Drishti/docs/product/epics/EPIC-05.md)** | Embedding & Vector Storage | P0 | 34 | OpenAI & BM25 embeddings, Qdrant | 🟩 Done |
 | **[EPIC-06](file:///Users/abhishek/Dev/Drishti/docs/product/epics/EPIC-06.md)** | Hybrid Search Engine | P0 | 55 | RRF fusion, Cohere re-ranking | 🟩 Done |
 | **[EPIC-07](file:///Users/abhishek/Dev/Drishti/docs/product/epics/EPIC-07.md)** | RAG Pipeline & Generation | P0 | 42 | Context builder, LLM integration, Citations | 🟩 Done |
 | **[EPIC-08](file:///Users/abhishek/Dev/Drishti/docs/product/epics/EPIC-08.md)** | API & Backend Service | P0 | 34 | FastAPI routing, validation schemas | 🟩 Done |
 | **[EPIC-09](file:///Users/abhishek/Dev/Drishti/docs/product/epics/EPIC-09.md)** | Dependency Graph & Impact Analysis | P2 | 34 | Neo4j graph, import extraction | 🔮 Planned |
-| **[EPIC-10](file:///Users/abhishek/Dev/Drishti/docs/product/epics/EPIC-10.md)** | Frontend UI | P1 | 55 | Next.js app, Monaco Editor, citation UI | 🟨 In Progress |
+| **[EPIC-10](file:///Users/abhishek/Dev/Drishti/docs/product/epics/EPIC-10.md)** | Frontend UI | P1 | 55 | Next.js app, Monaco Editor, citation UI | 🟩 Done |
 | **[EPIC-11](file:///Users/abhishek/Dev/Drishti/docs/product/epics/EPIC-11.md)** | Evaluation & Benchmarking | P1 | 34 | Golden Q&A, RAGAS execution, benchmarks | 🔮 Planned |
 | **[EPIC-12](file:///Users/abhishek/Dev/Drishti/docs/product/epics/EPIC-12.md)** | Demo, Polish & Deployment | P1 | 21 | Docker optimization, seed script, docs | 🔮 Planned |
-| **Total** | | | **461 SP** | | |
+| **[EPIC-13](file:///Users/abhishek/Dev/Drishti/docs/product/epics/EPIC-13.md)** | Production Platform (routing, uploads) | P1 | 34 | Workspaces, Redis conversations | 🟨 In Progress |
+| **V2 program** | See [Platform V2](../../architecture/platform-v2-agentic.md) | | | | |
+| **[EPIC-14](file:///Users/abhishek/Dev/Drishti/docs/product/epics/EPIC-14.md)** | LangGraph Agent Runtime | P0 | 55 | Agent graph, tools, checkpoints | 🔮 Planned |
+| **[EPIC-15](file:///Users/abhishek/Dev/Drishti/docs/product/epics/EPIC-15.md)** | Data Platform (Postgres + MinIO) | P0 | 42 | SoR, object store, workers | 🔮 Planned |
+| **[EPIC-16](file:///Users/abhishek/Dev/Drishti/docs/product/epics/EPIC-16.md)** | Auth, RBAC, Observability | P1 | 34 | OIDC, audit, tracing | 🔮 Planned |
+| **[EPIC-17](file:///Users/abhishek/Dev/Drishti/docs/product/epics/EPIC-17.md)** | Product UX Parity | P1 | 55 | Threads, uploads, memory UI | 🔮 Planned |
+| **Total (V1)** | | | **461 SP** | | |
+| **Total (V1 + V2)** | | | **~715 SP** | | |
 
 ---
 
@@ -106,6 +113,11 @@ Work is scheduled across six progressive build phases:
 ### Phase 6: Polish & Deployment (Epic 12)
 * **Objective**: Final package optimization, seeding script execution, deployment staging.
 * **Outputs**: Docker production images, interactive seed scripts, public walkthroughs.
+
+### Phase 7: Platform V2 — Agentic & Production (Epics 14–17)
+* **Objective**: LangGraph agents, PostgreSQL + MinIO data plane, auth, UX parity with modern assistants (for grounded repo Q&A).
+* **Outputs**: See [platform-v2-agentic.md](../../architecture/platform-v2-agentic.md).
+* **Order:** EPIC-15 → EPIC-14 → EPIC-16 / EPIC-11 (parallel) → EPIC-17.
 
 ---
 

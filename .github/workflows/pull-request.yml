@@ -89,9 +89,13 @@ jobs:
 
       - name: Evaluate diff size
         run: |
-          ADDITIONS=$(gh pr view ${{ github.event.pull_request.number }} --json additions -q '.additions')
-          DELETIONS=$(gh pr view ${{ github.event.pull_request.number }} --json deletions -q '.deletions')
-          TITLE=$(gh pr view ${{ github.event.pull_request.number }} --json title -q '.title')
+          BASE_SHA="${{ github.event.pull_request.base.sha }}"
+          HEAD_SHA="${{ github.event.pull_request.head.sha }}"
+          read -r ADDITIONS DELETIONS <<< "$(git diff --numstat "${BASE_SHA}...${HEAD_SHA}" | awk '
+            { add += $1; del += $2 }
+            END { print add + 0, del + 0 }
+          ')"
+          TITLE="${{ github.event.pull_request.title }}"
           TOTAL=$((ADDITIONS + DELETIONS))
 
           echo "PR has $ADDITIONS additions and $DELETIONS deletions ($TOTAL total)"

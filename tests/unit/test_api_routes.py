@@ -9,7 +9,7 @@ from fastapi.testclient import TestClient
 
 from drishti.api.responses import AskResponse, SearchResponse
 from drishti.config import Settings
-from drishti.generation.models import Citation, ContextChunk, RAGAnswer
+from drishti.generation.models import Citation, ContextChunk
 from drishti.main import create_app
 from drishti.search.models import SearchHit
 from drishti.services.health import ServiceStatus
@@ -18,13 +18,50 @@ from drishti.services.query_cache import QueryCache
 pytestmark = pytest.mark.unit
 
 
+def _mock_rag_pipeline(settings: Settings) -> MagicMock:
+    chunk = ContextChunk(
+        chunk_id="c1",
+        file_path="src/auth.py",
+        content="def auth(): pass",
+        start_line=1,
+        end_line=3,
+    )
+    mock_rag = MagicMock()
+    mock_rag.settings = settings
+    mock_rag.llm = MagicMock()
+    mock_rag.llm.complete.return_value = "See [src/auth.py:L1-3]."
+    mock_rag.llm.stream.return_value = iter(["See ", "[src/auth.py:L1-3]."])
+    mock_rag.prepare_context.return_value = ((chunk,), "prompt")
+    mock_rag.extract_citations.return_value = [
+        Citation(
+            citation_tag="[src/auth.py:L1-3]",
+            file_path="src/auth.py",
+            start_line=1,
+            end_line=3,
+            valid=True,
+        ),
+    ]
+    return mock_rag
+
+
 @pytest.fixture
 def api_client() -> TestClient:
-    settings = Settings(api_token="", debug=True, cache_enabled=False, rate_limit_enabled=False)
+    settings = Settings(
+        _env_file=None,
+        api_token="",
+        debug=True,
+        cache_enabled=False,
+        rate_limit_enabled=False,
+        llm_provider="mock",
+        embedding_provider="hashing",
+    )
     services = {
         "qdrant": ServiceStatus.CONNECTED,
         "redis": ServiceStatus.CONNECTED,
+        "postgres": ServiceStatus.DISABLED,
+        "minio": ServiceStatus.DISABLED,
         "neo4j": ServiceStatus.DISABLED,
+        "embedding": ServiceStatus.CONNECTED,
     }
     mock_search = MagicMock()
     mock_search.search.return_value = [
@@ -37,36 +74,13 @@ def api_client() -> TestClient:
         )
     ]
 
-    mock_rag = MagicMock()
-    mock_rag.ask_stream.return_value = iter([])
-    mock_rag.ask.return_value = RAGAnswer(
-        question="Where is auth?",
-        answer="See [src/auth.py:L1-3].",
-        citations=(
-            Citation(
-                citation_tag="[src/auth.py:L1-3]",
-                file_path="src/auth.py",
-                start_line=1,
-                end_line=3,
-                valid=True,
-            ),
-        ),
-        context_chunks=(
-            ContextChunk(
-                chunk_id="c1",
-                file_path="src/auth.py",
-                content="def auth(): pass",
-                start_line=1,
-                end_line=3,
-            ),
-        ),
-    )
+    mock_rag = _mock_rag_pipeline(settings)
 
     with (
         patch("drishti.main.probe_dependencies", new=AsyncMock(return_value=services)),
         patch("drishti.main.create_qdrant_client") as mock_qdrant,
+        patch("drishti.main.create_rag_pipeline", return_value=mock_rag),
         patch("drishti.api.deps.create_hybrid_search", return_value=mock_search),
-        patch("drishti.api.deps.create_rag_pipeline", return_value=mock_rag),
     ):
         mock_qdrant.return_value = MagicMock()
         app = create_app(settings)

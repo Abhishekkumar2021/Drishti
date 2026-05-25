@@ -7,7 +7,7 @@ This epic covers parsing unstructured documentation including PDFs, markdown, im
 ## Epic Metadata
 * **Complexity**: 42 Story Points
 * **Priority**: P1 (High Priority)
-* **Status**: Planned
+* **Status**: In Progress (US-04.03 done; PDF/Vision/OpenAPI planned)
 
 ---
 
@@ -21,9 +21,9 @@ This epic covers parsing unstructured documentation including PDFs, markdown, im
 **Complexity**: 8 SP | **Priority**: P1
 
 **Acceptance Criteria**
-1. [ ] PyMuPDF reads PDF documents.
-2. [ ] Detects headings and uses them to establish page hierarchy.
-3. [ ] Captures exact page numbers for citations.
+1. [x] PyMuPDF reads PDF documents.
+2. [x] Detects headings and uses them to establish page hierarchy.
+3. [x] Captures exact page numbers for citations.
 
 ---
 
@@ -35,9 +35,9 @@ This epic covers parsing unstructured documentation including PDFs, markdown, im
 **Complexity**: 8 SP | **Priority**: P1
 
 **Acceptance Criteria**
-1. [ ] Detects bounding boxes of tables inside PDFs.
-2. [ ] Converts rows and columns into clean markdown string tables.
-3. [ ] Embeds tabular data with associated column headers.
+1. [x] Detects bounding boxes of tables inside PDFs.
+2. [x] Converts rows and columns into clean markdown string tables.
+3. [x] Embeds tabular data with associated column headers.
 
 ---
 
@@ -49,8 +49,8 @@ This epic covers parsing unstructured documentation including PDFs, markdown, im
 **Complexity**: 8 SP | **Priority**: P1
 
 **Acceptance Criteria**
-1. [ ] Recursively parses markdown files by headers.
-2. [ ] Attaches the parent heading context (e.g. `Section 1.2 > Subsection A`) to the metadata of leaf node text blocks.
+1. [x] Recursively parses markdown files by headers.
+2. [x] Attaches the parent heading context (e.g. `Section 1.2 > Subsection A`) to the metadata of leaf node text blocks.
 
 ---
 
@@ -76,6 +76,6 @@ This epic covers parsing unstructured documentation including PDFs, markdown, im
 **Complexity**: 5 SP | **Priority**: P1
 
 **Acceptance Criteria**
-1. [ ] Parses `.yaml` and `.json` OpenAPI schemas.
-2. [ ] Generates separate chunks for each API path + HTTP method (e.g., `POST /users`).
-3. [ ] Includes query params, request bodies, and success responses in the chunk content.
+1. [x] Parses `.yaml` and `.json` OpenAPI schemas.
+2. [x] Generates separate chunks for each API path + HTTP method (e.g., `POST /users`).
+3. [x] Includes query params, request bodies, and success responses in the chunk content.

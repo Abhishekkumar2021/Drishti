@@ -8,6 +8,7 @@ Architecture documents describe **what Drishti is**, **how components interact**
 
 | Order | Document | Audience | Focus |
 |-------|----------|----------|-------|
+| 0 | **[Platform V2 — Agentic](platform-v2-agentic.md)** | Leads, PM | LangGraph, Postgres, MinIO, roadmap to production |
 | 1 | [High-Level Architecture](high-level-architecture.md) | Everyone | End-to-end target system, NFRs, storage, search |
 | 2 | [C4 Model](c4-model.md) | Architects, leads | Context → Container → Component views |
 | 3 | [As-Built: Code Ingestion](as-built-code-ingestion.md) | Backend engineers | Tree-sitter pipeline **implemented in EPIC-03** |

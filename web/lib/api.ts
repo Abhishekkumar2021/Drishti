@@ -6,7 +6,25 @@ export type IngestResult = {
   head_commit: string;
   chunks_indexed: number;
   files_parsed: number;
+  total_chunks_in_store: number;
+  parseable_files: number;
+  up_to_date: boolean;
+  repo_path?: string;
 };
+
+export function formatIngestStatus(result: IngestResult): string {
+  const commit = result.head_commit.slice(0, 8);
+  if (result.up_to_date && result.total_chunks_in_store > 0) {
+    return `Already indexed at ${commit} — ${result.total_chunks_in_store} chunks in store`;
+  }
+  if (result.chunks_indexed === 0 && result.total_chunks_in_store === 0) {
+    return "No chunks indexed — check supported file types or use Force re-index";
+  }
+  if (result.chunks_indexed > 0) {
+    return `Indexed ${result.chunks_indexed} new chunks (${result.total_chunks_in_store} total) · ${commit}`;
+  }
+  return `Indexed ${result.total_chunks_in_store} chunks from ${result.files_parsed} files · ${commit}`;
+}
 
 export type SourceFile = {
   file_path: string;

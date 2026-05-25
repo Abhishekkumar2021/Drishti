@@ -46,7 +46,7 @@ class Settings(BaseSettings):
     rerank_provider: str = "auto"
     rerank_model: str = ""
 
-    # ─── Provider API keys (legacy + shared) ─────
+    # ─── Provider API keys (shared + env fallbacks) ─
     openai_api_key: str = ""
     openai_embedding_model: str = "text-embedding-3-small"
     openai_embedding_dimensions: int = 1536
@@ -57,10 +57,36 @@ class Settings(BaseSettings):
     cohere_api_key: str = ""
     cohere_rerank_model: str = "rerank-v3.5"
 
+    # ─── PostgreSQL (system of record) ───────────
+    database_url: str = ""
+    database_pool_size: int = 5
+
+    # ─── MinIO (artifact object storage) ─────────
+    enable_minio: bool = False
+    minio_endpoint: str = "localhost:9000"
+    minio_access_key: str = "drishti"
+    minio_secret_key: str = ""
+    minio_bucket: str = "drishti-artifacts"
+    minio_secure: bool = False
+    minio_region: str = ""
+
+    # ─── Agent (LangGraph retrieve → generate) ───
+    agent_max_retrieval_loops: int = 2
+
+    # ─── Background workers (Arq) ────────────────
+    worker_enabled: bool = False
+
+    # ─── Observability ───────────────────────────
+    structured_logging: bool = True
+    log_json: bool = True
+    otel_enabled: bool = False
+    otel_service_name: str = "drishti-api"
+
     # ─── Redis (Cache & Rate Limiting) ───────────
     redis_url: str = "redis://localhost:6379/0"
     cache_enabled: bool = True
     cache_ttl_seconds: int = 3600
+    conversation_ttl_seconds: int = 604_800
     rate_limit_enabled: bool = True
     rate_limit_requests_per_minute: int = 60
 
@@ -82,6 +108,8 @@ class Settings(BaseSettings):
     )
     health_check_timeout_seconds: float = 5.0
     ingestion_allowed_roots: list[str] = Field(default_factory=list)
+    max_upload_bytes: int = 52_428_800
+    workspaces_cache_root: str = ""
 
     # ─── Search Defaults ─────────────────────────
     search_top_k: int = 10
@@ -117,6 +145,18 @@ class Settings(BaseSettings):
         if isinstance(value, list):
             return [str(item) for item in value]
         return []
+
+    @property
+    def postgres_enabled(self) -> bool:
+        """Whether PostgreSQL is configured as the system of record."""
+        return bool(self.database_url.strip())
+
+    @property
+    def minio_enabled(self) -> bool:
+        """Whether MinIO object storage is active."""
+        return self.enable_minio and bool(
+            self.minio_endpoint.strip() and self.minio_access_key.strip(),
+        )
 
     @property
     def qdrant_url(self) -> str:
@@ -315,6 +355,9 @@ class Settings(BaseSettings):
             "llm_model": self.resolved_llm_model(),
             "rerank_provider": self.rerank_provider,
             "rerank_model": self.resolved_rerank_model(),
+            "postgres_enabled": str(self.postgres_enabled),
+            "minio_enabled": str(self.minio_enabled),
+            "worker_enabled": str(self.worker_enabled),
         }
 
 
