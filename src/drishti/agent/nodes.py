@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 from drishti.agent.state import AgentState
-from drishti.observability.logging import get_logger
 from drishti.generation.citations import (
     filter_valid_citations,
     parse_citations,
@@ -12,6 +11,7 @@ from drishti.generation.citations import (
 from drishti.generation.llm import ChatLLM
 from drishti.generation.pipeline import RAGPipeline
 from drishti.generation.prompts import RAG_SYSTEM_PROMPT
+from drishti.observability.logging import get_logger
 from drishti.search.expansion import LLMQueryExpander, combine_expanded_query
 
 logger = get_logger(__name__)
