@@ -19,7 +19,7 @@ def psycopg_database_url(database_url: str) -> str:
     url = database_url.strip()
     for prefix in ("postgresql+asyncpg://", "postgres+asyncpg://"):
         if url.startswith(prefix):
-            return f"postgresql://{url[len(prefix):]}"
+            return f"postgresql://{url[len(prefix) :]}"
     return url
 
 
