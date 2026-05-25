@@ -6,13 +6,13 @@ import time
 from collections.abc import Iterator
 from typing import TYPE_CHECKING, Any
 
-from langchain_core.runnables import RunnableConfig
 from drishti.agent.graph import build_rag_graph
 from drishti.agent.nodes import generate_answer, retrieve_context
+from drishti.agent.state import AgentState
 
 if TYPE_CHECKING:
+    from langchain_core.runnables import RunnableConfig
     from langgraph.checkpoint.base import BaseCheckpointSaver
-from drishti.agent.state import AgentState
 from drishti.api.schemas import ChatMessage
 from drishti.config import Settings
 from drishti.generation.models import RAGAnswer, StreamEvent
