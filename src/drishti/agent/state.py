@@ -23,3 +23,5 @@ class AgentState(TypedDict, total=False):
     needs_retry: bool
     retry_mode: str
     query_expanded: bool
+    stream_tokens: bool
+    tools_invoked: bool

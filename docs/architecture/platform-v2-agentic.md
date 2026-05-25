@@ -240,8 +240,8 @@ Compaction job (worker): after each session, LangGraph **memory subgraph** runs 
 - [x] `src/drishti/agent/checkpointer.py` — Postgres
 - [x] Wrap `HybridSearchPipeline` as `hybrid_search` tool (+ `read_source`, `ingest_status`)
 - [x] `/ask` and `/conversations/{id}/ask` invoke `AgentRunner` (LangGraph)
-- [ ] Streaming via LangGraph `astream_events` → existing SSE format (UI unchanged)
-- [ ] LLM tool-calling node (tools registered, not invoked by graph yet)
+- [x] Streaming via LangGraph `astream` (`updates` + `custom`) → existing SSE format (UI unchanged)
+- [x] LLM tool router node (optional `tools` → `retrieve` when tools configured)
 
 **Exit:** Multi-step retrieval (grade + optional re-query) beats linear RAG on golden set.
 

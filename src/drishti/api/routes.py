@@ -271,7 +271,7 @@ async def _stream_rag_with_cache(
     citations: list[CitationItem] = []
     sources: list[dict[str, object]] = []
 
-    for event in agent.ask_stream(
+    async for event in agent.ask_stream(
         question,
         filters=filters,
         conversation_history=conversation_history,

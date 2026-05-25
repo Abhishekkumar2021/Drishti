@@ -1,19 +1,33 @@
-"""LangGraph RAG agent: retrieve → generate → grade."""
+"""LangGraph RAG agent: tools → retrieve → generate → grade."""
 
 from __future__ import annotations
 
-from typing import Literal
+from typing import TYPE_CHECKING, Literal
 
 from langgraph.graph import StateGraph
 
-from drishti.agent.nodes import expand_query, generate_answer, retrieve_context
+from drishti.agent.nodes import (
+    expand_query,
+    generate_answer,
+    retrieve_context,
+    run_agent_tools,
+)
 from drishti.agent.state import AgentState
 from drishti.generation.llm import ChatLLM
 from drishti.generation.pipeline import RAGPipeline
 
+if TYPE_CHECKING:
+    from langchain_core.tools import BaseTool
 
-def build_rag_graph(rag: RAGPipeline, llm: ChatLLM) -> StateGraph[AgentState, None, AgentState]:
+
+def build_rag_graph(
+    rag: RAGPipeline,
+    llm: ChatLLM,
+    *,
+    tools: list[BaseTool] | None = None,
+) -> StateGraph[AgentState, None, AgentState]:
     """Compile retrieve-grade-generate graph over hybrid search + LLM."""
+    tool_list = list(tools or [])
 
     def retrieve(state: AgentState) -> AgentState:
         return retrieve_context(rag, state)
@@ -39,7 +53,12 @@ def build_rag_graph(rag: RAGPipeline, llm: ChatLLM) -> StateGraph[AgentState, No
     graph.add_node("retrieve", retrieve)
     graph.add_node("generate", generate)
     graph.add_node("expand_query", expand)
-    graph.set_entry_point("retrieve")
+    if tool_list:
+        graph.add_node("tools", run_agent_tools(tool_list, llm))
+        graph.add_edge("tools", "retrieve")
+        graph.set_entry_point("tools")
+    else:
+        graph.set_entry_point("retrieve")
     graph.add_edge("retrieve", "generate")
     graph.add_edge("expand_query", "retrieve")
     graph.add_conditional_edges("generate", route_after_generate)

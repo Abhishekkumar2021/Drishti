@@ -191,7 +191,8 @@ xychart-beta
   * [x] Postgres checkpointer for multi-turn agent state — `agent/checkpointer.py`
   * [x] LangChain tools — `agent/tools/` (`hybrid_search`, `read_source`, `ingest_status`)
   * [x] `expand_query` node on low-confidence grade
-  * [ ] SSE via LangGraph `astream_events` (US-14.04)
+  * [x] SSE via LangGraph `astream` updates + custom stream (US-14.04)
+  * [x] LLM tool router node before retrieve (when tools configured)
 
 #### EPIC-15: Data platform (Priority: P0)
 * **Points**: 34 | **Status**: 🟨 In Progress (~55%)
