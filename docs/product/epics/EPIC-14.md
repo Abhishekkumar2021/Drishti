@@ -17,6 +17,7 @@ Replace the linear RAG path with a **LangGraph** agent that plans, retrieves, gr
 - [x] `hybrid_search` wrapping `HybridSearchPipeline` — `agent/tools/search.py`
 - [x] `read_source` wrapping source read API — `agent/tools/source.py`
 - [x] `ingest_status` for workspace job state — `agent/tools/ingest.py`
+- [x] Optional `tools` graph node (LLM JSON router invokes one tool before retrieve)
 
 ### US-14.03: Postgres checkpointer
 - [x] `langgraph-checkpoint-postgres` integration — `agent/checkpointer.py`
@@ -24,8 +25,8 @@ Replace the linear RAG path with a **LangGraph** agent that plans, retrieves, gr
 - [ ] Resume conversation after API restart (requires streaming via graph — US-14.04)
 
 ### US-14.04: Streaming SSE compatibility
-- [ ] Map `astream_events` to existing SSE events (`token`, `citation`, `context`, `done`)
-- [ ] No breaking changes to Next.js client
+- [x] Map LangGraph `astream` (`updates` + `custom`) to existing SSE events (`token`, `citation`, `context`, `done`)
+- [x] No breaking changes to Next.js client (async `ask_stream`)
 
 ### US-14.05: Retrieval grader loop
 - [x] If grade fails, `expand_query` node (max 2 iterations) — `agent/nodes.py`, `agent/graph.py`

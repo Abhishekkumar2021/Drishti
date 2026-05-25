@@ -3,12 +3,12 @@
 from __future__ import annotations
 
 import time
-from collections.abc import Iterator
+from collections.abc import AsyncIterator
 from typing import TYPE_CHECKING, Any
 
 from drishti.agent.graph import build_rag_graph
-from drishti.agent.nodes import expand_query, generate_answer, retrieve_context
 from drishti.agent.state import AgentState
+from drishti.agent.stream_mapping import initial_stream_state, iter_sse_from_graph_stream
 
 if TYPE_CHECKING:
     from langchain_core.runnables import RunnableConfig
@@ -18,13 +18,6 @@ from drishti.api.schemas import ChatMessage
 from drishti.config import Settings
 from drishti.generation.models import RAGAnswer, StreamEvent
 from drishti.generation.pipeline import RAGPipeline
-from drishti.generation.prompts import RAG_SYSTEM_PROMPT
-from drishti.generation.streaming import (
-    citation_event,
-    context_event,
-    done_event,
-    token_event,
-)
 
 
 class AgentRunner:
@@ -42,12 +35,12 @@ class AgentRunner:
         self._settings = settings
         self._checkpointer = checkpointer
         self._tools = list(tools or [])
-        graph = build_rag_graph(rag, rag.llm)
+        graph = build_rag_graph(rag, rag.llm, tools=self._tools)
         self._graph = graph.compile(checkpointer=checkpointer)
 
     @property
     def tools(self) -> list[BaseTool]:
-        """LangChain tools available for future tool-calling nodes."""
+        """LangChain tools wired into the optional tools graph node."""
         return self._tools
 
     def ask(
@@ -76,7 +69,7 @@ class AgentRunner:
             context_chunks=chunks,
         )
 
-    def ask_stream(
+    async def ask_stream(
         self,
         question: str,
         *,
@@ -84,62 +77,24 @@ class AgentRunner:
         conversation_history: list[ChatMessage] | None = None,
         workspace_memory: str = "",
         thread_id: str | None = None,
-    ) -> Iterator[StreamEvent]:
-        """Stream tokens using the same retrieve → generate → grade loop as the graph."""
+    ) -> AsyncIterator[StreamEvent]:
+        """Stream SSE events via LangGraph ``astream`` (updates + custom token chunks)."""
         started = time.perf_counter()
-        state = self._initial_state(
-            question,
-            filters=filters,
-            conversation_history=conversation_history,
-            workspace_memory=workspace_memory,
+        state = initial_stream_state(
+            self._initial_state(
+                question,
+                filters=filters,
+                conversation_history=conversation_history,
+                workspace_memory=workspace_memory,
+            ),
         )
-        token_count = 0
-
-        while True:
-            state = {**state, **retrieve_context(self._rag, state)}
-            if state.get("needs_retry") and state.get("retry_mode") == "empty":
-                continue
-
-            chunks = state.get("context_chunks") or ()
-            user_prompt = state.get("user_prompt", "")
-            yield context_event(chunks)
-
-            answer_parts: list[str] = []
-            for token in self._rag.llm.stream(
-                user_prompt,
-                system=RAG_SYSTEM_PROMPT,
-                max_tokens=self._settings.llm_max_tokens,
-                temperature=self._settings.llm_temperature,
-            ):
-                token_count += 1
-                answer_parts.append(token)
-                yield token_event(token)
-
-            state = {
-                **state,
-                **generate_answer(
-                    self._rag,
-                    self._rag.llm,
-                    state,
-                    answer="".join(answer_parts),
-                ),
-            }
-            for citation in state.get("citations") or []:
-                yield citation_event(citation)
-
-            if not state.get("needs_retry"):
-                break
-
-            passes = state.get("retrieval_pass", 0)
-            max_passes = state.get("max_passes", 2)
-            if passes >= max_passes:
-                break
-            if state.get("retry_mode") == "low_confidence" and not state.get("query_expanded"):
-                state = {**state, **expand_query(self._rag.llm, state)}
-                continue
-
-        elapsed_ms = int((time.perf_counter() - started) * 1000)
-        yield done_event(total_tokens=token_count, execution_time_ms=elapsed_ms)
+        graph_stream = self._graph.astream(
+            state,
+            config=self._invoke_config(thread_id),
+            stream_mode=["updates", "custom"],
+        )
+        async for event in iter_sse_from_graph_stream(graph_stream, started_perf=started):
+            yield event
 
     def _invoke_config(self, thread_id: str | None) -> RunnableConfig | None:
         if thread_id and self._checkpointer is not None:
@@ -162,6 +117,8 @@ class AgentRunner:
             "retrieval_pass": 0,  # nosec B105 — counter, not a credential
             "query_expanded": False,
             "retry_mode": "",
+            "tools_invoked": False,
+            "stream_tokens": False,
         }
 
 

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -40,7 +41,8 @@ def test_agent_ask_via_graph() -> None:
 
 
 @pytest.mark.unit
-def test_agent_stream_emits_sse_events() -> None:
+@pytest.mark.asyncio
+async def test_agent_stream_emits_sse_events() -> None:
     rag = MagicMock()
     rag.settings = Settings(agent_max_retrieval_loops=1)
     rag.llm = MagicMock()
@@ -56,7 +58,7 @@ def test_agent_stream_emits_sse_events() -> None:
     rag.extract_citations.return_value = []
 
     runner = AgentRunner(rag, rag.settings)
-    events = list(runner.ask_stream("question"))
+    events = [event async for event in runner.ask_stream("question")]
     formatted = [format_sse_event(event) for event in events]
 
     assert any("event: context" in line for line in formatted)
@@ -123,3 +125,40 @@ def test_agent_expands_query_on_low_confidence() -> None:
     assert result.answer
     assert expander.expand.called
     assert rag.prepare_context.call_count >= 2
+
+
+@pytest.mark.unit
+def test_agent_tools_node_invokes_hybrid_search() -> None:
+    rag = MagicMock()
+    rag.settings = Settings(agent_max_retrieval_loops=1)
+    rag.llm = MagicMock()
+    rag.llm.complete.side_effect = [
+        json.dumps({"tool": "hybrid_search", "arguments": {"query": "auth", "limit": 3}}),
+        "Answer [src/a.py:L1-2].",
+    ]
+    rag.llm.stream.return_value = iter(["Answer "])
+    rag.prepare_context.return_value = (
+        (
+            ContextChunk(
+                chunk_id="c1",
+                file_path="src/a.py",
+                content="code",
+                start_line=1,
+                end_line=2,
+            ),
+        ),
+        "prompt",
+    )
+    rag.extract_citations.return_value = []
+
+    mock_tool = MagicMock()
+    mock_tool.name = "hybrid_search"
+    mock_tool.description = "search"
+    mock_tool.invoke.return_value = '{"results": []}'
+
+    runner = AgentRunner(rag, rag.settings, tools=[mock_tool])
+    result = runner.ask("where is auth?")
+
+    assert result.answer
+    mock_tool.invoke.assert_called_once()
+    rag.prepare_context.assert_called()

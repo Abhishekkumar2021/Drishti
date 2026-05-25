@@ -295,7 +295,7 @@ async def _stream_conversation_answer(
     thread_id: str,
 ) -> AsyncIterator[str]:
     answer_parts: list[str] = []
-    for event in agent.ask_stream(
+    async for event in agent.ask_stream(
         question,
         filters=filters,
         conversation_history=history,
