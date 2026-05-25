@@ -67,6 +67,7 @@ def create_incremental_indexer(
     repo_root: Path,
     *,
     client: QdrantClient | None = None,
+    path_prefix: str = "",
 ) -> IncrementalIndexer:
     """Wire an incremental indexer for a repository root."""
     store = create_chunk_store(settings, client=client)
@@ -74,4 +75,5 @@ def create_incremental_indexer(
         repo_root,
         parser_registry=create_default_parser_registry(),
         chunk_index=store,
+        path_prefix=path_prefix,
     )

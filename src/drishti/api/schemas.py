@@ -184,6 +184,10 @@ class AskRequest(BaseModel):
         description="Prior conversation turns",
     )
     filters: dict[str, str] | None = Field(None, description="Metadata scope filters")
+    workspace_id: str | None = Field(
+        None,
+        description="When set, apply workspace chunk filter and inject workspace memory",
+    )
 
     @field_validator("conversation_history")
     @classmethod

@@ -79,6 +79,11 @@ class LanguageRegistry:
         """Return all registered file extensions."""
         return frozenset(self._extension_map)
 
+    @property
+    def extension_map(self) -> dict[str, str]:
+        """Return a copy of the extension-to-language map."""
+        return dict(self._extension_map)
+
     def has_parser_extension(self, file_path: str, parser_extensions: frozenset[str]) -> bool:
         """Check whether a file path maps to a registered parser extension.
 

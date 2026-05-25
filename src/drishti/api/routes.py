@@ -49,6 +49,7 @@ from drishti.generation.models import Citation, StreamEvent
 from drishti.generation.pipeline import RAGPipeline
 from drishti.generation.streaming import citation_event, done_event, format_sse_event, token_event
 from drishti.search.pipeline import HybridSearchPipeline
+from drishti.services.memory_store import WorkspaceMemoryStore
 from drishti.services.query_cache import CachedAskAnswer, QueryCache
 from drishti.services.wiring import create_incremental_indexer
 from drishti.utils.language import LanguageRegistry
@@ -149,15 +150,21 @@ async def search_chunks(
 @router.post("/ask", response_model=None)
 async def ask_question(
     body: AskRequest,
+    settings: Settings = Depends(get_app_settings),
     rag: RAGPipeline = Depends(get_rag_pipeline),
     cache: QueryCache = Depends(get_query_cache),
     stream: bool = Query(default=True, description="Stream answer via SSE when true"),
 ) -> AskResponse | StreamingResponse:
     """Answer a question using RAG; streams tokens via SSE by default."""
+    filters, workspace_memory = await _resolve_workspace_scope(
+        settings,
+        body.workspace_id,
+        body.filters,
+    )
     cache_key = cache.cache_key(
         body.question,
         conversation_history=body.conversation_history,
-        filters=body.filters,
+        filters=filters,
     )
 
     if cache.enabled:
@@ -177,8 +184,9 @@ async def ask_question(
                 cache,
                 cache_key,
                 question=body.question,
-                filters=body.filters,
+                filters=filters,
                 conversation_history=body.conversation_history,
+                workspace_memory=workspace_memory,
             ),
             media_type="text/event-stream",
         )
@@ -186,8 +194,9 @@ async def ask_question(
     try:
         answer = rag.ask(
             body.question,
-            filters=body.filters,
+            filters=filters,
             conversation_history=body.conversation_history,
+            workspace_memory=workspace_memory,
         )
     except GenerationError:
         raise
@@ -233,6 +242,20 @@ async def _stream_cached_answer(cached: CachedAskAnswer) -> AsyncIterator[str]:
     yield format_sse_event(done_event(total_tokens=len(cached.answer.split()), execution_time_ms=0))
 
 
+async def _resolve_workspace_scope(
+    settings: Settings,
+    workspace_id: str | None,
+    filters: dict[str, str] | None,
+) -> tuple[dict[str, str] | None, str]:
+    if not workspace_id or not workspace_id.strip():
+        return filters, ""
+    memory_store = WorkspaceMemoryStore(settings.redis_url, enabled=settings.cache_enabled)
+    memory = await memory_store.get(workspace_id.strip())
+    merged = dict(filters or {})
+    merged["file_path"] = f"workspaces/{workspace_id.strip()}/*"
+    return merged, memory
+
+
 async def _stream_rag_with_cache(
     rag: RAGPipeline,
     cache: QueryCache,
@@ -241,6 +264,7 @@ async def _stream_rag_with_cache(
     question: str,
     filters: dict[str, str] | None,
     conversation_history: list[ChatMessage],
+    workspace_memory: str = "",
 ) -> AsyncIterator[str]:
     answer_parts: list[str] = []
     citations: list[CitationItem] = []
@@ -250,6 +274,7 @@ async def _stream_rag_with_cache(
         question,
         filters=filters,
         conversation_history=conversation_history,
+        workspace_memory=workspace_memory,
     ):
         if event.event == "token":
             answer_parts.append(str(event.data.get("text", "")))

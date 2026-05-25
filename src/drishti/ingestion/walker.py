@@ -7,7 +7,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import TYPE_CHECKING
 
-from drishti.ingestion.documents.paths import is_openapi_spec_path
+from drishti.ingestion.content_router import ContentRouter
 from drishti.ingestion.gitignore import GitignoreMatcher
 from drishti.utils.language import LanguageRegistry
 from drishti.utils.paths import is_path_within_root
@@ -31,6 +31,8 @@ class DiscoveredFile:
     language: str | None
     extension: str
     has_registered_parser: bool
+    content_kind: str | None = None
+    detection_method: str | None = None
 
 
 class FileWalker:
@@ -64,6 +66,15 @@ class FileWalker:
         self.inspect_magic_bytes = inspect_magic_bytes
         self.follow_symlinks = follow_symlinks
         self._gitignore = GitignoreMatcher(self.root)
+        parser_extensions = (
+            parser_registry.registered_extensions()
+            if parser_registry is not None
+            else frozenset()
+        )
+        self._content_router = ContentRouter(
+            extension_map=self.language_registry.extension_map,
+            parser_extensions=parser_extensions,
+        )
 
     def walk(self) -> Iterator[DiscoveredFile]:
         """Yield discovered code files under the repository root."""
@@ -111,45 +122,21 @@ class FileWalker:
                 continue
 
             content = self._read_magic_bytes(resolved_entry) if self.inspect_magic_bytes else None
-            language = self.language_registry.detect(relative_path, content)
-            if language is None and is_openapi_spec_path(relative_path):
-                language = "openapi"
-
-            if language is None:
+            classification = self._content_router.classify(relative_path, content)
+            if classification.kind == "unknown":
                 continue
 
-            extension = self.language_registry.get_extension(relative_path) or ""
-            parser_extensions = (
-                self.parser_registry.registered_extensions()
-                if self.parser_registry is not None
-                else frozenset()
-            )
-            has_registered_parser = self._has_parser_for_path(
-                relative_path,
-                extension=extension,
-                parser_extensions=parser_extensions,
-            )
+            has_registered_parser = self._content_router.has_parser(classification)
 
             yield DiscoveredFile(
                 relative_path=relative_path,
                 absolute_path=resolved_entry,
-                language=language,
-                extension=extension,
+                language=classification.language,
+                extension=classification.effective_extension,
                 has_registered_parser=has_registered_parser,
+                content_kind=classification.kind,
+                detection_method=classification.detection_method,
             )
-
-    def _has_parser_for_path(
-        self,
-        relative_path: str,
-        *,
-        extension: str,
-        parser_extensions: frozenset[str],
-    ) -> bool:
-        if self.parser_registry is None:
-            return False
-        if is_openapi_spec_path(relative_path):
-            return extension in parser_extensions
-        return self.language_registry.has_parser_extension(relative_path, parser_extensions)
 
     def _read_magic_bytes(self, file_path: Path) -> bytes | None:
         try:

@@ -61,6 +61,7 @@ class Settings(BaseSettings):
     redis_url: str = "redis://localhost:6379/0"
     cache_enabled: bool = True
     cache_ttl_seconds: int = 3600
+    conversation_ttl_seconds: int = 604_800
     rate_limit_enabled: bool = True
     rate_limit_requests_per_minute: int = 60
 
@@ -82,6 +83,8 @@ class Settings(BaseSettings):
     )
     health_check_timeout_seconds: float = 5.0
     ingestion_allowed_roots: list[str] = Field(default_factory=list)
+    max_upload_bytes: int = 52_428_800
+    workspaces_cache_root: str = ""
 
     # ─── Search Defaults ─────────────────────────
     search_top_k: int = 10

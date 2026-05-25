@@ -53,12 +53,14 @@ class RAGPipeline:
         *,
         filters: dict[str, str] | None = None,
         conversation_history: list[ChatMessage] | None = None,
+        workspace_memory: str = "",
     ) -> RAGAnswer:
         """Run non-streaming RAG and return the full answer."""
         chunks, user_prompt = self._prepare_context(
             question,
             filters=filters,
             conversation_history=conversation_history,
+            workspace_memory=workspace_memory,
         )
         answer = self._llm.complete(
             user_prompt,
@@ -80,6 +82,7 @@ class RAGPipeline:
         *,
         filters: dict[str, str] | None = None,
         conversation_history: list[ChatMessage] | None = None,
+        workspace_memory: str = "",
     ) -> Iterator[StreamEvent]:
         """Yield SSE-ready stream events for a RAG answer."""
         started = time.perf_counter()
@@ -87,6 +90,7 @@ class RAGPipeline:
             question,
             filters=filters,
             conversation_history=conversation_history,
+            workspace_memory=workspace_memory,
         )
         yield context_event(chunks)
 
@@ -115,6 +119,7 @@ class RAGPipeline:
         *,
         filters: dict[str, str] | None,
         conversation_history: list[ChatMessage] | None,
+        workspace_memory: str = "",
     ) -> tuple[tuple[ContextChunk, ...], str]:
         hits = self._search.search(
             question,
@@ -123,7 +128,7 @@ class RAGPipeline:
         )
         chunks = self._context_builder.build_from_hits(hits)
         context_xml = self._context_builder.render_xml(chunks)
-        history_prefix = _format_history(conversation_history)
+        history_prefix = _format_history(conversation_history, workspace_memory)
         user_prompt = build_user_prompt(
             question,
             context_xml,
@@ -141,10 +146,16 @@ class RAGPipeline:
         return filter_valid_citations(validated)
 
 
-def _format_history(messages: list[ChatMessage] | None) -> str:
-    if not messages:
-        return ""
-    lines = ["## Conversation history"]
-    for message in messages[-6:]:
-        lines.append(f"{message.role}: {message.content}")
-    return "\n".join(lines)
+def _format_history(
+    messages: list[ChatMessage] | None,
+    workspace_memory: str = "",
+) -> str:
+    parts: list[str] = []
+    if workspace_memory.strip():
+        parts.append(f"## Workspace memory\n{workspace_memory.strip()}")
+    if messages:
+        lines = ["## Conversation history"]
+        for message in messages[-12:]:
+            lines.append(f"{message.role}: {message.content}")
+        parts.append("\n".join(lines))
+    return "\n\n".join(parts)

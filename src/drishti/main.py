@@ -16,6 +16,7 @@ from starlette.responses import Response
 
 from drishti import __version__
 from drishti.api.responses import ErrorDetail, ErrorResponse, HealthResponse, LivenessResponse
+from drishti.api.platform_routes import router as platform_router
 from drishti.api.routes import router as api_router
 from drishti.config import Settings, get_settings
 from drishti.exceptions import DrishtiError
@@ -103,6 +104,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     register_exception_handlers(application)
     register_health_routes(application, app_settings)
     application.include_router(api_router)
+    application.include_router(platform_router)
     return application
 
 

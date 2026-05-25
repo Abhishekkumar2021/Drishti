@@ -11,6 +11,12 @@
 
 Flow: `POST /api/v1/ingest` with `repo_path` or `repo_url` → incremental indexer → Qdrant.
 
+**Routing:** Files are classified by `ContentRouter` (magic bytes, content sniffing, path heuristics)—not extension alone. See [production-roadmap.md](architecture/production-roadmap.md).
+
+**Uploads:** `POST /api/v1/workspaces/{id}/artifacts` for PDFs/specs without a git repo.
+
+**Chat:** Server-side sessions via `/api/v1/conversations`; workspace memory via `PUT /workspaces/{id}/memory`.
+
 ## Planned (EPIC-04 remainder)
 
 - **US-04.04** — Diagram / image vision descriptions (Claude Vision)

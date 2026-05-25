@@ -19,7 +19,9 @@ from drishti.ingestion.git_changes import (
     filter_existing_paths,
     resolve_changes,
 )
+from drishti.ingestion.content_router import ContentRouter
 from drishti.ingestion.index_state import IndexState, IndexStateStore
+from drishti.utils.language import LanguageRegistry
 
 logger = logging.getLogger(__name__)
 
@@ -51,12 +53,21 @@ class IncrementalIndexer:
         parser_registry: ParserRegistry,
         chunk_index: ChunkIndex,
         state_store: IndexStateStore | None = None,
+        path_prefix: str = "",
     ) -> None:
         """Wire the indexer to a repository root and storage backends."""
         self._repo_root = repo_root.resolve()
         self._parser_registry = parser_registry
         self._chunk_index = chunk_index
         self._state_store = state_store or IndexStateStore.for_repository(self._repo_root)
+        self._path_prefix = path_prefix.strip().rstrip("/")
+        if self._path_prefix:
+            self._path_prefix = f"{self._path_prefix}/"
+        language_registry = LanguageRegistry()
+        self._content_router = ContentRouter(
+            extension_map=language_registry.extension_map,
+            parser_extensions=self._parser_registry.registered_extensions(),
+        )
 
     def run(self, *, force_full: bool = False) -> IncrementalIndexResult:
         """Run incremental indexing from stored state to HEAD."""
@@ -147,7 +158,11 @@ class IncrementalIndexer:
 
     def _parse_file(self, relative_path: str) -> list[UniversalChunk]:
         absolute = self._repo_root / relative_path
-        parser = self._parser_registry.get_parser(relative_path)
         content = absolute.read_bytes()
+        classification = self._content_router.classify(relative_path, content)
+        parser = self._parser_registry.get_parser_for_extension(
+            classification.effective_extension,
+        )
         modified = datetime.fromtimestamp(absolute.stat().st_mtime, tz=UTC)
-        return parser.parse(content, relative_path, last_modified=modified)
+        indexed_path = f"{self._path_prefix}{relative_path}" if self._path_prefix else relative_path
+        return parser.parse(content, indexed_path, last_modified=modified)
