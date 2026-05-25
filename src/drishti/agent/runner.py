@@ -7,11 +7,12 @@ from collections.abc import Iterator
 from typing import TYPE_CHECKING, Any
 
 from drishti.agent.graph import build_rag_graph
-from drishti.agent.nodes import generate_answer, retrieve_context
+from drishti.agent.nodes import expand_query, generate_answer, retrieve_context
 from drishti.agent.state import AgentState
 
 if TYPE_CHECKING:
     from langchain_core.runnables import RunnableConfig
+    from langchain_core.tools import BaseTool
     from langgraph.checkpoint.base import BaseCheckpointSaver
 from drishti.api.schemas import ChatMessage
 from drishti.config import Settings
@@ -35,12 +36,19 @@ class AgentRunner:
         settings: Settings,
         *,
         checkpointer: BaseCheckpointSaver[Any] | None = None,
+        tools: list[BaseTool] | None = None,
     ) -> None:
         self._rag = rag
         self._settings = settings
         self._checkpointer = checkpointer
+        self._tools = list(tools or [])
         graph = build_rag_graph(rag, rag.llm)
         self._graph = graph.compile(checkpointer=checkpointer)
+
+    @property
+    def tools(self) -> list[BaseTool]:
+        """LangChain tools available for future tool-calling nodes."""
+        return self._tools
 
     def ask(
         self,
@@ -89,7 +97,7 @@ class AgentRunner:
 
         while True:
             state = {**state, **retrieve_context(self._rag, state)}
-            if state.get("needs_retry"):
+            if state.get("needs_retry") and state.get("retry_mode") == "empty":
                 continue
 
             chunks = state.get("context_chunks") or ()
@@ -122,6 +130,14 @@ class AgentRunner:
             if not state.get("needs_retry"):
                 break
 
+            passes = state.get("retrieval_pass", 0)
+            max_passes = state.get("max_passes", 2)
+            if passes >= max_passes:
+                break
+            if state.get("retry_mode") == "low_confidence" and not state.get("query_expanded"):
+                state = {**state, **expand_query(self._rag.llm, state)}
+                continue
+
         elapsed_ms = int((time.perf_counter() - started) * 1000)
         yield done_event(total_tokens=token_count, execution_time_ms=elapsed_ms)
 
@@ -144,6 +160,8 @@ class AgentRunner:
             "workspace_memory": _history_prefix(conversation_history, workspace_memory),
             "max_passes": self._settings.agent_max_retrieval_loops,
             "retrieval_pass": 0,  # nosec B105 — counter, not a credential
+            "query_expanded": False,
+            "retry_mode": "",
         }
 
 

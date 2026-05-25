@@ -49,6 +49,11 @@ class RAGPipeline:
         """Chat model used by the agent generate step."""
         return self._llm
 
+    @property
+    def search(self) -> HybridSearchPipeline:
+        """Hybrid search pipeline backing retrieval."""
+        return self._search
+
     def prepare_context(
         self,
         question: str,

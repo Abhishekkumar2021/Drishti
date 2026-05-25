@@ -104,10 +104,21 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             app.state.agent_checkpointer_cm = checkpointer_cm
             log.info("agent_checkpointer_enabled")
 
+        from drishti.agent.tools import AgentToolRuntime, build_agent_tools
+
+        agent_tools = build_agent_tools(
+            AgentToolRuntime(
+                settings=app_settings,
+                search=rag.search,
+                platform=app.state.platform_service,
+            ),
+        )
+        app.state.agent_tools = agent_tools
         app.state.agent_runner = AgentRunner(
             rag,
             app_settings,
             checkpointer=checkpointer,
+            tools=agent_tools,
         )
 
         yield

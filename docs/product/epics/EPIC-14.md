@@ -14,9 +14,9 @@ Replace the linear RAG path with a **LangGraph** agent that plans, retrieves, gr
 - [x] Unit tests with mocked LLM and retriever
 
 ### US-14.02: LangChain tools
-- [ ] `hybrid_search` wrapping `HybridSearchPipeline`
-- [ ] `read_source` wrapping source read API
-- [ ] `ingest_status` for workspace job state
+- [x] `hybrid_search` wrapping `HybridSearchPipeline` — `agent/tools/search.py`
+- [x] `read_source` wrapping source read API — `agent/tools/source.py`
+- [x] `ingest_status` for workspace job state — `agent/tools/ingest.py`
 
 ### US-14.03: Postgres checkpointer
 - [x] `langgraph-checkpoint-postgres` integration — `agent/checkpointer.py`
@@ -28,8 +28,8 @@ Replace the linear RAG path with a **LangGraph** agent that plans, retrieves, gr
 - [ ] No breaking changes to Next.js client
 
 ### US-14.05: Retrieval grader loop
-- [ ] If grade fails, `expand_query` node (max 2 iterations)
-- [ ] Log grader decisions for EPIC-11 eval
+- [x] If grade fails, `expand_query` node (max 2 iterations) — `agent/nodes.py`, `agent/graph.py`
+- [x] Log grader decisions for EPIC-11 eval (`agent_grade_retry`, `agent_query_expanded`)
 
 ### US-14.06: Graph tool (EPIC-09 dependency)
 - [ ] `graph_impact` tool when Neo4j enabled
