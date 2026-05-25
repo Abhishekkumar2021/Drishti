@@ -46,6 +46,11 @@ All Mermaid diagrams are version-controlled in Markdown (render on GitHub, VS Co
 | Embeddings + Qdrant write path | HLA §4 · [Model providers](../design/model-providers.md) | 🟩 Implemented (EPIC-05) |
 | Hybrid search (dense/sparse, RRF, rerank) | [LLD Ch. 04](../lld/04-search-pipeline.md) | 🟩 Implemented (EPIC-06) |
 | RAG generation | HLA §5–6 | 🟩 Implemented (EPIC-07) |
+| LangGraph agent (`/ask`) | [platform-v2-agentic.md](platform-v2-agentic.md) | 🟩 Implemented (EPIC-14 core) |
+| PostgreSQL + Alembic | [platform-v2-agentic.md](platform-v2-agentic.md) | 🟩 Implemented (EPIC-15 core) |
+| MinIO artifacts | [platform-v2-agentic.md](platform-v2-agentic.md) | 🟩 Implemented (`ENABLE_MINIO`) |
+| Structured logging + request IDs | [platform-v2-agentic.md](platform-v2-agentic.md) | 🟩 Implemented (EPIC-16 partial) |
+| OIDC / OpenTelemetry | [platform-v2-agentic.md](platform-v2-agentic.md) | 🔮 Planned |
 
 Live checklist: [IMPLEMENTATION_STATUS.md](../IMPLEMENTATION_STATUS.md).
 

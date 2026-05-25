@@ -77,9 +77,9 @@ The estimation follows standard Fibonacci story points (1, 2, 3, 5, 8, 13) where
 | **[EPIC-12](file:///Users/abhishek/Dev/Drishti/docs/product/epics/EPIC-12.md)** | Demo, Polish & Deployment | P1 | 21 | Docker optimization, seed script, docs | 🔮 Planned |
 | **[EPIC-13](file:///Users/abhishek/Dev/Drishti/docs/product/epics/EPIC-13.md)** | Production Platform (routing, uploads) | P1 | 34 | Workspaces, Redis conversations | 🟨 In Progress |
 | **V2 program** | See [Platform V2](../../architecture/platform-v2-agentic.md) | | | | |
-| **[EPIC-14](file:///Users/abhishek/Dev/Drishti/docs/product/epics/EPIC-14.md)** | LangGraph Agent Runtime | P0 | 55 | Agent graph, tools, checkpoints | 🔮 Planned |
-| **[EPIC-15](file:///Users/abhishek/Dev/Drishti/docs/product/epics/EPIC-15.md)** | Data Platform (Postgres + MinIO) | P0 | 42 | SoR, object store, workers | 🔮 Planned |
-| **[EPIC-16](file:///Users/abhishek/Dev/Drishti/docs/product/epics/EPIC-16.md)** | Auth, RBAC, Observability | P1 | 34 | OIDC, audit, tracing | 🔮 Planned |
+| **[EPIC-14](file:///Users/abhishek/Dev/Drishti/docs/product/epics/EPIC-14.md)** | LangGraph Agent Runtime | P0 | 55 | Agent graph, tools, checkpoints | 🟨 In Progress (~65%) |
+| **[EPIC-15](file:///Users/abhishek/Dev/Drishti/docs/product/epics/EPIC-15.md)** | Data Platform (Postgres + MinIO) | P0 | 42 | SoR, object store, workers | 🟨 In Progress (~55%) |
+| **[EPIC-16](file:///Users/abhishek/Dev/Drishti/docs/product/epics/EPIC-16.md)** | Auth, RBAC, Observability | P1 | 34 | OIDC, audit, tracing | 🟨 In Progress (~35%) |
 | **[EPIC-17](file:///Users/abhishek/Dev/Drishti/docs/product/epics/EPIC-17.md)** | Product UX Parity | P1 | 55 | Threads, uploads, memory UI | 🔮 Planned |
 | **Total (V1)** | | | **461 SP** | | |
 | **Total (V1 + V2)** | | | **~715 SP** | | |

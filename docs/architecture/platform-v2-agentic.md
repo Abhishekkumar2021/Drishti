@@ -225,28 +225,29 @@ Compaction job (worker): after each session, LangGraph **memory subgraph** runs 
 
 ### Phase V2.0 — Data foundation (weeks 1–4)
 
-- [ ] ADR-012 Postgres, ADR-013 MinIO, docker-compose services
-- [ ] SQLAlchemy 2 + Alembic migrations
-- [ ] Tables: `organizations`, `users`, `workspaces`, `artifacts`, `ingest_jobs`, `conversations`, `messages`
-- [ ] MinIO client; migrate artifact upload off local disk
-- [ ] Dual-write: Redis conversations → Postgres (migration path)
+- [x] ADR-012 Postgres, ADR-013 MinIO, docker-compose services
+- [x] SQLAlchemy 2 + Alembic migrations
+- [x] Tables: `organizations`, `users`, `workspaces`, `artifacts`, `ingest_jobs`, `conversations`, `messages`
+- [x] MinIO client; artifact upload via `storage/artifacts.py` when `ENABLE_MINIO=true`
+- [x] Conversations persist in Postgres when `DATABASE_URL` is set (Redis store bypassed)
 
 **Exit:** Upload PDF → MinIO → job row → worker indexes → searchable.
 
 ### Phase V2.1 — Agent runtime (weeks 5–10)
 
-- [ ] `langgraph`, `langchain-core`, `langchain-community` dependencies (pinned)
-- [ ] `src/drishti/agent/graph.py` — compile graph
-- [ ] `src/drishti/agent/checkpointer.py` — Postgres
-- [ ] Wrap `HybridSearchPipeline` as retriever tool
+- [x] `langgraph`, `langchain-core`, `langchain-community` dependencies (pinned)
+- [x] `src/drishti/agent/graph.py` — compile graph
+- [x] `src/drishti/agent/checkpointer.py` — Postgres
+- [x] Wrap `HybridSearchPipeline` as `hybrid_search` tool (+ `read_source`, `ingest_status`)
 - [x] `/ask` and `/conversations/{id}/ask` invoke `AgentRunner` (LangGraph)
 - [ ] Streaming via LangGraph `astream_events` → existing SSE format (UI unchanged)
+- [ ] LLM tool-calling node (tools registered, not invoked by graph yet)
 
 **Exit:** Multi-step retrieval (grade + optional re-query) beats linear RAG on golden set.
 
 ### Phase V2.2 — Memory & jobs (weeks 11–14)
 
-- [ ] Arq or Celery worker container
+- [x] Arq worker scaffold (`make worker`, `worker/tasks.py`)
 - [ ] Memory compaction subgraph + scheduler
 - [ ] Async ingest with progress API
 - [ ] EPIC-11 eval in CI (block merge if faithfulness &lt; threshold)

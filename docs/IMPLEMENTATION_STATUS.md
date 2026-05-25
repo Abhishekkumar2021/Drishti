@@ -31,14 +31,22 @@ This file is the living source of truth for the current build status of Drishti.
 
 ## 2. Phase Progression
 
+```mermaid
+xychart-beta
+    title "Phase completion (%)"
+    x-axis ["P1 Foundation", "P2 Ingestion", "P3 Search & RAG", "P4 UI & Platform", "P5 Evaluation", "P6 Release"]
+    y-axis "Percent" 0 --> 100
+    bar [100, 68, 100, 53, 0, 0]
 ```
-Phase 1: Foundation     [████████████████████] 100.0% (Completed)
-Phase 2: Ingestion      [█████████████░░░░░░░] 67.9% (In Progress)
-Phase 3: Search & RAG   [████████████████████] 100.0% (Completed)
-Phase 4: UI & Graph     [██████████░░░░░░░░░░] 52.8% (In Progress)
-Phase 5: Evaluation     [░░░░░░░░░░░░░░░░░░░] 0.0%  (Planned)
-Phase 6: Release        [░░░░░░░░░░░░░░░░░░░] 0.0%  (Planned)
-```
+
+| Phase | Points done | Status |
+|-------|-------------|--------|
+| Phase 1: Foundation | 55 / 55 | Completed |
+| Phase 2: Ingestion | 89 / 131 | In progress (EPIC-04 vision deferred) |
+| Phase 3: Search & RAG | 131 / 131 | Completed |
+| Phase 4: UI & Platform | 47 / 89 | In progress (EPIC-13–17) |
+| Phase 5: Evaluation | 0 / 34 | Planned |
+| Phase 6: Release | 0 / 21 | Planned |
 
 ---
 

@@ -174,35 +174,25 @@ This graph enables impact analysis: querying Neo4j for all nodes that have a pat
 
 Retrieval combines keyword accuracy with semantic meaning, structured as a multi-stage process.
 
+```mermaid
+flowchart TB
+  Q[Incoming user query]
+  E[LLM query expansion]
+  D[Dense search — Qdrant cosine]
+  S[Sparse search — BM25]
+  R[Reciprocal Rank Fusion]
+  C[Cohere cross-encoder rerank]
+  X[Context compiler — prompt assembly]
+
+  Q --> E
+  E --> D
+  E --> S
+  D --> R
+  S --> R
+  R --> C --> X
 ```
-Incoming User Query
-       │
-       ▼
-┌───────────────────────────────┐
-│ LLM Query Expansion           │  Generate technical synonyms
-└──────┬─────────────────┬──────┘
-       │                 │
-       ▼                 ▼
-┌──────────────┐  ┌──────────────┐
-│ Dense Search │  │ Sparse Search│  Parallel retrievals via Qdrant
-│ (1536 Cosine)│  │ (BM25 Sparse)│
-└──────┬───────┘  └──────┬───────┘
-       │                 │
-       ▼                 ▼
-┌───────────────────────────────┐
-│ Reciprocal Rank Fusion (RRF)  │  Score-agnostic ranking fusion
-└──────────────┬────────────────┘
-               │
-               ▼
-┌───────────────────────────────┐
-│ Cohere Cross-Encoder Reranker │  Context relevance scoring (Top K)
-└──────────────┬────────────────┘
-               │
-               ▼
-┌───────────────────────────────┐
-│ Context Compiler              │  Assemble LLM prompt
-└───────────────────────────────┘
-```
+
+> **Q&A path:** `/ask` runs through the **LangGraph agent** (`retrieve` → `generate` → `grade`), which calls `HybridSearchPipeline` for retrieval. Query expansion also runs in the `expand_query` node on low-confidence grades.
 
 ### A. Query Expansion
 Queries like "db check" are expanded via a fast LLM utility to `["database_connection", "DbConnection", "initialize_db", "pool", "health_check"]` to account for variable nomenclature in codebases.

@@ -19,37 +19,22 @@ This chapter details the design of Drishti's search and retrieval pipeline, focu
 
 Retrieval is structured as a multi-stage funnel designed to maximize recall in the first stage and precision in the final stages.
 
-```
-       [User Query: "auth token"]
-                   │
-                   ▼
-       ┌───────────────────────┐
-       │ 1. Query Expansion    │ ──▶ ["JWT", "verify", "bearer", "cookie"]
-       └───────────┬───────────┘
-                   │
-         ┌─────────┴─────────┐
-         ▼                   ▼
- ┌──────────────┐    ┌──────────────┐
- │ 2. Dense     │    │ 2. Sparse    │
- │    Retriever │    │    Retriever │
- └───────┬──────┘    └───────┬──────┘
-         │                   │
-         └─────────┬─────────┘
-                   ▼
-       ┌───────────────────────┐
-       │ 3. Reciprocal Rank    │
-       │    Fusion (RRF)       │
-       └───────────┬───────────┘
-                   │
-                   ▼
-       ┌───────────────────────┐
-       │ 4. Cohere Reranker    │
-       └───────────┬───────────┘
-                   │
-                   ▼
-       ┌───────────────────────┐
-       │ 5. Context Builder    │ ──▶ Prompt context for Claude
-       └───────────────────────┘
+```mermaid
+flowchart TB
+  Q["User query: auth token"]
+  E["1. Query expansion → JWT, verify, bearer, cookie"]
+  D[2a. Dense retriever]
+  S[2b. Sparse retriever]
+  R[3. Reciprocal Rank Fusion]
+  C[4. Cohere reranker]
+  B[5. Context builder → LLM prompt]
+
+  Q --> E
+  E --> D
+  E --> S
+  D --> R
+  S --> R
+  R --> C --> B
 ```
 
 ---
