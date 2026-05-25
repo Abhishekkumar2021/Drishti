@@ -15,7 +15,9 @@ pytestmark = pytest.mark.unit
 
 class TestCreateChatLLM:
     def test_anthropic_when_key_present(self) -> None:
-        llm = create_chat_llm(Settings(anthropic_api_key="key"))
+        llm = create_chat_llm(
+            Settings(anthropic_api_key="key", llm_provider="anthropic"),
+        )
         assert isinstance(llm, AnthropicChatLLM)
 
     def test_openai_client(self) -> None:
@@ -24,7 +26,8 @@ class TestCreateChatLLM:
 
     def test_mock_client(self) -> None:
         llm = MockChatLLM()
-        assert llm.complete("q") == llm._response
+        text = llm.complete("q")
+        assert "LLM_PROVIDER=mock" in text
 
 
 class TestAnthropicStream:

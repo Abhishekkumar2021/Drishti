@@ -20,9 +20,11 @@ class TestIngestionRequest:
         request = IngestionRequest(repo_path=str(repo))
         assert request.resolved_repo_path() == repo.resolve()
 
-    def test_rejects_empty_repo_path(self) -> None:
-        with pytest.raises(ValidationError):
-            IngestionRequest(repo_path="")
+    def test_requires_exactly_one_repo_source(self) -> None:
+        with pytest.raises(ValidationError, match="exactly one"):
+            IngestionRequest()
+        with pytest.raises(ValidationError, match="exactly one"):
+            IngestionRequest(repo_path="/tmp/a", repo_url="https://github.com/o/r")
 
 
 class TestUniversalChunk:

@@ -262,7 +262,13 @@ class OllamaChatLLM:
 
 
 class MockChatLLM:
-    """Deterministic LLM stub for unit tests."""
+    """Deterministic LLM stub for unit tests only — not for real Q&A."""
+
+    _DEFAULT_STUB = (
+        "This is a test stub (LLM_PROVIDER=mock), not a real answer. "
+        "Set LLM_PROVIDER=ollama or anthropic in .env for real responses. "
+        "[src/auth.py:L1-5]"
+    )
 
     def __init__(
         self,
@@ -271,7 +277,7 @@ class MockChatLLM:
         response: str = "",
     ) -> None:
         self._model = model
-        self._response = response or "Answer with citation [src/auth.py:L1-5]."
+        self._response = response or self._DEFAULT_STUB
 
     @property
     def model(self) -> str:

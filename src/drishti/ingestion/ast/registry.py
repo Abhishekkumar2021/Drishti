@@ -7,6 +7,7 @@ from functools import lru_cache
 from drishti.ingestion.ast.catalog import PARSER_CATALOG
 from drishti.ingestion.ast.rules import ParserRules, load_parser_rules
 from drishti.ingestion.base import ParserRegistry
+from drishti.ingestion.documents.registry import register_document_parsers
 
 
 @lru_cache(maxsize=1)
@@ -21,4 +22,5 @@ def create_default_parser_registry() -> ParserRegistry:
         parser = factory(_parser_rules())
         for extension in extensions:
             registry.register(extension, parser)
+    register_document_parsers(registry)
     return registry

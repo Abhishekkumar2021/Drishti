@@ -90,6 +90,10 @@ class AskResponse(BaseModel):
 class IngestResponse(BaseModel):
     """Incremental repository indexing summary."""
 
+    repo_path: str | None = Field(
+        None,
+        description="Resolved absolute path indexed (use for source/read after GitHub clone)",
+    )
     head_commit: str
     base_commit: str | None = None
     added: list[str] = Field(default_factory=list)
@@ -98,6 +102,9 @@ class IngestResponse(BaseModel):
     chunks_indexed: int = 0
     chunks_removed: int = 0
     files_parsed: int = 0
+    total_chunks_in_store: int = 0
+    parseable_files: int = 0
+    up_to_date: bool = False
 
 
 class SourceReadResponse(BaseModel):

@@ -7,6 +7,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import TYPE_CHECKING
 
+from drishti.ingestion.documents.paths import is_openapi_spec_path
 from drishti.ingestion.gitignore import GitignoreMatcher
 from drishti.utils.language import LanguageRegistry
 from drishti.utils.paths import is_path_within_root
@@ -111,6 +112,9 @@ class FileWalker:
 
             content = self._read_magic_bytes(resolved_entry) if self.inspect_magic_bytes else None
             language = self.language_registry.detect(relative_path, content)
+            if language is None and is_openapi_spec_path(relative_path):
+                language = "openapi"
+
             if language is None:
                 continue
 
@@ -120,12 +124,10 @@ class FileWalker:
                 if self.parser_registry is not None
                 else frozenset()
             )
-            has_registered_parser = (
-                self.parser_registry is not None
-                and self.language_registry.has_parser_extension(
-                    relative_path,
-                    parser_extensions,
-                )
+            has_registered_parser = self._has_parser_for_path(
+                relative_path,
+                extension=extension,
+                parser_extensions=parser_extensions,
             )
 
             yield DiscoveredFile(
@@ -135,6 +137,19 @@ class FileWalker:
                 extension=extension,
                 has_registered_parser=has_registered_parser,
             )
+
+    def _has_parser_for_path(
+        self,
+        relative_path: str,
+        *,
+        extension: str,
+        parser_extensions: frozenset[str],
+    ) -> bool:
+        if self.parser_registry is None:
+            return False
+        if is_openapi_spec_path(relative_path):
+            return extension in parser_extensions
+        return self.language_registry.has_parser_extension(relative_path, parser_extensions)
 
     def _read_magic_bytes(self, file_path: Path) -> bytes | None:
         try:

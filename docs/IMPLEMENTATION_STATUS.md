@@ -85,13 +85,13 @@ Phase 6: Release        [░░░░░░░░░░░░░░░░░░�
   * [x] **US-03.10**: Repository git walker (incremental indexing via diffs)
 
 #### EPIC-04: Document Ingestion Pipeline (Priority: P1)
-* **Points**: 42 | **Status**: 🔮 Planned (0%)
+* **Points**: 42 | **Status**: 🟨 In Progress (~81% — vision deferred)
 * **Stories**:
-  * [ ] **US-04.01**: PDF layout-aware parser (PyMuPDF)
-  * [ ] **US-04.02**: PDF table structure extraction
-  * [ ] **US-04.03**: Markdown header hierarchy parser
+  * [x] **US-04.01**: PDF layout-aware parser (PyMuPDF) — `src/drishti/ingestion/documents/pdf.py`
+  * [x] **US-04.02**: PDF table structure extraction (markdown tables in PDF parser)
+  * [x] **US-04.03**: Markdown header hierarchy parser — `src/drishti/ingestion/documents/markdown.py`
   * [ ] **US-04.04**: Multi-modal image analysis (Claude Vision API)
-  * [ ] **US-04.05**: OpenAPI spec endpoint parser
+  * [x] **US-04.05**: OpenAPI spec endpoint parser — `src/drishti/ingestion/documents/openapi.py`
 
 #### EPIC-05: Embedding & Vector Storage (Priority: P0)
 * **Points**: 34 | **Status**: 🟩 Completed (100%)
@@ -143,7 +143,7 @@ Phase 6: Release        [░░░░░░░░░░░░░░░░░░�
   * [ ] **US-09.04**: Change impact analysis endpoint (`/api/v1/impact-analysis`)
 
 #### EPIC-10: Frontend UI (Priority: P1)
-* **Points**: 55 | **Status**: 🟨 In Progress (85% — US-10.05 deferred)
+* **Points**: 55 | **Status**: 🟩 Completed (US-10.05 deferred to EPIC-09)
 * **Stories**:
   * [x] **US-10.01**: Next.js 14 layout & landing page
   * [x] **US-10.02**: Chat interface with streaming responses

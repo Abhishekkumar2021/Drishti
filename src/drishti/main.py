@@ -48,6 +48,11 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         app_settings.validate_runtime_configuration()
         for key, value in app_settings.runtime_provider_summary().items():
             logger.info("Config %s=%s", key, value)
+        if app_settings.llm_provider == "mock":
+            logger.warning(
+                "LLM_PROVIDER=mock returns a fixed stub answer — set LLM_PROVIDER=ollama "
+                "or anthropic in .env for real Q&A",
+            )
         logger.info("Qdrant: %s", app_settings.qdrant_url)
         logger.info("Collection: %s", app_settings.qdrant_collection_name)
         if app_settings.api_auth_enabled:

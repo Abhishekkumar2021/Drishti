@@ -36,6 +36,9 @@ class IncrementalIndexResult:
     chunks_indexed: int
     chunks_removed: int
     files_parsed: int
+    total_chunks_in_store: int
+    parseable_files: int
+    up_to_date: bool
 
 
 class IncrementalIndexer:
@@ -113,13 +116,19 @@ class IncrementalIndexer:
         )
         self._state_store.save(new_state)
 
+        total_in_store = self._chunk_index.count()
+        up_to_date = indexed_count == 0 and len(paths_to_parse) == 0 and prior_state is not None
+
         logger.info(
-            "Incremental index complete commit=%s added=%d modified=%d deleted=%d chunks=%d",
+            "Incremental index complete commit=%s added=%d modified=%d deleted=%d "
+            "new_chunks=%d total_in_store=%d up_to_date=%s",
             changes.head_commit[:8],
             len(changes.added),
             len(changes.modified),
             len(changes.deleted),
             indexed_count,
+            total_in_store,
+            up_to_date,
         )
 
         return IncrementalIndexResult(
@@ -131,6 +140,9 @@ class IncrementalIndexer:
             chunks_indexed=indexed_count,
             chunks_removed=removed,
             files_parsed=len(paths_to_parse),
+            total_chunks_in_store=total_in_store,
+            parseable_files=len(parseable),
+            up_to_date=up_to_date,
         )
 
     def _parse_file(self, relative_path: str) -> list[UniversalChunk]:

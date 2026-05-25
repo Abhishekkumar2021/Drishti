@@ -99,7 +99,10 @@ It also ingests PDFs, Markdown docs, diagrams, and API specs, enabling **cross-m
 | **Parser rule engine** | JSON-driven queries + `min_chunk_lines` | 🟩 Implemented |
 | **Chunk metadata** | Docstrings, params, complexity, context paths | 🟩 Implemented |
 | **Incremental git indexing** | Diff-based re-index via `IncrementalIndexer` | 🟩 Implemented |
-| **PDF Ingestion** | Layout-aware parsing: text blocks, tables, images | 🔮 Planned |
+| **Markdown ingestion** | Header-hierarchy chunks (`.md`, `.mdx`) | 🟩 Implemented |
+| **PDF Ingestion** | Layout-aware parsing: text blocks, tables | 🟩 Implemented |
+| **OpenAPI ingestion** | Per-endpoint chunks from OpenAPI/Swagger specs | 🟩 Implemented |
+| **PDF diagram vision** | Claude Vision for images in PDFs | 🔮 Planned |
 | **Hybrid Search** | BM25 + dense vectors, RRF fusion (`HybridSearchPipeline`) | 🟩 Implemented |
 | **Re-ranking** | Cohere rerank or lexical fallback (configurable) | 🟩 Implemented |
 | **Provider-agnostic models** | Any embedding/LLM via `EMBEDDING_PROVIDER`, `LLM_PROVIDER` | 🟩 Implemented |

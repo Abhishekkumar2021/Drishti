@@ -63,10 +63,31 @@ async def check_neo4j(settings: Settings) -> ServiceStatus:
     return ServiceStatus.NOT_CONFIGURED
 
 
+async def check_embedding(settings: Settings) -> ServiceStatus:
+    """Verify the configured embedding provider is reachable."""
+    if settings.embedding_provider == "hashing":
+        return ServiceStatus.CONNECTED
+
+    if settings.embedding_provider == "ollama":
+        base = settings.resolved_embedding_api_base().rstrip("/")
+        url = f"{base}/api/tags"
+        try:
+            async with httpx.AsyncClient(timeout=settings.health_check_timeout_seconds) as client:
+                response = await client.get(url)
+                response.raise_for_status()
+            return ServiceStatus.CONNECTED
+        except Exception:
+            logger.warning("Ollama embedding health check failed for %s", url, exc_info=True)
+            return ServiceStatus.DISCONNECTED
+
+    return ServiceStatus.CONNECTED
+
+
 async def probe_dependencies(settings: Settings) -> dict[str, ServiceStatus]:
     """Run all infrastructure health probes."""
     return {
         "qdrant": await check_qdrant(settings),
         "redis": await check_redis(settings),
         "neo4j": await check_neo4j(settings),
+        "embedding": await check_embedding(settings),
     }

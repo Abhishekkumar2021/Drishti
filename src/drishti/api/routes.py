@@ -59,6 +59,29 @@ logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/api/v1", tags=["API"])
 
 
+def _ingestion_error_message(exc: Exception, settings: Settings) -> str:
+    """Return a user-actionable message for ingestion failures."""
+    detail = str(exc).strip()
+    if settings.embedding_provider == "ollama" and (
+        "Connection refused" in detail or "ConnectError" in detail
+    ):
+        return (
+            "Ollama is not running (connection refused on "
+            f"{settings.resolved_embedding_api_base()}). "
+            "Run `make docker-ollama-up` and `make docker-ollama-pull`, "
+            "or set EMBEDDING_PROVIDER=hashing in .env for keyless local dev."
+        )
+    return f"Ingestion failed: {detail}"
+
+
+@router.get("/config/providers")
+async def get_provider_config(
+    settings: Settings = Depends(get_app_settings),
+) -> dict[str, str]:
+    """Return active model providers (no secrets) for UI diagnostics."""
+    return settings.runtime_provider_summary()
+
+
 @router.post("/ingest", response_model=IngestResponse)
 async def ingest_repository(
     body: IngestionRequest,
@@ -83,13 +106,14 @@ async def ingest_repository(
     except GitRepositoryError:
         raise
     except Exception as exc:
-        msg = f"Ingestion failed: {exc}"
+        msg = _ingestion_error_message(exc, settings)
         raise DrishtiError(msg, code="INGESTION_ERROR") from exc
 
     cache: QueryCache = request.app.state.query_cache
     await cache.invalidate_all()
 
     return IngestResponse(
+        repo_path=str(repo_path),
         head_commit=result.head_commit,
         base_commit=result.base_commit,
         added=list(result.added),
@@ -98,6 +122,9 @@ async def ingest_repository(
         chunks_indexed=result.chunks_indexed,
         chunks_removed=result.chunks_removed,
         files_parsed=result.files_parsed,
+        total_chunks_in_store=result.total_chunks_in_store,
+        parseable_files=result.parseable_files,
+        up_to_date=result.up_to_date,
     )
 
 

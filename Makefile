@@ -11,14 +11,17 @@
 #   make pre-commit    Full quality check before committing
 # ──────────────────────────────────────────────────────────
 
-.PHONY: help setup dev test test-unit test-integration test-e2e lint lint-fix type-check \
-        docker-up docker-down docker-logs seed benchmark clean pre-commit ci-precheck
+.PHONY: help setup dev-ready dev dev-web test test-unit test-integration test-e2e lint lint-fix type-check \
+        docker-up docker-ollama-up docker-ollama-pull docker-down docker-logs seed benchmark clean pre-commit ci-precheck
 
 .DEFAULT_GOAL := help
 
 # ═══════════════════════════════════════
 # Setup
 # ═══════════════════════════════════════
+
+dev-ready: ## Bootstrap Docker, Ollama models, wait for services
+	@bash scripts/dev-ready.sh
 
 setup: ## First-time project setup
 	@echo "🔮 Setting up Drishti..."
@@ -79,15 +82,24 @@ type-check: ## Run mypy type checking
 # Docker Infrastructure
 # ═══════════════════════════════════════
 
-docker-up: ## Start infrastructure (Qdrant, Redis)
+docker-up: ## Start infrastructure (Qdrant, Redis, Ollama) and pull models
 	docker compose up -d
-	@echo "⏳ Waiting for services to be healthy..."
+	@echo "⏳ Waiting for Qdrant and Redis..."
 	@sleep 3
+	@$(MAKE) docker-ollama-pull
 	@docker compose ps
 	@echo ""
 	@echo "✅ Infrastructure ready!"
 	@echo "   Qdrant:  http://localhost:6333/dashboard"
 	@echo "   Redis:   localhost:6379"
+	@echo "   Ollama:  http://localhost:11434 (nomic-embed-text + llama3.2)"
+
+docker-ollama-up: ## Start Ollama and pull embedding + chat models
+	docker compose up -d ollama
+	@bash scripts/docker-ollama-pull.sh
+
+docker-ollama-pull: ## Pull models into running Ollama container
+	@bash scripts/docker-ollama-pull.sh
 
 docker-down: ## Stop infrastructure
 	docker compose down

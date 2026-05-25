@@ -5,7 +5,9 @@ from __future__ import annotations
 import re
 from dataclasses import dataclass, field
 
-SUPPORTED_LANGUAGES = frozenset({"python", "java", "javascript", "typescript", "go"})
+SUPPORTED_LANGUAGES = frozenset(
+    {"python", "java", "javascript", "typescript", "go", "markdown", "pdf", "openapi"},
+)
 
 _PYTHON_SHEBANG = re.compile(rb"^#!.*\bpython[23]?\b", re.IGNORECASE)
 _JAVA_CLASS_MAGIC = b"\xca\xfe\xba\xbe"
@@ -120,3 +122,5 @@ class LanguageRegistry:
         self.register("javascript", [".js", ".jsx", ".mjs", ".cjs"])
         self.register("typescript", [".ts", ".tsx"])
         self.register("go", [".go"])
+        self.register("markdown", [".md", ".mdx"])
+        self.register("pdf", [".pdf"])

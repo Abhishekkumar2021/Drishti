@@ -54,6 +54,7 @@ dependencies = [
 
     # PDF Parsing
     "pymupdf>=1.24.0",
+    "pyyaml>=6.0.0",
 
     # Data & Config
     "pydantic>=2.9.0",

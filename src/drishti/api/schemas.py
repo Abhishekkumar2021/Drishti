@@ -125,19 +125,41 @@ class UniversalChunk(BaseModel):
 class IngestionRequest(BaseModel):
     """Payload trigger schema for starting codebase ingestion."""
 
-    repo_path: str = Field(
-        ...,
+    repo_path: str | None = Field(
+        None,
         description="Absolute local directory path of repository to index",
-        min_length=1,
+    )
+    repo_url: str | None = Field(
+        None,
+        description="GitHub HTTPS or SSH URL to clone before indexing",
     )
     branch: str | None = Field("main", description="Target Git branch")
     recursive: bool = Field(True, description="Recursively walk subdirectories")
     force_reindex: bool = Field(False, description="Ignore state hash and re-index all files")
 
+    @model_validator(mode="after")
+    def validate_repo_source(self) -> IngestionRequest:
+        has_path = bool(self.repo_path and self.repo_path.strip())
+        has_url = bool(self.repo_url and self.repo_url.strip())
+        if has_path == has_url:
+            msg = "Provide exactly one of repo_path or repo_url"
+            raise ValueError(msg)
+        return self
+
     def resolved_repo_path(self, *, allowed_roots: list[Path] | None = None) -> Path:
-        """Validate and resolve the repository path."""
+        """Validate and resolve the repository path (local or cloned GitHub)."""
+        if self.repo_url and self.repo_url.strip():
+            from drishti.utils.github import clone_or_pull_github_repo
+
+            return clone_or_pull_github_repo(
+                self.repo_url.strip(),
+                branch=self.branch,
+            )
+        if not self.repo_path or not self.repo_path.strip():
+            msg = "repo_path is required when repo_url is not set"
+            raise ValueError(msg)
         try:
-            return resolve_repo_path(self.repo_path, allowed_roots=allowed_roots)
+            return resolve_repo_path(self.repo_path.strip(), allowed_roots=allowed_roots)
         except PathValidationError as exc:
             raise ValueError(str(exc)) from exc
 
