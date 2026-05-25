@@ -19,8 +19,9 @@ Replace the linear RAG path with a **LangGraph** agent that plans, retrieves, gr
 - [ ] `ingest_status` for workspace job state
 
 ### US-14.03: Postgres checkpointer
-- [ ] `langgraph-checkpoint-postgres` integration
-- [ ] Resume conversation after API restart
+- [x] `langgraph-checkpoint-postgres` integration — `agent/checkpointer.py`
+- [x] Thread ID = conversation ID on `/conversations/{id}/ask`
+- [ ] Resume conversation after API restart (requires streaming via graph — US-14.04)
 
 ### US-14.04: Streaming SSE compatibility
 - [ ] Map `astream_events` to existing SSE events (`token`, `citation`, `context`, `done`)

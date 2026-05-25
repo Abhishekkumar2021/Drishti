@@ -219,6 +219,7 @@ async def ask_in_conversation(
                 history=history,
                 filters=filters,
                 workspace_memory=memory,
+                thread_id=conversation_id,
             ),
             media_type="text/event-stream",
         )
@@ -229,6 +230,7 @@ async def ask_in_conversation(
             filters=filters,
             conversation_history=history,
             workspace_memory=memory,
+            thread_id=conversation_id,
         )
     except GenerationError:
         raise
@@ -290,6 +292,7 @@ async def _stream_conversation_answer(
     history: list[ChatMessage],
     filters: dict[str, str] | None,
     workspace_memory: str,
+    thread_id: str,
 ) -> AsyncIterator[str]:
     answer_parts: list[str] = []
     for event in agent.ask_stream(
@@ -297,6 +300,7 @@ async def _stream_conversation_answer(
         filters=filters,
         conversation_history=history,
         workspace_memory=workspace_memory,
+        thread_id=thread_id,
     ):
         if event.event == "token":
             answer_parts.append(str(event.data.get("text", "")))

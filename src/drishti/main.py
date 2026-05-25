@@ -5,6 +5,7 @@ Multi-modal, AST-aware RAG system for code & document understanding.
 
 from __future__ import annotations
 
+import asyncio
 from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
 
@@ -88,10 +89,31 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         app.state.platform_service = PlatformService.create(app_settings)
         rag = create_rag_pipeline(app_settings, client=qdrant_client)
         app.state.rag_pipeline = rag
-        app.state.agent_runner = AgentRunner(rag, app_settings)
+
+        checkpointer = None
+        checkpointer_cm = None
+        if app_settings.postgres_enabled:
+            from drishti.agent.checkpointer import (
+                open_postgres_checkpointer,
+                setup_postgres_checkpointer,
+            )
+
+            checkpointer_cm = open_postgres_checkpointer(app_settings)
+            checkpointer = checkpointer_cm.__enter__()
+            await asyncio.to_thread(setup_postgres_checkpointer, checkpointer)
+            app.state.agent_checkpointer_cm = checkpointer_cm
+            log.info("agent_checkpointer_enabled")
+
+        app.state.agent_runner = AgentRunner(
+            rag,
+            app_settings,
+            checkpointer=checkpointer,
+        )
 
         yield
 
+        if checkpointer_cm is not None:
+            checkpointer_cm.__exit__(None, None, None)
         qdrant_client.close()
         log.info("drishti_shutdown")
 

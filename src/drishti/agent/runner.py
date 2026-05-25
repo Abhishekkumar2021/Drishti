@@ -4,9 +4,14 @@ from __future__ import annotations
 
 import time
 from collections.abc import Iterator
+from typing import TYPE_CHECKING, Any
 
+from langchain_core.runnables import RunnableConfig
 from drishti.agent.graph import build_rag_graph
 from drishti.agent.nodes import generate_answer, retrieve_context
+
+if TYPE_CHECKING:
+    from langgraph.checkpoint.base import BaseCheckpointSaver
 from drishti.agent.state import AgentState
 from drishti.api.schemas import ChatMessage
 from drishti.config import Settings
@@ -24,10 +29,18 @@ from drishti.generation.streaming import (
 class AgentRunner:
     """Retrieve → grade → generate agent (LangGraph)."""
 
-    def __init__(self, rag: RAGPipeline, settings: Settings) -> None:
+    def __init__(
+        self,
+        rag: RAGPipeline,
+        settings: Settings,
+        *,
+        checkpointer: BaseCheckpointSaver[Any] | None = None,
+    ) -> None:
         self._rag = rag
         self._settings = settings
-        self._graph = build_rag_graph(rag, rag.llm).compile()
+        self._checkpointer = checkpointer
+        graph = build_rag_graph(rag, rag.llm)
+        self._graph = graph.compile(checkpointer=checkpointer)
 
     def ask(
         self,
@@ -36,6 +49,7 @@ class AgentRunner:
         filters: dict[str, str] | None = None,
         conversation_history: list[ChatMessage] | None = None,
         workspace_memory: str = "",
+        thread_id: str | None = None,
     ) -> RAGAnswer:
         final = self._graph.invoke(
             self._initial_state(
@@ -44,6 +58,7 @@ class AgentRunner:
                 conversation_history=conversation_history,
                 workspace_memory=workspace_memory,
             ),
+            config=self._invoke_config(thread_id),
         )
         chunks = final.get("context_chunks") or ()
         return RAGAnswer(
@@ -60,6 +75,7 @@ class AgentRunner:
         filters: dict[str, str] | None = None,
         conversation_history: list[ChatMessage] | None = None,
         workspace_memory: str = "",
+        thread_id: str | None = None,
     ) -> Iterator[StreamEvent]:
         """Stream tokens using the same retrieve → generate → grade loop as the graph."""
         started = time.perf_counter()
@@ -108,6 +124,11 @@ class AgentRunner:
 
         elapsed_ms = int((time.perf_counter() - started) * 1000)
         yield done_event(total_tokens=token_count, execution_time_ms=elapsed_ms)
+
+    def _invoke_config(self, thread_id: str | None) -> RunnableConfig | None:
+        if thread_id and self._checkpointer is not None:
+            return {"configurable": {"thread_id": thread_id}}
+        return None
 
     def _initial_state(
         self,
