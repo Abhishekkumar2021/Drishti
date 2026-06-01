@@ -24,8 +24,8 @@ This file is the living source of truth for the current build status of Drishti.
 | **Phase 3: Core Search & RAG** | 131 | 131 | 100.0% | 🟩 Completed |
 | **Phase 4: Advanced Features** | 89 | 81 | 91.0% | 🟨 In Progress |
 | **Phase 5: Evaluation** | 34 | 34 | 100.0% | 🟩 Completed |
-| **Phase 6: Release** | 21 | 0 | 0.0% | 🔮 Planned |
-| **Total Project** | **461** | **432** | **93.7%** | **🟨 In Progress** |
+| **Phase 6: Release** | 21 | 21 | 100.0% | 🟩 Completed |
+| **Total Project** | **461** | **461** | **100.0%** | **🟩 Completed** |
 
 ---
 
@@ -36,7 +36,7 @@ xychart-beta
     title "Phase completion (%)"
     x-axis ["P1 Foundation", "P2 Ingestion", "P3 Search & RAG", "P4 UI & Platform", "P5 Evaluation", "P6 Release"]
     y-axis "Percent" 0 --> 100
-    bar [100, 100, 100, 91, 100, 0]
+    bar [100, 100, 100, 100, 100, 100]
 ```
 
 | Phase | Points done | Status |
@@ -44,9 +44,9 @@ xychart-beta
 | Phase 1: Foundation | 55 / 55 | Completed |
 | Phase 2: Ingestion | 131 / 131 | Completed |
 | Phase 3: Search & RAG | 131 / 131 | Completed |
-| Phase 4: UI & Platform | 81 / 89 | In progress (EPIC-10) |
+| Phase 4: UI & Platform | 89 / 89 | Completed |
 | Phase 5: Evaluation | 34 / 34 | Completed |
-| Phase 6: Release | 0 / 21 | Planned |
+| Phase 6: Release | 21 / 21 | Completed |
 
 ---
 
@@ -226,7 +226,11 @@ xychart-beta
 ### Phase 6: Release (Epic 12)
 
 #### EPIC-12: Demo, Polish & Deployment (Priority: P1)
-* **Points**: 21 | **Status**: 🔮 Planned (0%)
+* **Points**: 21 | **Status**: 🟩 Completed (100%)
+* **Stories**:
+  * [x] **US-12.01**: Seed script for sample projects — `scripts/seed_demo.py`
+  * [x] **US-12.02**: Docker production optimization — `docker-compose.prod.yml`, `web/Dockerfile`
+  * [x] **US-12.03**: Deployment guidelines — `docs/deployment/DEPLOYMENT.md`
 * **Stories**:
   * [ ] **US-12.01**: Seed script for sample projects
   * [ ] **US-12.02**: Docker production optimization
