@@ -2,7 +2,7 @@
 
 This file is the living source of truth for the current build status of Drishti. It tracks progress at the Epic and User Story levels.
 
-*Last Updated: 2026-05-24*
+*Last Updated: 2026-06-01*
 
 ---
 
@@ -23,9 +23,9 @@ This file is the living source of truth for the current build status of Drishti.
 | **Phase 2: Ingestion** | 131 | 89 | 67.9% | 🟨 In Progress |
 | **Phase 3: Core Search & RAG** | 131 | 131 | 100.0% | 🟩 Completed |
 | **Phase 4: Advanced Features** | 89 | 47 | 52.8% | 🟨 In Progress |
-| **Phase 5: Evaluation** | 34 | 0 | 0.0% | 🔮 Planned |
+| **Phase 5: Evaluation** | 34 | 34 | 100.0% | 🟩 Completed |
 | **Phase 6: Release** | 21 | 0 | 0.0% | 🔮 Planned |
-| **Total Project** | **461** | **322** | **69.8%** | **🟨 In Progress** |
+| **Total Project** | **461** | **356** | **77.2%** | **🟨 In Progress** |
 
 ---
 
@@ -36,7 +36,7 @@ xychart-beta
     title "Phase completion (%)"
     x-axis ["P1 Foundation", "P2 Ingestion", "P3 Search & RAG", "P4 UI & Platform", "P5 Evaluation", "P6 Release"]
     y-axis "Percent" 0 --> 100
-    bar [100, 68, 100, 53, 0, 0]
+    bar [100, 68, 100, 53, 100, 0]
 ```
 
 | Phase | Points done | Status |
@@ -45,7 +45,7 @@ xychart-beta
 | Phase 2: Ingestion | 89 / 131 | In progress (EPIC-04 vision deferred) |
 | Phase 3: Search & RAG | 131 / 131 | Completed |
 | Phase 4: UI & Platform | 47 / 89 | In progress (EPIC-13–17) |
-| Phase 5: Evaluation | 0 / 34 | Planned |
+| Phase 5: Evaluation | 34 / 34 | Completed |
 | Phase 6: Release | 0 / 21 | Planned |
 
 ---
@@ -164,11 +164,11 @@ xychart-beta
 ### Phase 5: Evaluation & Benchmarking (Epic 11)
 
 #### EPIC-11: Evaluation & Benchmarking (Priority: P1)
-* **Points**: 34 | **Status**: 🔮 Planned (0%)
+* **Points**: 34 | **Status**: 🟩 Completed (100%)
 * **Stories**:
-  * [ ] **US-11.01**: Golden Q&A dataset curation
-  * [ ] **US-11.02**: RAGAS evaluation runner script
-  * [ ] **US-11.03**: Comparative dashboard (AST vs Naive chunking)
+  * [x] **US-11.01**: Golden Q&A dataset curation — `benchmarks/datasets/golden_qa.json` (55 Q&A pairs)
+  * [x] **US-11.02**: RAGAS evaluation runner script — `benchmarks/runner.py`, `benchmarks/metrics.py`
+  * [x] **US-11.03**: Comparative dashboard (AST vs Naive chunking) — `benchmarks/compare.py`, `benchmarks/report.py`
 
 ---
 
@@ -275,6 +275,9 @@ Once a User Story is implemented, the corresponding code files must be registere
 | US-08.03 | [services/query_cache.py](file:///Users/abhishek/Dev/Drishti/src/drishti/services/query_cache.py) | 🟩 Completed | [test_query_cache.py](file:///Users/abhishek/Dev/Drishti/tests/unit/test_query_cache.py) |
 | US-08.04 | [middleware/rate_limit.py](file:///Users/abhishek/Dev/Drishti/src/drishti/middleware/rate_limit.py) | 🟩 Completed | [test_rate_limit.py](file:///Users/abhishek/Dev/Drishti/tests/unit/test_rate_limit.py) |
 | US-10.01–04 | [web/](file:///Users/abhishek/Dev/Drishti/web/), [api/routes.py](file:///Users/abhishek/Dev/Drishti/src/drishti/api/routes.py) (`/source/read`) | 🟩 Completed | [test_source_read.py](file:///Users/abhishek/Dev/Drishti/tests/unit/test_source_read.py), `npm run build` in `web/` |
+| US-11.01 | [benchmarks/datasets/golden_qa.json](file:///Users/abhishek/Dev/Drishti/benchmarks/datasets/golden_qa.json) | 🟩 Completed | [test_evaluation.py](file:///Users/abhishek/Dev/Drishti/tests/unit/test_evaluation.py) |
+| US-11.02 | [benchmarks/runner.py](file:///Users/abhishek/Dev/Drishti/benchmarks/runner.py), [benchmarks/metrics.py](file:///Users/abhishek/Dev/Drishti/benchmarks/metrics.py) | 🟩 Completed | [test_evaluation.py](file:///Users/abhishek/Dev/Drishti/tests/unit/test_evaluation.py) |
+| US-11.03 | [benchmarks/compare.py](file:///Users/abhishek/Dev/Drishti/benchmarks/compare.py), [benchmarks/report.py](file:///Users/abhishek/Dev/Drishti/benchmarks/report.py) | 🟩 Completed | [test_evaluation.py](file:///Users/abhishek/Dev/Drishti/tests/unit/test_evaluation.py) |
 | EPIC-14 | [agent/](file:///Users/abhishek/Dev/Drishti/src/drishti/agent/), [ADR-011](file:///Users/abhishek/Dev/Drishti/docs/adr/ADR-011-langgraph-agent-orchestration.md) | 🟨 In Progress | [test_agent_graph.py](file:///Users/abhishek/Dev/Drishti/tests/unit/test_agent_graph.py) |
 | EPIC-15 | [db/](file:///Users/abhishek/Dev/Drishti/src/drishti/db/), [platform_service.py](file:///Users/abhishek/Dev/Drishti/src/drishti/services/platform_service.py), [alembic/](file:///Users/abhishek/Dev/Drishti/alembic/) | 🟨 In Progress | [test_platform_service.py](file:///Users/abhishek/Dev/Drishti/tests/unit/test_platform_service.py) |
 | EPIC-16 | [observability/](file:///Users/abhishek/Dev/Drishti/src/drishti/observability/) | 🟨 In Progress | [test_structured_logging.py](file:///Users/abhishek/Dev/Drishti/tests/unit/test_structured_logging.py) |

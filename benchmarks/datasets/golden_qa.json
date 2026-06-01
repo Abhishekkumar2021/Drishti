@@ -1,20 +1,497 @@
 [
   {
     "id": "qa_001",
-    "question": "What parameters does verify_access_token accept in token.py, and what exceptions does it raise?",
-    "expected_files": ["src/auth/token.py"],
-    "ground_truth_answer": "The verify_access_token function in src/auth/token.py accepts a single string parameter 'token'. It raises a CredentialsException if the token signature is invalid, expired, or cannot be decoded."
+    "category": "code_structure",
+    "difficulty": "easy",
+    "question": "What parameters does the UniversalChunk class accept and what are their types?",
+    "expected_files": ["src/drishti/api/schemas.py"],
+    "expected_chunks": ["UniversalChunk"],
+    "ground_truth_answer": "The UniversalChunk class accepts numerous parameters including: id (str), source_id (str), content (str), content_type (Literal), file_path (str), source_type (Literal), language (str|None), start_line (int|None), end_line (int|None), page_number (int|None), node_type (str|None), name (str|None), parent_class (str|None), package_name (str|None), decorators (list[str]), exports (list[str]), dependencies (list[str]), docstring (str|None), parameters (list[str]), return_type (str|None), cyclomatic_complexity (int|None), parent_module (str|None), context_path (str|None), imported_symbols (list[str]), definition_file_path (str|None), and last_modified (datetime)."
   },
   {
     "id": "qa_002",
-    "question": "Explain how language detection is implemented in the ingestion pipeline.",
-    "expected_files": ["src/drishti/utils/language_detect.py"],
-    "ground_truth_answer": "Language detection is resolved in the ingestion pipeline by mapping file extensions to canonical names (e.g. '.py' to Python, '.java' to Java). It optionally checks file content headers to disambiguate between similar extensions."
+    "category": "code_structure",
+    "difficulty": "easy",
+    "question": "How does language detection work in the ingestion pipeline?",
+    "expected_files": ["src/drishti/utils/language.py"],
+    "expected_chunks": ["detect_language", "EXTENSION_MAP"],
+    "ground_truth_answer": "Language detection maps file extensions to canonical programming language names using an EXTENSION_MAP dictionary. Extensions like .py map to 'python', .java to 'java', .js to 'javascript', .ts to 'typescript', and .go to 'go'. The detect_language function takes a file path and returns the language name or None if unrecognized."
   },
   {
     "id": "qa_003",
-    "question": "Where is the FastAPI application router and app object initialized?",
+    "category": "api",
+    "difficulty": "easy",
+    "question": "Where is the FastAPI application and its routers initialized?",
     "expected_files": ["src/drishti/main.py"],
-    "ground_truth_answer": "The FastAPI application router and main app object are initialized in src/drishti/main.py, which configures lifespan events, middlewares (CORS), and routers."
+    "expected_chunks": ["create_app", "app"],
+    "ground_truth_answer": "The FastAPI application is initialized in src/drishti/main.py via the create_app() function or direct app instantiation. It configures lifespan events for startup/shutdown, adds CORS middleware, and includes routers from api/routes.py and api/platform_routes.py for core and platform endpoints respectively."
+  },
+  {
+    "id": "qa_004",
+    "category": "search",
+    "difficulty": "medium",
+    "question": "Explain how the hybrid search pipeline combines dense and sparse retrieval results.",
+    "expected_files": ["src/drishti/search/pipeline.py", "src/drishti/search/rrf.py"],
+    "expected_chunks": ["HybridSearchPipeline", "ReciprocalRankFusion", "search", "merge"],
+    "ground_truth_answer": "The HybridSearchPipeline first expands the query, then runs parallel dense vector search and sparse BM25 search against Qdrant. Results are combined using Reciprocal Rank Fusion (RRF) which assigns scores based on rank position: score = 1/(k + rank) where k=60 by default. The merged results are then passed through a reranker (Cohere or lexical) to produce the final top-k results."
+  },
+  {
+    "id": "qa_005",
+    "category": "search",
+    "difficulty": "medium",
+    "question": "What is Reciprocal Rank Fusion and how is it implemented?",
+    "expected_files": ["src/drishti/search/rrf.py"],
+    "expected_chunks": ["ReciprocalRankFusion", "merge"],
+    "ground_truth_answer": "Reciprocal Rank Fusion (RRF) is a rank aggregation method that combines multiple ranked lists without requiring score normalization. For each document, RRF score = sum(1/(k + rank_i)) across all lists where the document appears. The default k=60 dampens the contribution of lower-ranked results. Documents are then sorted by total RRF score descending."
+  },
+  {
+    "id": "qa_006",
+    "category": "ingestion",
+    "difficulty": "medium",
+    "question": "How does the Tree-sitter Python parser extract function definitions?",
+    "expected_files": ["src/drishti/ingestion/ast/python.py", "src/drishti/ingestion/queries/python.scm"],
+    "expected_chunks": ["PythonParser", "parse"],
+    "ground_truth_answer": "The PythonParser uses tree-sitter-python to parse source code into an AST. It runs Tree-sitter queries defined in python.scm to capture function_definition nodes. For each captured node, it extracts the function name, parameters, return type annotation, docstring, and body. The parser also computes cyclomatic complexity and identifies decorators attached to the function."
+  },
+  {
+    "id": "qa_007",
+    "category": "ingestion",
+    "difficulty": "hard",
+    "question": "Explain the incremental indexing mechanism for git repositories.",
+    "expected_files": ["src/drishti/ingestion/incremental.py", "src/drishti/ingestion/git_changes.py", "src/drishti/ingestion/index_state.py"],
+    "expected_chunks": ["IncrementalIndexer", "GitChangeDetector", "IndexState"],
+    "ground_truth_answer": "The IncrementalIndexer tracks repository state using commit hashes stored in IndexState. When re-indexing, GitChangeDetector compares the current HEAD against the stored commit to identify added, modified, and deleted files via git diff. Only changed files are re-parsed and re-embedded. Deleted files have their chunks removed from Qdrant. The ChunkIndex maintains a mapping of file paths to chunk IDs for efficient deletion."
+  },
+  {
+    "id": "qa_008",
+    "category": "embedding",
+    "difficulty": "medium",
+    "question": "How are dense embeddings generated and what providers are supported?",
+    "expected_files": ["src/drishti/embedding/factory.py", "src/drishti/embedding/dense.py"],
+    "expected_chunks": ["create_dense_embedder", "DenseEmbedder", "OpenAIDenseEmbedder"],
+    "ground_truth_answer": "Dense embeddings are generated via the create_dense_embedder() factory which reads EMBEDDING_PROVIDER from config. Supported providers include: 'openai' (text-embedding-3-small), 'cohere' (embed-english-v3.0), 'ollama' (local models), and 'openai_compatible' (any OpenAI-compatible endpoint). Embeddings are batched with configurable batch size and include retry logic for API failures."
+  },
+  {
+    "id": "qa_009",
+    "category": "embedding",
+    "difficulty": "easy",
+    "question": "How does sparse BM25 embedding work in Drishti?",
+    "expected_files": ["src/drishti/embedding/sparse.py"],
+    "expected_chunks": ["SparseEncoder", "BM25SparseEncoder"],
+    "ground_truth_answer": "The BM25SparseEncoder tokenizes text into terms and computes term frequency weights. It produces a sparse vector where indices represent term IDs and values represent BM25-style weights. This enables exact keyword matching in Qdrant's sparse vector index, complementing semantic dense search."
+  },
+  {
+    "id": "qa_010",
+    "category": "storage",
+    "difficulty": "medium",
+    "question": "How does the Qdrant chunk store handle hybrid dense and sparse vectors?",
+    "expected_files": ["src/drishti/storage/qdrant_store.py", "src/drishti/storage/schema.py"],
+    "expected_chunks": ["QdrantChunkStore", "create_collection", "upsert"],
+    "ground_truth_answer": "QdrantChunkStore creates a Qdrant collection with two named vectors: 'dense' (1536-dim for OpenAI embeddings) and 'sparse' (sparse BM25 vectors). On upsert, chunks are stored with both vector types plus metadata payload. The schema.py defines payload indexes for efficient filtering on language, file_path, content_type, etc."
+  },
+  {
+    "id": "qa_011",
+    "category": "generation",
+    "difficulty": "medium",
+    "question": "How does the context builder prepare retrieved chunks for the LLM?",
+    "expected_files": ["src/drishti/generation/context.py"],
+    "expected_chunks": ["ContextBuilder", "build_context"],
+    "ground_truth_answer": "ContextBuilder takes search results and formats them into a structured context string. Each chunk is wrapped with metadata including file path, line numbers, language, and a citation reference like [1]. The builder respects a max_tokens limit, truncating if necessary. It also generates a citation mapping for post-processing LLM responses."
+  },
+  {
+    "id": "qa_012",
+    "category": "generation",
+    "difficulty": "medium",
+    "question": "How does Drishti generate streaming responses with citations?",
+    "expected_files": ["src/drishti/generation/streaming.py", "src/drishti/generation/citations.py"],
+    "expected_chunks": ["stream_rag_response", "parse_citations"],
+    "ground_truth_answer": "Streaming responses use Server-Sent Events (SSE) via sse-starlette. The RAG pipeline streams LLM tokens as 'token' events. After completion, citations are parsed from the response using regex to match [n] patterns. Each citation is resolved to its source chunk, emitting 'citation' events with file_path, start_line, end_line. A final 'done' event signals completion."
+  },
+  {
+    "id": "qa_013",
+    "category": "agent",
+    "difficulty": "hard",
+    "question": "How does the LangGraph agent implement retrieve-grade-generate with retry logic?",
+    "expected_files": ["src/drishti/agent/graph.py", "src/drishti/agent/nodes.py"],
+    "expected_chunks": ["build_rag_graph", "retrieve_context", "generate_answer", "route_after_generate"],
+    "ground_truth_answer": "The LangGraph agent builds a StateGraph with nodes: retrieve, generate, and expand_query. After generation, route_after_generate checks needs_retry flag. If context was empty or confidence low, it routes back to retrieve (up to max_passes). For low confidence without prior expansion, it first routes to expand_query which uses the LLM to rephrase the query before retrying retrieval."
+  },
+  {
+    "id": "qa_014",
+    "category": "agent",
+    "difficulty": "medium",
+    "question": "What LangChain tools are available to the Drishti agent?",
+    "expected_files": ["src/drishti/agent/tools/__init__.py", "src/drishti/agent/tools/search.py", "src/drishti/agent/tools/source.py"],
+    "expected_chunks": ["hybrid_search_tool", "read_source_tool", "ingest_status_tool"],
+    "ground_truth_answer": "The agent has three registered LangChain tools: hybrid_search executes the full search pipeline and returns ranked chunks; read_source reads a specific file from the indexed repository; ingest_status checks the current indexing state of a workspace. These tools are invoked by the tool_router node when the LLM decides tool use is needed."
+  },
+  {
+    "id": "qa_015",
+    "category": "platform",
+    "difficulty": "medium",
+    "question": "How does the platform service handle workspace and conversation persistence?",
+    "expected_files": ["src/drishti/services/platform_service.py", "src/drishti/db/models.py"],
+    "expected_chunks": ["PlatformService", "Workspace", "Conversation"],
+    "ground_truth_answer": "PlatformService provides CRUD operations for workspaces and conversations. When DATABASE_URL is configured, it uses PostgreSQL via SQLAlchemy async models. Otherwise, it falls back to in-memory or filesystem storage. Workspaces track repository paths, indexing status, and chunk counts. Conversations store message history with workspace association."
+  },
+  {
+    "id": "qa_016",
+    "category": "platform",
+    "difficulty": "medium",
+    "question": "How does the Postgres checkpointer persist LangGraph agent state?",
+    "expected_files": ["src/drishti/agent/checkpointer.py"],
+    "expected_chunks": ["create_checkpointer", "PostgresCheckpointer"],
+    "ground_truth_answer": "The create_checkpointer function initializes a langgraph-checkpoint-postgres checkpointer when DATABASE_URL is set. It stores agent state (messages, retrieved context, retry counts) keyed by thread_id. This enables multi-turn conversations where the agent remembers prior context. State is automatically saved after each graph node execution."
+  },
+  {
+    "id": "qa_017",
+    "category": "api",
+    "difficulty": "easy",
+    "question": "What API endpoints does Drishti expose and what are their purposes?",
+    "expected_files": ["src/drishti/api/routes.py", "src/drishti/api/platform_routes.py"],
+    "expected_chunks": ["ingest", "search", "ask", "source_read"],
+    "ground_truth_answer": "Core endpoints: POST /api/v1/ingest triggers repository indexing; POST /api/v1/search performs hybrid search returning chunks; POST /api/v1/ask runs the RAG pipeline with SSE streaming. POST /api/v1/source/read returns file contents for citation navigation. Platform routes add workspace CRUD, conversation management, and upload handling."
+  },
+  {
+    "id": "qa_018",
+    "category": "api",
+    "difficulty": "easy",
+    "question": "How does the rate limiting middleware work?",
+    "expected_files": ["src/drishti/middleware/rate_limit.py"],
+    "expected_chunks": ["RateLimitMiddleware"],
+    "ground_truth_answer": "RateLimitMiddleware uses Redis to track request counts per client IP within a sliding time window. Configurable limits (e.g., 100 requests/minute) are enforced. When exceeded, it returns HTTP 429 Too Many Requests. The middleware skips rate limiting for health check endpoints and internal requests."
+  },
+  {
+    "id": "qa_019",
+    "category": "api",
+    "difficulty": "easy",
+    "question": "How does Redis query caching work in Drishti?",
+    "expected_files": ["src/drishti/services/query_cache.py"],
+    "expected_chunks": ["QueryCache", "get", "set"],
+    "ground_truth_answer": "QueryCache stores search and ask results in Redis with configurable TTL (default 1 hour). Cache keys are hashed from query + filters. On ingest, relevant cache entries are invalidated to ensure freshness. The cache reduces latency for repeated queries and decreases load on embedding APIs and Qdrant."
+  },
+  {
+    "id": "qa_020",
+    "category": "ingestion",
+    "difficulty": "medium",
+    "question": "How does the PDF parser extract layout-aware content?",
+    "expected_files": ["src/drishti/ingestion/documents/pdf.py"],
+    "expected_chunks": ["PDFParser", "parse"],
+    "ground_truth_answer": "PDFParser uses PyMuPDF (fitz) to extract text blocks preserving spatial layout. It identifies headers via font size analysis, extracts tables as markdown, and segments content by page. Each text block becomes a chunk with page_number, bounding box coordinates, and detected structure type (heading, paragraph, table, etc.)."
+  },
+  {
+    "id": "qa_021",
+    "category": "ingestion",
+    "difficulty": "easy",
+    "question": "How does the Markdown parser handle header hierarchy?",
+    "expected_files": ["src/drishti/ingestion/documents/markdown.py"],
+    "expected_chunks": ["MarkdownParser", "parse"],
+    "ground_truth_answer": "MarkdownParser splits content by ATX headers (#, ##, ###). Each section becomes a chunk with its header as metadata. The parser tracks header hierarchy so a ### section knows its parent ## and # contexts. Code blocks within sections are preserved with their language tags."
+  },
+  {
+    "id": "qa_022",
+    "category": "ingestion",
+    "difficulty": "medium",
+    "question": "How does the OpenAPI parser extract endpoint information?",
+    "expected_files": ["src/drishti/ingestion/documents/openapi.py"],
+    "expected_chunks": ["OpenAPIParser", "parse"],
+    "ground_truth_answer": "OpenAPIParser loads OpenAPI/Swagger YAML or JSON specs. For each path+method combination, it creates a chunk containing: HTTP method, path, summary, description, parameters (path/query/body), request body schema, and response schemas. This enables searching API specs like 'POST endpoint for creating users'."
+  },
+  {
+    "id": "qa_023",
+    "category": "ingestion",
+    "difficulty": "medium",
+    "question": "How does the content router determine which parser to use for a file?",
+    "expected_files": ["src/drishti/ingestion/content_router.py"],
+    "expected_chunks": ["ContentRouter", "route"],
+    "ground_truth_answer": "ContentRouter examines file extension and magic bytes to determine content type. Programming files (.py, .java, .ts) route to AST parsers. PDFs route to PDFParser, .md/.mdx to MarkdownParser, .yaml/.json with openapi key to OpenAPIParser. Unknown types are skipped or treated as plain text based on configuration."
+  },
+  {
+    "id": "qa_024",
+    "category": "ingestion",
+    "difficulty": "medium",
+    "question": "How does the AST metadata enricher compute cyclomatic complexity?",
+    "expected_files": ["src/drishti/ingestion/ast/metadata.py"],
+    "expected_chunks": ["enrich_metadata", "compute_complexity"],
+    "ground_truth_answer": "Cyclomatic complexity is computed by counting decision points in the function body: if/elif/else, for, while, try/except, boolean operators (and/or), and ternary expressions. The formula is: M = E - N + 2P where E=edges, N=nodes, P=connected components. In practice, we count branches + 1 for the base path."
+  },
+  {
+    "id": "qa_025",
+    "category": "ingestion",
+    "difficulty": "hard",
+    "question": "How does the Java parser extract class hierarchies and interfaces?",
+    "expected_files": ["src/drishti/ingestion/ast/java.py", "src/drishti/ingestion/queries/java.scm"],
+    "expected_chunks": ["JavaParser", "parse"],
+    "ground_truth_answer": "JavaParser uses tree-sitter-java with queries capturing class_declaration, interface_declaration, method_declaration, and constructor_declaration. For classes, it extracts extends/implements relationships, visibility modifiers, and annotations. Methods are associated with their parent class, and package declarations determine the full qualified name."
+  },
+  {
+    "id": "qa_026",
+    "category": "search",
+    "difficulty": "medium",
+    "question": "How does query expansion improve search results?",
+    "expected_files": ["src/drishti/search/expansion.py"],
+    "expected_chunks": ["QueryExpander", "expand"],
+    "ground_truth_answer": "QueryExpander uses an LLM to generate related search terms for the original query. For example, 'authentication' expands to ['auth', 'login', 'jwt', 'token', 'session']. The expanded terms are combined with the original query for broader retrieval coverage. This helps when users use different terminology than the codebase."
+  },
+  {
+    "id": "qa_027",
+    "category": "search",
+    "difficulty": "medium",
+    "question": "How does the Cohere reranker improve search precision?",
+    "expected_files": ["src/drishti/search/rerank.py"],
+    "expected_chunks": ["CohereReranker", "rerank"],
+    "ground_truth_answer": "CohereReranker uses Cohere's rerank API to score query-document pairs with a cross-encoder model. Initial candidates from RRF are passed to Cohere which returns relevance scores. Results are re-sorted by these scores and top-n are returned. Cross-encoders see query+document together, enabling better semantic matching than bi-encoder retrieval alone."
+  },
+  {
+    "id": "qa_028",
+    "category": "storage",
+    "difficulty": "medium",
+    "question": "How does Qdrant filter compilation work for metadata queries?",
+    "expected_files": ["src/drishti/storage/filters.py"],
+    "expected_chunks": ["compile_qdrant_filter"],
+    "ground_truth_answer": "compile_qdrant_filter converts a dict of key-value filters into Qdrant Filter objects. It supports equality matches on payload fields like language='python', file_path prefix matches with wildcards, and content_type filtering. Multiple conditions are combined with AND logic. The compiled filter is passed to Qdrant search operations."
+  },
+  {
+    "id": "qa_029",
+    "category": "observability",
+    "difficulty": "easy",
+    "question": "How does structured logging work in Drishti?",
+    "expected_files": ["src/drishti/observability/logging.py"],
+    "expected_chunks": ["configure_logging", "get_logger"],
+    "ground_truth_answer": "Drishti uses structlog for JSON-formatted structured logging. configure_logging sets up processors for timestamp, log level, and context binding. get_logger returns a bound logger that automatically includes request_id, workspace_id, and other context. In production (DEBUG=false), logs are JSON for easy parsing by log aggregators."
+  },
+  {
+    "id": "qa_030",
+    "category": "observability",
+    "difficulty": "easy",
+    "question": "How does request ID correlation work across the request lifecycle?",
+    "expected_files": ["src/drishti/middleware/request_id.py", "src/drishti/middleware/logging_context.py"],
+    "expected_chunks": ["RequestIDMiddleware", "LoggingContextMiddleware"],
+    "ground_truth_answer": "RequestIDMiddleware generates or extracts X-Request-ID from incoming requests. LoggingContextMiddleware binds this ID to structlog context. All subsequent log calls within the request include the request_id, enabling distributed tracing across services. The ID is also returned in response headers for client correlation."
+  },
+  {
+    "id": "qa_031",
+    "category": "platform",
+    "difficulty": "medium",
+    "question": "How does MinIO artifact storage work for uploaded files?",
+    "expected_files": ["src/drishti/storage/artifacts.py"],
+    "expected_chunks": ["ArtifactStore", "upload", "download"],
+    "ground_truth_answer": "ArtifactStore wraps the MinIO S3-compatible client when ENABLE_MINIO=true. Uploaded files are stored in workspace-specific buckets with content-addressed keys (SHA256 hash). Metadata includes original filename, content type, and upload timestamp. Files can be downloaded by key for processing or re-indexing."
+  },
+  {
+    "id": "qa_032",
+    "category": "platform",
+    "difficulty": "medium",
+    "question": "How do Arq background workers handle ingestion jobs?",
+    "expected_files": ["src/drishti/worker/tasks.py", "src/drishti/worker/settings.py"],
+    "expected_chunks": ["ingest_workspace", "WorkerSettings"],
+    "ground_truth_answer": "Arq workers consume jobs from Redis queues. The ingest_workspace task clones/pulls the repository, runs the content router and parsers, generates embeddings, and upserts to Qdrant. Progress is reported via workspace status updates. WorkerSettings configures Redis connection, job timeout, and retry policies."
+  },
+  {
+    "id": "qa_033",
+    "category": "database",
+    "difficulty": "medium",
+    "question": "What database models does Drishti define for the platform?",
+    "expected_files": ["src/drishti/db/models.py"],
+    "expected_chunks": ["Workspace", "Conversation", "Message", "IngestJob"],
+    "ground_truth_answer": "Database models include: Workspace (id, name, repo_path, status, chunk_count, last_indexed), Conversation (id, workspace_id, title, created_at), Message (id, conversation_id, role, content, timestamp), and IngestJob (id, workspace_id, status, started_at, completed_at, error). All use SQLAlchemy 2.0 async ORM patterns."
+  },
+  {
+    "id": "qa_034",
+    "category": "database",
+    "difficulty": "easy",
+    "question": "How does Alembic database migration work in Drishti?",
+    "expected_files": ["alembic/env.py", "alembic/versions/001_initial_platform.py"],
+    "expected_chunks": ["run_migrations", "upgrade"],
+    "ground_truth_answer": "Alembic manages PostgreSQL schema migrations. env.py configures the async SQLAlchemy engine from DATABASE_URL. Migration scripts in alembic/versions/ define upgrade/downgrade operations. Running 'make db-migrate' applies pending migrations via 'alembic upgrade head'. The initial migration creates workspaces, conversations, messages, and ingest_jobs tables."
+  },
+  {
+    "id": "qa_035",
+    "category": "config",
+    "difficulty": "easy",
+    "question": "How does Drishti manage configuration and environment variables?",
+    "expected_files": ["src/drishti/config.py"],
+    "expected_chunks": ["Settings", "get_settings"],
+    "ground_truth_answer": "Configuration uses Pydantic BaseSettings which reads from environment variables or .env file. Settings include: DEBUG, API keys (OPENAI_API_KEY, ANTHROPIC_API_KEY, COHERE_API_KEY), provider selection (EMBEDDING_PROVIDER, LLM_PROVIDER), database URLs, and feature flags. get_settings() returns a cached singleton instance."
+  },
+  {
+    "id": "qa_036",
+    "category": "config",
+    "difficulty": "medium",
+    "question": "How does provider-agnostic model configuration work?",
+    "expected_files": ["src/drishti/config.py", "src/drishti/embedding/factory.py", "src/drishti/generation/factory.py"],
+    "expected_chunks": ["EMBEDDING_PROVIDER", "LLM_PROVIDER", "create_dense_embedder", "create_chat_llm"],
+    "ground_truth_answer": "Provider selection via environment variables: EMBEDDING_PROVIDER (openai/cohere/ollama/openai_compatible), LLM_PROVIDER (anthropic/openai/ollama/openai_compatible), RERANK_PROVIDER (cohere/lexical). Factory functions instantiate the appropriate client based on provider setting. This allows switching providers without code changes."
+  },
+  {
+    "id": "qa_037",
+    "category": "testing",
+    "difficulty": "easy",
+    "question": "How are unit tests organized and what markers are used?",
+    "expected_files": ["tests/unit/test_walker.py", "pyproject.toml"],
+    "expected_chunks": ["test_", "markers"],
+    "ground_truth_answer": "Tests are in tests/unit/, tests/integration/, and tests/e2e/. Pytest markers distinguish test types: @pytest.mark.unit (no external deps), @pytest.mark.integration (requires Qdrant/Redis), @pytest.mark.e2e (full pipeline). Unit tests mock external APIs. CI runs 'pytest tests/unit/ -m unit' for fast feedback."
+  },
+  {
+    "id": "qa_038",
+    "category": "ingestion",
+    "difficulty": "hard",
+    "question": "How does the TypeScript parser handle both .ts and .tsx files with JSX?",
+    "expected_files": ["src/drishti/ingestion/ast/typescript.py", "src/drishti/ingestion/queries/typescript.scm"],
+    "expected_chunks": ["TypeScriptParser"],
+    "ground_truth_answer": "TypeScriptParser uses tree-sitter-typescript which has separate grammars for typescript and tsx. The parser detects .tsx extension and uses the TSX grammar that includes jsx_element and jsx_expression nodes. Function and class extraction works identically, but TSX files may have React component patterns detected via heuristics like returning JSX."
+  },
+  {
+    "id": "qa_039",
+    "category": "ingestion",
+    "difficulty": "medium",
+    "question": "How does the JavaScript parser differ from TypeScript?",
+    "expected_files": ["src/drishti/ingestion/ast/javascript.py", "src/drishti/ingestion/ast/ecmascript.py"],
+    "expected_chunks": ["JavaScriptParser", "ECMAScriptBase"],
+    "ground_truth_answer": "JavaScriptParser extends ECMAScriptBase which provides common logic for function/class extraction. The difference is the tree-sitter grammar: JavaScript doesn't have type annotations, so parameter types and return types are always None. Both share extraction of arrow functions, exports, and ES6 class syntax."
+  },
+  {
+    "id": "qa_040",
+    "category": "ingestion",
+    "difficulty": "medium",
+    "question": "How does the Go parser handle Go-specific constructs like interfaces and goroutines?",
+    "expected_files": ["src/drishti/ingestion/ast/go.py", "src/drishti/ingestion/queries/go.scm"],
+    "expected_chunks": ["GoParser"],
+    "ground_truth_answer": "GoParser captures function_declaration, method_declaration (with receiver), type_declaration (including interfaces and structs). Interfaces are chunked with their method signatures. The parser extracts package name, receiver type for methods, and handles exported vs unexported based on capital letter convention."
+  },
+  {
+    "id": "qa_041",
+    "category": "search",
+    "difficulty": "easy",
+    "question": "How does the dense vector retriever query Qdrant?",
+    "expected_files": ["src/drishti/search/dense.py"],
+    "expected_chunks": ["DenseVectorRetriever", "retrieve"],
+    "ground_truth_answer": "DenseVectorRetriever embeds the query using the dense embedder, then calls Qdrant's search with the 'dense' vector name. It passes optional filters, sets limit, and retrieves points with payloads. Results are converted to SearchHit objects containing chunk metadata and similarity score."
+  },
+  {
+    "id": "qa_042",
+    "category": "search",
+    "difficulty": "easy",
+    "question": "How does the sparse BM25 retriever query Qdrant?",
+    "expected_files": ["src/drishti/search/sparse.py"],
+    "expected_chunks": ["SparseVectorRetriever", "retrieve"],
+    "ground_truth_answer": "SparseVectorRetriever encodes the query using BM25SparseEncoder to get term indices and weights. It queries Qdrant's 'sparse' vector using sparse vector search. This finds documents with exact term matches, complementing semantic dense search for keyword-heavy queries."
+  },
+  {
+    "id": "qa_043",
+    "category": "generation",
+    "difficulty": "medium",
+    "question": "How does the RAG pipeline combine search and generation?",
+    "expected_files": ["src/drishti/generation/pipeline.py"],
+    "expected_chunks": ["RAGPipeline", "ask"],
+    "ground_truth_answer": "RAGPipeline orchestrates: 1) hybrid search for relevant chunks, 2) context building with citations, 3) prompt construction with system message + context + question, 4) LLM generation with optional streaming. The pipeline tracks retrieved chunks for citation resolution and can optionally include conversation history."
+  },
+  {
+    "id": "qa_044",
+    "category": "generation",
+    "difficulty": "easy",
+    "question": "What prompt templates does Drishti use for RAG?",
+    "expected_files": ["src/drishti/generation/prompts.py"],
+    "expected_chunks": ["SYSTEM_PROMPT", "RAG_PROMPT"],
+    "ground_truth_answer": "The system prompt establishes Drishti as a code understanding assistant that answers based only on provided context. The RAG prompt template includes: retrieved context with citations, the user's question, and instructions to cite sources using [n] notation. Prompts emphasize factual answers without hallucination."
+  },
+  {
+    "id": "qa_045",
+    "category": "agent",
+    "difficulty": "medium",
+    "question": "How does the agent state track retrieval passes and retries?",
+    "expected_files": ["src/drishti/agent/state.py"],
+    "expected_chunks": ["AgentState"],
+    "ground_truth_answer": "AgentState is a TypedDict containing: messages (conversation), question (current query), context (retrieved chunks), answer (generated response), retrieval_pass (current attempt count), max_passes (retry limit), needs_retry (flag), retry_mode ('empty_context' or 'low_confidence'), and query_expanded (whether expansion occurred)."
+  },
+  {
+    "id": "qa_046",
+    "category": "frontend",
+    "difficulty": "medium",
+    "question": "How does the frontend handle streaming SSE responses?",
+    "expected_files": ["web/lib/api.ts", "web/components/ChatPanel.tsx"],
+    "expected_chunks": ["askStream", "handleSubmit"],
+    "ground_truth_answer": "The askStream function uses EventSource or fetch with streaming to consume SSE from /api/v1/ask. Events are parsed by type: 'token' events append to the answer, 'citation' events store file references, 'done' signals completion. ChatPanel's handleSubmit calls askStream with a callback that updates React state progressively."
+  },
+  {
+    "id": "qa_047",
+    "category": "frontend",
+    "difficulty": "medium",
+    "question": "How does clicking a citation open the source file in Monaco editor?",
+    "expected_files": ["web/components/ChatPanel.tsx", "web/components/CodePanel.tsx", "web/lib/api.ts"],
+    "expected_chunks": ["handleCitation", "readSourceFile", "openEditor"],
+    "ground_truth_answer": "Citations render as clickable buttons. On click, handleCitation calls readSourceFile API which returns file content. It then calls openEditor from the store with file path, content, language, and highlight range. CodePanel's Monaco instance receives the content and uses decorations to highlight the cited lines."
+  },
+  {
+    "id": "qa_048",
+    "category": "frontend",
+    "difficulty": "easy",
+    "question": "How does the frontend store manage application state?",
+    "expected_files": ["web/lib/store.tsx"],
+    "expected_chunks": ["useAppStore", "AppStoreProvider"],
+    "ground_truth_answer": "The app uses Zustand or React context for state management. useAppStore provides: repoPath (current repository), messages (chat history), editor state (open file, highlights), and actions like appendMessage, updateLastAssistant, openEditor. State persists across component re-renders."
+  },
+  {
+    "id": "qa_049",
+    "category": "cicd",
+    "difficulty": "easy",
+    "question": "What checks does the CI pipeline run?",
+    "expected_files": [".github/workflows/ci.yml"],
+    "expected_chunks": ["quality", "test", "docker"],
+    "ground_truth_answer": "CI runs three jobs: 1) quality - ruff lint and format check, mypy type checking; 2) test - pytest unit tests with coverage (must exceed 70%), uploads to Codecov; 3) docker - builds Docker image and verifies it can import drishti. Jobs run on push/PR to main/develop branches."
+  },
+  {
+    "id": "qa_050",
+    "category": "cicd",
+    "difficulty": "easy",
+    "question": "What Makefile targets are available for development?",
+    "expected_files": ["Makefile"],
+    "expected_chunks": ["dev", "test", "lint", "pre-commit"],
+    "ground_truth_answer": "Key targets: 'make setup' (first-time install), 'make dev' (uvicorn with reload), 'make dev-web' (Next.js frontend), 'make test' (all tests with coverage), 'make test-unit' (fast unit tests), 'make lint' (ruff check), 'make type-check' (mypy), 'make pre-commit' (lint + types + unit tests), 'make docker-up' (start infrastructure)."
+  },
+  {
+    "id": "qa_051",
+    "category": "code_structure",
+    "difficulty": "hard",
+    "question": "How does the walker traverse a repository while respecting gitignore patterns?",
+    "expected_files": ["src/drishti/ingestion/walker.py", "src/drishti/ingestion/gitignore.py"],
+    "expected_chunks": ["walk_repository", "GitIgnoreMatcher"],
+    "ground_truth_answer": "The walker uses GitIgnoreMatcher which parses .gitignore files at each directory level. It compiles patterns into regex and checks each file/directory path. Ignored patterns, hidden files (starting with .), and common non-code directories (node_modules, __pycache__, .git) are skipped. The walker yields file paths that pass all filters."
+  },
+  {
+    "id": "qa_052",
+    "category": "ingestion",
+    "difficulty": "medium",
+    "question": "How does the parser rule engine configure AST extraction?",
+    "expected_files": ["src/drishti/ingestion/ast/rules.py", "src/drishti/ingestion/queries/parser_rules.json"],
+    "expected_chunks": ["ParserRules", "load_rules"],
+    "ground_truth_answer": "parser_rules.json defines per-language configuration: node types to extract (function_definition, class_definition), minimum chunk lines, and query file paths. ParserRules loads and validates this JSON. The AST parser uses these rules to decide which nodes become chunks and applies min_chunk_lines filtering."
+  },
+  {
+    "id": "qa_053",
+    "category": "storage",
+    "difficulty": "hard",
+    "question": "How does chunk indexing track file-to-chunk mappings for deletion?",
+    "expected_files": ["src/drishti/ingestion/chunk_index.py"],
+    "expected_chunks": ["ChunkIndex", "add", "remove", "get_chunk_ids"],
+    "ground_truth_answer": "ChunkIndex maintains a bidirectional mapping: file_path -> set of chunk_ids and chunk_id -> file_path. When a file is deleted or modified, get_chunk_ids returns all chunks for that file. These IDs are used to delete from Qdrant before re-indexing. The index is persisted to disk for durability across restarts."
+  },
+  {
+    "id": "qa_054",
+    "category": "generation",
+    "difficulty": "medium",
+    "question": "How does the LLM factory support multiple providers with streaming?",
+    "expected_files": ["src/drishti/generation/factory.py", "src/drishti/generation/llm.py"],
+    "expected_chunks": ["create_chat_llm", "ChatLLM", "stream"],
+    "ground_truth_answer": "create_chat_llm reads LLM_PROVIDER and instantiates the appropriate client: AnthropicChatLLM (Claude), OpenAIChatLLM (GPT), OllamaChatLLM (local), or OpenAICompatibleLLM (generic). All implement ChatLLM protocol with stream() method yielding tokens. Streaming uses provider-specific APIs but presents a unified async generator interface."
+  },
+  {
+    "id": "qa_055",
+    "category": "api",
+    "difficulty": "medium",
+    "question": "How does the health check endpoint verify service dependencies?",
+    "expected_files": ["src/drishti/services/health.py", "src/drishti/api/routes.py"],
+    "expected_chunks": ["HealthChecker", "health"],
+    "ground_truth_answer": "HealthChecker probes each dependency: Qdrant (collection exists), Redis (PING), PostgreSQL (SELECT 1), MinIO (bucket exists). Each check has a timeout and returns status + latency. The /health endpoint aggregates results - returns 200 if all critical services are healthy, 503 if any fail. Useful for Kubernetes liveness/readiness probes."
   }
 ]
