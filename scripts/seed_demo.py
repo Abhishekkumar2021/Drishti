@@ -24,8 +24,8 @@ import sys
 import tempfile
 import time
 from pathlib import Path
-from urllib.request import Request, urlopen
 from urllib.error import URLError
+from urllib.request import Request, urlopen
 
 DEFAULT_API_URL = "http://localhost:8000"
 DEFAULT_SAMPLE_REPO = "https://github.com/pallets/flask"
@@ -110,11 +110,13 @@ def ingest_repository(api_url: str, repo_path: str) -> dict | None:
 def run_search_query(api_url: str, repo_path: str, query: str) -> dict | None:
     """Run a search query via API."""
     try:
-        data = json.dumps({
-            "query": query,
-            "repo_root": repo_path,
-            "top_k": 5,
-        }).encode("utf-8")
+        data = json.dumps(
+            {
+                "query": query,
+                "repo_root": repo_path,
+                "top_k": 5,
+            }
+        ).encode("utf-8")
         req = Request(
             f"{api_url}/api/v1/search",
             data=data,
@@ -131,11 +133,13 @@ def run_search_query(api_url: str, repo_path: str, query: str) -> dict | None:
 def run_ask_query(api_url: str, repo_path: str, question: str) -> str | None:
     """Run an ask query via API (non-streaming)."""
     try:
-        data = json.dumps({
-            "question": question,
-            "repo_root": repo_path,
-            "stream": False,
-        }).encode("utf-8")
+        data = json.dumps(
+            {
+                "question": question,
+                "repo_root": repo_path,
+                "stream": False,
+            }
+        ).encode("utf-8")
         req = Request(
             f"{api_url}/api/v1/ask",
             data=data,
@@ -163,7 +167,7 @@ def main() -> int:
     parser.add_argument(
         "--repo",
         default="flask",
-        choices=list(SAMPLE_REPOS.keys()) + ["custom"],
+        choices=[*list(SAMPLE_REPOS.keys()), "custom"],
         help="Sample repository to use (default: flask)",
     )
     parser.add_argument(
@@ -206,7 +210,7 @@ def main() -> int:
         print_step(2, f"Cloning {args.repo} repository...")
         if not clone_repository(repo_url, repo_dir):
             return 1
-        
+
         file_count = sum(1 for _ in repo_dir.rglob("*") if _.is_file())
         print_success(f"Cloned to {repo_dir} ({file_count} files)")
 
@@ -223,10 +227,10 @@ def main() -> int:
         print_success(f"Indexed {chunks} chunks from {files} files in {elapsed:.1f}s")
 
         print_step(4, "Running verification queries...")
-        
+
         query = SAMPLE_QUERIES[0]
-        print(f"\n  Query: \"{query}\"")
-        
+        print(f'\n  Query: "{query}"')
+
         search_result = run_search_query(args.api_url, str(repo_dir), query)
         if search_result:
             results_count = len(search_result.get("results", []))
@@ -242,12 +246,12 @@ def main() -> int:
         print(f"Repository indexed: {repo_dir}")
         print(f"Total chunks: {chunks}")
         print(f"Total files: {files}")
-        print(f"\nYou can now use the Drishti UI at: http://localhost:3000")
+        print("\nYou can now use the Drishti UI at: http://localhost:3000")
         print(f"Or query the API directly at: {args.api_url}/api/v1/ask")
 
         if args.keep:
             print(f"\nRepository kept at: {repo_dir}")
-        
+
         return 0
 
     finally:
