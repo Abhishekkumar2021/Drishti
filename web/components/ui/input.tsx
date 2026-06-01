@@ -4,33 +4,39 @@ import { cn } from "@/lib/cn";
 export interface InputProps
   extends React.InputHTMLAttributes<HTMLInputElement> {
   icon?: React.ReactNode;
+  iconRight?: React.ReactNode;
 }
 
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
-  ({ className, type, icon, ...props }, ref) => {
+  ({ className, type, icon, iconRight, ...props }, ref) => {
     return (
       <div className="relative">
         {icon && (
-          <div className="absolute left-3 top-1/2 -translate-y-1/2 text-text-muted">
+          <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-text-muted pointer-events-none">
             {icon}
           </div>
         )}
         <input
           type={type}
           className={cn(
-            "flex h-10 w-full rounded-xl bg-surface-raised/50 px-4 py-2 text-sm text-text-primary",
+            "flex h-11 w-full rounded-xl bg-surface px-4 py-2.5 text-sm text-text-primary",
             "placeholder:text-text-muted",
-            "border border-surface-border/50 backdrop-blur-sm",
-            "focus:border-accent/50 focus:outline-none focus:ring-2 focus:ring-accent/20",
-            "transition-all duration-200",
+            "border border-surface-border",
+            "focus:border-surface-border-light focus:outline-none focus:ring-1 focus:ring-surface-border-light",
+            "transition-all duration-150",
             "disabled:cursor-not-allowed disabled:opacity-50",
-            "file:border-0 file:bg-transparent file:text-sm file:font-medium",
-            icon && "pl-10",
+            icon && "pl-11",
+            iconRight && "pr-11",
             className
           )}
           ref={ref}
           {...props}
         />
+        {iconRight && (
+          <div className="absolute right-3.5 top-1/2 -translate-y-1/2 text-text-muted">
+            {iconRight}
+          </div>
+        )}
       </div>
     );
   }

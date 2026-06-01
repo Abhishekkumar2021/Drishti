@@ -4,7 +4,7 @@ import { CodeViewer } from "@/components/layout/CodeViewer";
 
 export default function HomePage() {
   return (
-    <main className="flex h-screen overflow-hidden bg-background">
+    <main className="flex h-screen overflow-hidden bg-bg">
       <AppSidebar />
       <ChatArea />
       <CodeViewer />

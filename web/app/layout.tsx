@@ -3,7 +3,7 @@ import { Inter, JetBrains_Mono } from "next/font/google";
 
 import "./globals.css";
 
-const inter = Inter({ 
+const inter = Inter({
   subsets: ["latin"],
   variable: "--font-sans",
   display: "swap",
@@ -16,25 +16,17 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Drishti — दृष्टि | AI-Powered Code Intelligence",
-  description: "AST-aware RAG system for intelligent code understanding, search, and exploration",
-  keywords: ["code search", "RAG", "AI", "code understanding", "developer tools"],
-  authors: [{ name: "Abhishek Kumar" }],
+  title: "Drishti — Code Intelligence",
+  description: "AST-aware RAG system for intelligent code understanding and exploration",
   icons: {
     icon: "/favicon.ico",
-    apple: "/apple-touch-icon.png",
-  },
-  openGraph: {
-    title: "Drishti — दृष्टि",
-    description: "AI-Powered Code Intelligence",
-    type: "website",
   },
 };
 
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  themeColor: "#030712",
+  themeColor: "#0f0f0f",
 };
 
 export default function RootLayout({
@@ -44,7 +36,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className="dark" suppressHydrationWarning>
-      <body 
+      <body
         className={`${inter.variable} ${jetbrainsMono.variable} font-sans antialiased`}
         suppressHydrationWarning
       >

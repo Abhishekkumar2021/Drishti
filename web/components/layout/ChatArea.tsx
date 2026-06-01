@@ -10,12 +10,10 @@ import {
   Loader2,
   Copy,
   Check,
-  ChevronRight,
   Sparkles,
   Code2,
-  MessageSquare,
   X,
-  ExternalLink,
+  ArrowRight,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -40,7 +38,7 @@ async function askStream(
   onEvent: StreamCallback
 ): Promise<void> {
   const url = `${process.env.NEXT_PUBLIC_DRISHTI_API_URL || "http://localhost:8000"}/api/v1/ask`;
-  
+
   const response = await fetch(url, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -230,78 +228,65 @@ export function ChatArea() {
     }
   };
 
+  const suggestions = [
+    "How does authentication work?",
+    "What is the main entry point?",
+    "Explain the data models",
+  ];
+
   return (
-    <div className="flex flex-1 flex-col min-w-0">
+    <div className="flex flex-1 flex-col min-w-0 bg-bg">
       {/* Header */}
-      <header className="flex items-center justify-between border-b border-surface-border/30 px-6 py-4 backdrop-blur-sm bg-background/50">
-        <div className="flex items-center gap-3">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-accent-muted">
-            <Sparkles className="h-4 w-4 text-accent" />
-          </div>
-          <div>
-            <h2 className="text-sm font-semibold text-text-primary">
-              {activeThread?.title || "New Conversation"}
-            </h2>
-            <p className="text-xs text-text-muted">
-              {activeWorkspace
-                ? `Querying ${activeWorkspace.name}`
-                : "Select a workspace to start"}
-            </p>
-          </div>
+      <header className="flex items-center justify-between border-b border-surface-border px-6 py-4">
+        <div>
+          <h2 className="text-sm font-semibold text-text-primary">
+            {activeThread?.title || "New Conversation"}
+          </h2>
+          <p className="text-xs text-text-muted mt-0.5">
+            {activeWorkspace ? `Querying ${activeWorkspace.name}` : "Select a workspace"}
+          </p>
         </div>
         {selectedMessageSources.length > 0 && (
           <Button
             variant="secondary"
             size="sm"
             onClick={() => setShowSources(!showSources)}
-            className="gap-2"
           >
             <FileCode className="h-4 w-4" />
-            <span>{selectedMessageSources.length} Sources</span>
-            <ChevronRight
-              className={cn(
-                "h-4 w-4 transition-transform duration-200",
-                showSources && "rotate-90"
-              )}
-            />
+            {selectedMessageSources.length} Sources
           </Button>
         )}
       </header>
 
-      {/* Main Content */}
+      {/* Chat Area */}
       <div className="flex flex-1 overflow-hidden">
-        <ScrollArea className="flex-1 px-6 py-6">
-          <div className="mx-auto max-w-3xl space-y-6">
+        <ScrollArea className="flex-1">
+          <div className="max-w-3xl mx-auto px-6 py-6">
             {/* Empty State */}
             {messages.length === 0 && (
-              <div className="flex flex-col items-center justify-center py-16 text-center animate-fade-in">
-                <div className="relative mb-6">
-                  <div className="absolute inset-0 rounded-full bg-gradient-to-r from-accent to-primary opacity-20 blur-xl" />
-                  <div className="relative flex h-20 w-20 items-center justify-center rounded-2xl bg-gradient-to-br from-accent to-primary shadow-glow">
-                    <Code2 className="h-10 w-10 text-white" />
-                  </div>
+              <div className="flex flex-col items-center justify-center py-20 animate-fade-in">
+                <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-surface border border-surface-border mb-6">
+                  <Code2 className="h-8 w-8 text-text-muted" />
                 </div>
                 <h3 className="text-xl font-semibold text-text-primary">
                   Ask about your codebase
                 </h3>
-                <p className="mt-3 max-w-md text-sm text-text-tertiary leading-relaxed">
+                <p className="mt-2 text-sm text-text-tertiary text-center max-w-md">
                   {activeWorkspace
-                    ? "Ask questions about how the code works, find implementations, or understand architecture. Citations link directly to source files."
-                    : "Select or create a workspace, then index your repository to start exploring your code with AI."}
+                    ? "Ask questions about how the code works. Citations link to source files."
+                    : "Select a workspace to start exploring your code with AI."}
                 </p>
+
                 {activeWorkspace && (
-                  <div className="mt-6 flex flex-wrap justify-center gap-2">
-                    {[
-                      "How does authentication work?",
-                      "What is the main entry point?",
-                      "Explain the data models",
-                    ].map((suggestion) => (
+                  <div className="flex flex-wrap justify-center gap-2 mt-6">
+                    {suggestions.map((suggestion) => (
                       <button
                         key={suggestion}
                         onClick={() => setInput(suggestion)}
-                        className="rounded-full bg-surface-raised/50 px-4 py-2 text-xs text-text-tertiary border border-surface-border/30 transition-all hover:bg-surface-raised hover:text-text-secondary hover:border-surface-border-light"
+                        className="flex items-center gap-2 px-4 py-2 rounded-full text-sm text-text-secondary bg-surface border border-surface-border hover:bg-surface-hover hover:text-text-primary hover:border-surface-border-light transition-colors"
                       >
                         {suggestion}
+                        <ArrowRight className="h-3.5 w-3.5" />
                       </button>
                     ))}
                   </div>
@@ -310,83 +295,85 @@ export function ChatArea() {
             )}
 
             {/* Messages */}
-            {messages.map((message, index) => (
-              <div
-                key={message.id}
-                className={cn(
-                  "animate-slide-up",
-                  message.role === "user" && "flex justify-end"
-                )}
-                style={{ animationDelay: `${index * 50}ms` }}
-              >
+            <div className="space-y-6">
+              {messages.map((message, index) => (
                 <div
+                  key={message.id}
                   className={cn(
-                    "relative max-w-[85%] rounded-2xl transition-all",
-                    message.role === "user"
-                      ? "bg-gradient-to-r from-accent to-accent-dark px-5 py-3 text-white shadow-glow-sm"
-                      : "glass-card px-5 py-4"
+                    "animate-slide-up",
+                    message.role === "user" && "flex justify-end"
                   )}
+                  style={{ animationDelay: `${Math.min(index * 30, 150)}ms` }}
                 >
-                  {message.role === "user" ? (
-                    <p className="text-sm leading-relaxed">{message.content}</p>
-                  ) : (
-                    <AssistantContent
-                      content={message.content}
-                      onCitationClick={handleCitationClick}
-                    />
-                  )}
+                  <div
+                    className={cn(
+                      "max-w-[85%] rounded-2xl px-4 py-3",
+                      message.role === "user"
+                        ? "bg-accent text-white"
+                        : "bg-surface border border-surface-border"
+                    )}
+                  >
+                    {message.role === "user" ? (
+                      <p className="text-sm leading-relaxed">{message.content}</p>
+                    ) : (
+                      <AssistantContent
+                        content={message.content}
+                        onCitationClick={handleCitationClick}
+                      />
+                    )}
 
-                  {message.role === "assistant" && message.content && (
-                    <div className="mt-3 flex items-center gap-2 border-t border-surface-border/30 pt-3">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="h-7 text-xs text-text-muted hover:text-text-secondary"
-                        onClick={() => handleCopyMessage(message)}
-                      >
-                        {copiedMessageId === message.id ? (
-                          <>
-                            <Check className="mr-1.5 h-3 w-3 text-success" />
-                            Copied
-                          </>
-                        ) : (
-                          <>
-                            <Copy className="mr-1.5 h-3 w-3" />
-                            Copy
-                          </>
-                        )}
-                      </Button>
-                      {message.sources && message.sources.length > 0 && (
+                    {message.role === "assistant" && message.content && (
+                      <div className="flex items-center gap-2 mt-3 pt-3 border-t border-surface-border">
                         <Button
                           variant="ghost"
                           size="sm"
-                          className="h-7 text-xs text-text-muted hover:text-text-secondary"
-                          onClick={() => {
-                            setSelectedMessageSources(message.sources || []);
-                            setShowSources(true);
-                          }}
+                          className="h-7 text-xs text-text-muted"
+                          onClick={() => handleCopyMessage(message)}
                         >
-                          <FileCode className="mr-1.5 h-3 w-3" />
-                          {message.sources.length} sources
+                          {copiedMessageId === message.id ? (
+                            <>
+                              <Check className="h-3.5 w-3.5 text-success" />
+                              Copied
+                            </>
+                          ) : (
+                            <>
+                              <Copy className="h-3.5 w-3.5" />
+                              Copy
+                            </>
+                          )}
                         </Button>
-                      )}
-                    </div>
-                  )}
+                        {message.sources && message.sources.length > 0 && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-7 text-xs text-text-muted"
+                            onClick={() => {
+                              setSelectedMessageSources(message.sources || []);
+                              setShowSources(true);
+                            }}
+                          >
+                            <FileCode className="h-3.5 w-3.5" />
+                            {message.sources.length} sources
+                          </Button>
+                        )}
+                      </div>
+                    )}
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
 
-            {/* Loading State */}
-            {isAsking && messages[messages.length - 1]?.content === "" && (
-              <div className="flex items-center gap-3 text-sm text-text-tertiary animate-fade-in">
-                <div className="flex gap-1">
-                  <div className="h-2 w-2 rounded-full bg-accent animate-pulse" style={{ animationDelay: "0ms" }} />
-                  <div className="h-2 w-2 rounded-full bg-accent animate-pulse" style={{ animationDelay: "150ms" }} />
-                  <div className="h-2 w-2 rounded-full bg-accent animate-pulse" style={{ animationDelay: "300ms" }} />
+              {/* Loading */}
+              {isAsking && messages[messages.length - 1]?.content === "" && (
+                <div className="flex items-center gap-2 text-sm text-text-muted animate-fade-in">
+                  <div className="flex gap-1">
+                    <div className="h-2 w-2 rounded-full bg-text-muted animate-pulse" />
+                    <div className="h-2 w-2 rounded-full bg-text-muted animate-pulse" style={{ animationDelay: "150ms" }} />
+                    <div className="h-2 w-2 rounded-full bg-text-muted animate-pulse" style={{ animationDelay: "300ms" }} />
+                  </div>
+                  Thinking...
                 </div>
-                <span>Thinking...</span>
-              </div>
-            )}
+              )}
+            </div>
 
             <div ref={bottomRef} />
           </div>
@@ -404,41 +391,32 @@ export function ChatArea() {
         )}
       </div>
 
-      {/* Input Area */}
-      <form
-        onSubmit={handleSubmit}
-        className="border-t border-surface-border/30 p-4 backdrop-blur-sm bg-background/50"
-      >
-        <div className="mx-auto flex max-w-3xl gap-3">
-          <div className="relative flex-1">
+      {/* Input */}
+      <div className="border-t border-surface-border p-4">
+        <form onSubmit={handleSubmit} className="max-w-3xl mx-auto">
+          <div className="flex gap-3">
             <Input
               ref={inputRef}
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              placeholder={
-                activeWorkspace
-                  ? "Ask about your codebase..."
-                  : "Select a workspace first"
-              }
+              placeholder={activeWorkspace ? "Ask about your codebase..." : "Select a workspace first"}
               disabled={isAsking || !activeWorkspace}
-              className="pr-12 h-12 text-base"
-              icon={<MessageSquare className="h-4 w-4" />}
+              className="flex-1 h-12"
             />
+            <Button
+              type="submit"
+              disabled={isAsking || !input.trim() || !activeWorkspace}
+              className="h-12 w-12 shrink-0"
+            >
+              {isAsking ? (
+                <Loader2 className="h-5 w-5 animate-spin" />
+              ) : (
+                <Send className="h-5 w-5" />
+              )}
+            </Button>
           </div>
-          <Button
-            type="submit"
-            disabled={isAsking || !input.trim() || !activeWorkspace}
-            size="lg"
-            className="h-12 w-12 shrink-0"
-          >
-            {isAsking ? (
-              <Loader2 className="h-5 w-5 animate-spin" />
-            ) : (
-              <Send className="h-5 w-5" />
-            )}
-          </Button>
-        </div>
-      </form>
+        </form>
+      </div>
     </div>
   );
 }
@@ -456,16 +434,16 @@ function AssistantContent({
     return (
       <div className="flex items-center gap-2 text-sm text-text-muted">
         <div className="flex gap-1">
-          <div className="h-1.5 w-1.5 rounded-full bg-accent animate-pulse" />
-          <div className="h-1.5 w-1.5 rounded-full bg-accent animate-pulse" style={{ animationDelay: "150ms" }} />
-          <div className="h-1.5 w-1.5 rounded-full bg-accent animate-pulse" style={{ animationDelay: "300ms" }} />
+          <div className="h-1.5 w-1.5 rounded-full bg-text-muted animate-pulse" />
+          <div className="h-1.5 w-1.5 rounded-full bg-text-muted animate-pulse" style={{ animationDelay: "150ms" }} />
+          <div className="h-1.5 w-1.5 rounded-full bg-text-muted animate-pulse" style={{ animationDelay: "300ms" }} />
         </div>
       </div>
     );
   }
 
   return (
-    <div className="prose prose-invert prose-sm max-w-none prose-pre:glass prose-pre:border prose-pre:border-surface-border/30">
+    <div className="prose prose-sm max-w-none text-text-secondary prose-headings:text-text-primary prose-strong:text-text-primary prose-code:text-text-primary">
       {parts.map((part, index) =>
         part.type === "citation" ? (
           <button
@@ -478,7 +456,7 @@ function AssistantContent({
                 part.value.endLine
               )
             }
-            className="mx-0.5 inline-flex items-center gap-1.5 rounded-lg bg-accent-muted px-2 py-1 font-mono text-xs text-accent-light border border-accent/20 hover:bg-accent/20 hover:border-accent/40 transition-all"
+            className="inline-flex items-center gap-1 mx-0.5 px-2 py-0.5 rounded-md text-xs font-medium text-accent bg-accent-muted hover:bg-accent-muted-hover transition-colors"
           >
             <FileCode className="h-3 w-3" />
             {part.value.tag}
@@ -507,44 +485,39 @@ function SourcesPanel({
   onSourceClick: (source: Source) => void;
 }) {
   return (
-    <div className="w-80 border-l border-surface-border/30 bg-background/50 backdrop-blur-sm animate-slide-left">
-      <div className="flex items-center justify-between border-b border-surface-border/30 p-4">
+    <div className="w-80 border-l border-surface-border bg-bg-secondary animate-slide-up">
+      <div className="flex items-center justify-between border-b border-surface-border px-4 py-3">
         <h3 className="text-sm font-semibold text-text-primary">Sources</h3>
         <Button variant="ghost" size="icon-sm" onClick={onClose}>
           <X className="h-4 w-4" />
         </Button>
       </div>
-      <ScrollArea className="h-[calc(100%-57px)]">
-        <div className="space-y-2 p-3">
+      <ScrollArea className="h-[calc(100%-49px)]">
+        <div className="p-3 space-y-2">
           {sources.map((source, index) => (
             <button
               key={`${source.filePath}-${index}`}
               onClick={() => onSourceClick(source)}
-              className="w-full rounded-xl glass-card p-3 text-left transition-all hover:border-accent/30 hover:shadow-glow-sm group"
+              className="w-full text-left rounded-xl bg-surface border border-surface-border p-3 hover:bg-surface-hover hover:border-surface-border-light transition-colors group"
             >
-              <div className="flex items-center gap-2">
-                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-accent-muted">
-                  <FileCode className="h-4 w-4 text-accent" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <span className="block truncate text-sm font-medium text-text-primary group-hover:text-accent-light transition-colors">
-                    {source.filePath.split("/").pop()}
-                  </span>
-                  <span className="text-xs text-text-muted">
-                    Lines {source.startLine}-{source.endLine}
-                  </span>
-                </div>
-                <ExternalLink className="h-4 w-4 text-text-muted opacity-0 group-hover:opacity-100 transition-opacity" />
+              <div className="flex items-center gap-2 mb-1">
+                <FileCode className="h-4 w-4 text-accent shrink-0" />
+                <span className="text-sm font-medium text-text-primary truncate group-hover:text-accent transition-colors">
+                  {source.filePath.split("/").pop()}
+                </span>
               </div>
+              <p className="text-xs text-text-muted">
+                Lines {source.startLine}-{source.endLine}
+              </p>
               {source.score !== undefined && (
-                <div className="mt-2 flex items-center gap-2">
-                  <div className="flex-1 h-1.5 rounded-full bg-surface-raised overflow-hidden">
-                    <div 
-                      className="h-full rounded-full bg-gradient-to-r from-accent to-primary"
+                <div className="flex items-center gap-2 mt-2">
+                  <div className="flex-1 h-1 rounded-full bg-surface-border overflow-hidden">
+                    <div
+                      className="h-full rounded-full bg-accent"
                       style={{ width: `${source.score * 100}%` }}
                     />
                   </div>
-                  <span className="text-[10px] text-text-muted font-medium">
+                  <span className="text-2xs text-text-muted">
                     {(source.score * 100).toFixed(0)}%
                   </span>
                 </div>

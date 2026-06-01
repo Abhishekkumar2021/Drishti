@@ -1,28 +1,25 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import Editor, { Monaco } from "@monaco-editor/react";
 import type { editor } from "monaco-editor";
-import { X, FileCode, Copy, Check, Code2, Maximize2, Minimize2 } from "lucide-react";
-import { useState } from "react";
+import { X, FileCode, Copy, Check, Code2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useAppStore } from "@/lib/storage";
-import { cn } from "@/lib/cn";
 
 export function CodeViewer() {
   const { editor: editorState, setEditor } = useAppStore();
   const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null);
   const [copied, setCopied] = useState(false);
-  const [expanded, setExpanded] = useState(false);
 
   useEffect(() => {
     if (editorRef.current && editorState) {
       const { highlightStart, highlightEnd } = editorState;
-      
+
       editorRef.current.revealLineInCenter(highlightStart);
-      
+
       editorRef.current.setSelection({
         startLineNumber: highlightStart,
         startColumn: 1,
@@ -56,37 +53,38 @@ export function CodeViewer() {
     monaco: Monaco
   ) => {
     editorRef.current = editor;
-    
+
     monaco.editor.defineTheme("drishti-dark", {
       base: "vs-dark",
       inherit: true,
       rules: [
-        { token: "comment", foreground: "6b7280", fontStyle: "italic" },
-        { token: "keyword", foreground: "a78bfa" },
-        { token: "string", foreground: "34d399" },
-        { token: "number", foreground: "f59e0b" },
-        { token: "type", foreground: "60a5fa" },
-        { token: "function", foreground: "f472b6" },
+        { token: "comment", foreground: "525252", fontStyle: "italic" },
+        { token: "keyword", foreground: "c792ea" },
+        { token: "string", foreground: "c3e88d" },
+        { token: "number", foreground: "f78c6c" },
+        { token: "type", foreground: "82aaff" },
+        { token: "function", foreground: "82aaff" },
+        { token: "variable", foreground: "a1a1a1" },
       ],
       colors: {
-        "editor.background": "#0a0f1a",
-        "editor.foreground": "#e2e8f0",
-        "editor.lineHighlightBackground": "#1e293b40",
-        "editor.selectionBackground": "#8b5cf640",
-        "editorLineNumber.foreground": "#475569",
-        "editorLineNumber.activeForeground": "#94a3b8",
-        "editorCursor.foreground": "#8b5cf6",
-        "editor.inactiveSelectionBackground": "#8b5cf620",
-        "editorIndentGuide.background": "#1e293b",
-        "editorIndentGuide.activeBackground": "#334155",
-        "editorWidget.background": "#0f172a",
-        "editorWidget.border": "#334155",
-        "scrollbarSlider.background": "#47556560",
-        "scrollbarSlider.hoverBackground": "#47556580",
-        "scrollbarSlider.activeBackground": "#475565a0",
+        "editor.background": "#0f0f0f",
+        "editor.foreground": "#a1a1a1",
+        "editor.lineHighlightBackground": "#1a1a1a",
+        "editor.selectionBackground": "#6366f130",
+        "editorLineNumber.foreground": "#525252",
+        "editorLineNumber.activeForeground": "#717171",
+        "editorCursor.foreground": "#ffffff",
+        "editor.inactiveSelectionBackground": "#6366f115",
+        "editorIndentGuide.background": "#1a1a1a",
+        "editorIndentGuide.activeBackground": "#2a2a2a",
+        "editorWidget.background": "#141414",
+        "editorWidget.border": "#2a2a2a",
+        "scrollbarSlider.background": "#2a2a2a80",
+        "scrollbarSlider.hoverBackground": "#333333",
+        "scrollbarSlider.activeBackground": "#3a3a3a",
       },
     });
-    
+
     monaco.editor.setTheme("drishti-dark");
   };
 
@@ -99,95 +97,55 @@ export function CodeViewer() {
 
   if (!editorState) {
     return (
-      <div className="flex h-full w-[400px] flex-col items-center justify-center border-l border-surface-border/30 bg-background/50 text-center backdrop-blur-sm">
-        <div className="relative mb-6">
-          <div className="absolute inset-0 rounded-full bg-surface-raised blur-xl" />
-          <div className="relative flex h-16 w-16 items-center justify-center rounded-2xl bg-surface-raised border border-surface-border/30">
-            <Code2 className="h-8 w-8 text-text-muted" />
-          </div>
+      <div className="flex h-full w-96 flex-col items-center justify-center border-l border-surface-border bg-bg-secondary">
+        <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-surface border border-surface-border mb-4">
+          <Code2 className="h-7 w-7 text-text-muted" />
         </div>
-        <h3 className="text-sm font-semibold text-text-secondary">
-          No file selected
-        </h3>
-        <p className="mt-2 max-w-[220px] text-xs text-text-muted leading-relaxed">
-          Click a citation in the chat to view the source code with syntax highlighting.
+        <h3 className="text-sm font-medium text-text-secondary">No file selected</h3>
+        <p className="mt-1 text-xs text-text-muted text-center max-w-[200px]">
+          Click a citation in the chat to view source code
         </p>
       </div>
     );
   }
 
   const fileName = editorState.filePath.split("/").pop();
-  const lineCount = editorState.highlightEnd - editorState.highlightStart + 1;
 
   return (
-    <div 
-      className={cn(
-        "flex h-full flex-col border-l border-surface-border/30 bg-background/50 backdrop-blur-sm transition-all duration-300",
-        expanded ? "w-[700px]" : "w-[500px]"
-      )}
-    >
+    <div className="flex h-full w-[480px] flex-col border-l border-surface-border bg-bg-secondary">
       {/* Header */}
-      <header className="flex items-center justify-between border-b border-surface-border/30 px-4 py-3">
+      <header className="flex items-center justify-between border-b border-surface-border px-4 py-3">
         <div className="flex items-center gap-3 min-w-0">
-          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-accent-muted">
+          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-surface border border-surface-border">
             <FileCode className="h-4 w-4 text-accent" />
           </div>
           <div className="min-w-0">
-            <span className="block truncate text-sm font-semibold text-text-primary">
-              {fileName}
-            </span>
-            <span className="text-xs text-text-muted truncate block">
-              {editorState.filePath}
-            </span>
+            <p className="text-sm font-medium text-text-primary truncate">{fileName}</p>
+            <p className="text-2xs text-text-muted truncate">{editorState.filePath}</p>
           </div>
         </div>
         <div className="flex items-center gap-1">
-          <Button
-            variant="ghost"
-            size="icon-sm"
-            onClick={() => setExpanded(!expanded)}
-            className="text-text-muted hover:text-text-primary"
-          >
-            {expanded ? (
-              <Minimize2 className="h-4 w-4" />
-            ) : (
-              <Maximize2 className="h-4 w-4" />
-            )}
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon-sm"
-            onClick={handleCopy}
-            className="text-text-muted hover:text-text-primary"
-          >
+          <Button variant="ghost" size="icon-sm" onClick={handleCopy}>
             {copied ? (
               <Check className="h-4 w-4 text-success" />
             ) : (
               <Copy className="h-4 w-4" />
             )}
           </Button>
-          <Button
-            variant="ghost"
-            size="icon-sm"
-            onClick={() => setEditor(null)}
-            className="text-text-muted hover:text-text-primary"
-          >
+          <Button variant="ghost" size="icon-sm" onClick={() => setEditor(null)}>
             <X className="h-4 w-4" />
           </Button>
         </div>
       </header>
 
       {/* Info Bar */}
-      <div className="flex items-center gap-3 border-b border-surface-border/30 bg-surface-raised/30 px-4 py-2">
-        <Badge variant="default" className="font-mono">
+      <div className="flex items-center gap-2 border-b border-surface-border bg-surface/50 px-4 py-2">
+        <Badge variant="accent">
           L{editorState.highlightStart}-{editorState.highlightEnd}
         </Badge>
-        <Badge variant="secondary" className="uppercase">
+        <Badge variant="default" className="uppercase">
           {editorState.language}
         </Badge>
-        <span className="text-xs text-text-muted">
-          {lineCount} line{lineCount !== 1 ? "s" : ""} highlighted
-        </span>
       </div>
 
       {/* Editor */}
@@ -200,9 +158,9 @@ export function CodeViewer() {
           loading={
             <div className="flex h-full items-center justify-center">
               <div className="flex gap-1">
-                <div className="h-2 w-2 rounded-full bg-accent animate-pulse" />
-                <div className="h-2 w-2 rounded-full bg-accent animate-pulse" style={{ animationDelay: "150ms" }} />
-                <div className="h-2 w-2 rounded-full bg-accent animate-pulse" style={{ animationDelay: "300ms" }} />
+                <div className="h-2 w-2 rounded-full bg-text-muted animate-pulse" />
+                <div className="h-2 w-2 rounded-full bg-text-muted animate-pulse" style={{ animationDelay: "150ms" }} />
+                <div className="h-2 w-2 rounded-full bg-text-muted animate-pulse" style={{ animationDelay: "300ms" }} />
               </div>
             </div>
           }
@@ -211,15 +169,15 @@ export function CodeViewer() {
             minimap: { enabled: false },
             scrollBeyondLastLine: false,
             fontSize: 13,
-            fontFamily: "'JetBrains Mono', 'Fira Code', 'Cascadia Code', Menlo, Monaco, monospace",
+            fontFamily: "var(--font-mono), 'JetBrains Mono', 'Fira Code', monospace",
             fontLigatures: true,
             lineNumbers: "on",
             renderLineHighlight: "all",
             scrollbar: {
               vertical: "auto",
               horizontal: "auto",
-              verticalScrollbarSize: 8,
-              horizontalScrollbarSize: 8,
+              verticalScrollbarSize: 6,
+              horizontalScrollbarSize: 6,
               useShadows: false,
             },
             overviewRulerLanes: 0,
@@ -228,35 +186,26 @@ export function CodeViewer() {
             guides: {
               indentation: true,
               highlightActiveIndentation: true,
-              bracketPairs: true,
             },
             padding: { top: 16, bottom: 16 },
             smoothScrolling: true,
             cursorBlinking: "smooth",
-            cursorSmoothCaretAnimation: "on",
-            bracketPairColorization: {
-              enabled: true,
-            },
-            renderWhitespace: "selection",
           }}
         />
       </div>
 
       <style jsx global>{`
         .highlighted-line {
-          background: linear-gradient(90deg, rgba(139, 92, 246, 0.15) 0%, rgba(139, 92, 246, 0.05) 100%) !important;
-          border-left: 3px solid #8b5cf6 !important;
+          background-color: rgba(99, 102, 241, 0.1) !important;
+          border-left: 2px solid #6366f1 !important;
         }
         .highlighted-glyph {
-          background: linear-gradient(180deg, #8b5cf6 0%, #7c3aed 100%);
-          width: 3px !important;
+          background-color: #6366f1;
+          width: 2px !important;
           margin-left: 3px;
         }
         .monaco-editor .margin {
           background: transparent !important;
-        }
-        .monaco-editor .monaco-scrollable-element > .scrollbar > .slider {
-          border-radius: 4px;
         }
       `}</style>
     </div>
