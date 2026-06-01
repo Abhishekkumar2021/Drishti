@@ -96,23 +96,13 @@ export function CodeViewer() {
   };
 
   if (!editorState) {
-    return (
-      <div className="flex h-full w-[420px] flex-col items-center justify-center border-l border-surface-border bg-bg">
-        <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-surface border border-surface-border mb-4">
-          <Code2 className="h-7 w-7 text-text-muted" />
-        </div>
-        <h3 className="text-sm font-medium text-text-secondary">No file selected</h3>
-        <p className="mt-1.5 text-xs text-text-muted text-center max-w-[200px]">
-          Click a citation in the chat to view source code
-        </p>
-      </div>
-    );
+    return null;
   }
 
   const fileName = editorState.filePath.split("/").pop();
 
   return (
-    <div className="flex h-full w-[420px] flex-col border-l border-surface-border bg-bg">
+    <div className="flex h-full w-full flex-col border-l border-surface-border bg-bg">
       {/* Header */}
       <header className="flex items-center justify-between border-b border-surface-border h-14 px-4">
         <div className="flex items-center gap-3 min-w-0">

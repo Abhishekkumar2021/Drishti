@@ -208,6 +208,25 @@ input[type="range"]::-moz-range-thumb:hover {
   transform: scale(1.1);
 }
 
+/* Resize Handle */
+[data-panel-resize-handle-enabled] {
+  transition: background-color 0.15s ease;
+}
+
+[data-panel-resize-handle-enabled]:hover,
+[data-panel-resize-handle-enabled][data-resize-handle-state="hover"] {
+  background-color: rgba(99, 102, 241, 0.15);
+}
+
+[data-panel-resize-handle-enabled][data-resize-handle-state="drag"] {
+  background-color: rgba(99, 102, 241, 0.25);
+}
+
+/* Panel animations */
+[data-panel] {
+  transition: flex 0.1s ease-out;
+}
+
 /* Responsive utilities */
 @media (max-width: 1024px) {
   .sidebar-responsive {
@@ -225,4 +244,25 @@ input[type="range"]::-moz-range-thumb:hover {
   .code-viewer-responsive.open {
     @apply translate-x-0;
   }
+}
+
+/* Focus visible */
+:focus-visible {
+  @apply outline-none ring-2 ring-accent/50 ring-offset-2 ring-offset-bg;
+}
+
+button:focus-visible {
+  @apply outline-none ring-2 ring-accent/50;
+}
+
+/* Smooth transitions */
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Better text rendering */
+body {
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }

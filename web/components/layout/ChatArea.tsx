@@ -233,7 +233,7 @@ export function ChatArea() {
   ];
 
   return (
-    <div className="flex flex-1 flex-col min-w-0 bg-bg">
+    <div className="flex h-full w-full flex-col min-w-0 bg-bg">
       {/* Header */}
       <header className="flex items-center justify-between border-b border-surface-border h-14 px-6">
         <div>
@@ -485,8 +485,8 @@ function SourcesPanel({
   onSourceClick: (source: Source) => void;
 }) {
   return (
-    <div className="w-72 border-l border-surface-border bg-bg flex flex-col">
-      <div className="flex items-center justify-between border-b border-surface-border h-14 px-4">
+    <div className="w-80 shrink-0 border-l border-surface-border bg-bg-secondary flex flex-col">
+      <div className="flex items-center justify-between border-b border-surface-border h-14 px-4 shrink-0">
         <h3 className="text-sm font-semibold text-text-primary">Sources</h3>
         <Button variant="ghost" size="icon-sm" onClick={onClose}>
           <X className="h-4 w-4" />
@@ -500,24 +500,27 @@ function SourcesPanel({
               onClick={() => onSourceClick(source)}
               className="w-full text-left rounded-xl bg-surface border border-surface-border p-3 hover:bg-surface-hover hover:border-surface-border-light transition-colors group"
             >
-              <div className="flex items-center gap-2 mb-1">
+              <div className="flex items-center gap-2 mb-1 overflow-hidden">
                 <FileCode className="h-4 w-4 text-accent shrink-0" />
                 <span className="text-sm font-medium text-text-primary truncate group-hover:text-accent transition-colors">
                   {source.filePath.split("/").pop()}
                 </span>
               </div>
-              <p className="text-xs text-text-muted pl-6">
+              <p className="text-xs text-text-muted pl-6 truncate" title={source.filePath}>
+                {source.filePath}
+              </p>
+              <p className="text-xs text-text-tertiary pl-6 mt-0.5">
                 Lines {source.startLine}-{source.endLine}
               </p>
               {source.score !== undefined && (
                 <div className="flex items-center gap-2 mt-2 pl-6">
-                  <div className="flex-1 h-1 rounded-full bg-surface-border overflow-hidden">
+                  <div className="flex-1 h-1.5 rounded-full bg-surface-border overflow-hidden">
                     <div
-                      className="h-full rounded-full bg-accent"
+                      className="h-full rounded-full bg-accent transition-all"
                       style={{ width: `${source.score * 100}%` }}
                     />
                   </div>
-                  <span className="text-2xs text-text-muted">
+                  <span className="text-2xs text-text-muted font-medium">
                     {(source.score * 100).toFixed(0)}%
                   </span>
                 </div>
