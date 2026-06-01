@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useRef, useState, useEffect } from "react";
+import { FormEvent, useRef, useState, useEffect, useMemo } from "react";
 import ReactMarkdown from "react-markdown";
 import rehypeHighlight from "rehype-highlight";
 import remarkGfm from "remark-gfm";
@@ -10,7 +10,6 @@ import {
   Loader2,
   Copy,
   Check,
-  Sparkles,
   Code2,
   X,
   ArrowRight,
@@ -19,7 +18,6 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/cn";
 import {
   useAppStore,
@@ -119,7 +117,7 @@ export function ChatArea() {
 
   const activeThread = getActiveThread();
   const activeWorkspace = getActiveWorkspace();
-  const messages = activeThread?.messages || [];
+  const messages = useMemo(() => activeThread?.messages || [], [activeThread?.messages]);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -237,12 +235,12 @@ export function ChatArea() {
   return (
     <div className="flex flex-1 flex-col min-w-0 bg-bg">
       {/* Header */}
-      <header className="flex items-center justify-between border-b border-surface-border px-6 py-4">
+      <header className="flex items-center justify-between border-b border-surface-border h-14 px-6">
         <div>
           <h2 className="text-sm font-semibold text-text-primary">
             {activeThread?.title || "New Conversation"}
           </h2>
-          <p className="text-xs text-text-muted mt-0.5">
+          <p className="text-xs text-text-muted">
             {activeWorkspace ? `Querying ${activeWorkspace.name}` : "Select a workspace"}
           </p>
         </div>
@@ -260,124 +258,153 @@ export function ChatArea() {
 
       {/* Chat Area */}
       <div className="flex flex-1 overflow-hidden">
-        <ScrollArea className="flex-1">
-          <div className="max-w-3xl mx-auto px-6 py-6">
-            {/* Empty State */}
-            {messages.length === 0 && (
-              <div className="flex flex-col items-center justify-center py-20 animate-fade-in">
-                <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-surface border border-surface-border mb-6">
-                  <Code2 className="h-8 w-8 text-text-muted" />
-                </div>
-                <h3 className="text-xl font-semibold text-text-primary">
-                  Ask about your codebase
-                </h3>
-                <p className="mt-2 text-sm text-text-tertiary text-center max-w-md">
-                  {activeWorkspace
-                    ? "Ask questions about how the code works. Citations link to source files."
-                    : "Select a workspace to start exploring your code with AI."}
-                </p>
-
-                {activeWorkspace && (
-                  <div className="flex flex-wrap justify-center gap-2 mt-6">
-                    {suggestions.map((suggestion) => (
-                      <button
-                        key={suggestion}
-                        onClick={() => setInput(suggestion)}
-                        className="flex items-center gap-2 px-4 py-2 rounded-full text-sm text-text-secondary bg-surface border border-surface-border hover:bg-surface-hover hover:text-text-primary hover:border-surface-border-light transition-colors"
-                      >
-                        {suggestion}
-                        <ArrowRight className="h-3.5 w-3.5" />
-                      </button>
-                    ))}
+        <div className="flex-1 flex flex-col">
+          <ScrollArea className="flex-1">
+            <div className="max-w-3xl mx-auto px-6 py-6">
+              {/* Empty State */}
+              {messages.length === 0 && (
+                <div className="flex flex-col items-center justify-center py-16 animate-fade-in">
+                  <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-surface border border-surface-border mb-5">
+                    <Code2 className="h-7 w-7 text-text-muted" />
                   </div>
-                )}
-              </div>
-            )}
+                  <h3 className="text-lg font-semibold text-text-primary">
+                    Ask about your codebase
+                  </h3>
+                  <p className="mt-2 text-sm text-text-tertiary text-center max-w-md">
+                    {activeWorkspace
+                      ? "Ask questions about how the code works. Citations link to source files."
+                      : "Select a workspace to start exploring your code with AI."}
+                  </p>
 
-            {/* Messages */}
-            <div className="space-y-6">
-              {messages.map((message, index) => (
-                <div
-                  key={message.id}
-                  className={cn(
-                    "animate-slide-up",
-                    message.role === "user" && "flex justify-end"
-                  )}
-                  style={{ animationDelay: `${Math.min(index * 30, 150)}ms` }}
-                >
-                  <div
-                    className={cn(
-                      "max-w-[85%] rounded-2xl px-4 py-3",
-                      message.role === "user"
-                        ? "bg-accent text-white"
-                        : "bg-surface border border-surface-border"
-                    )}
-                  >
-                    {message.role === "user" ? (
-                      <p className="text-sm leading-relaxed">{message.content}</p>
-                    ) : (
-                      <AssistantContent
-                        content={message.content}
-                        onCitationClick={handleCitationClick}
-                      />
-                    )}
-
-                    {message.role === "assistant" && message.content && (
-                      <div className="flex items-center gap-2 mt-3 pt-3 border-t border-surface-border">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="h-7 text-xs text-text-muted"
-                          onClick={() => handleCopyMessage(message)}
+                  {activeWorkspace && (
+                    <div className="flex flex-wrap justify-center gap-2 mt-6">
+                      {suggestions.map((suggestion) => (
+                        <button
+                          key={suggestion}
+                          onClick={() => setInput(suggestion)}
+                          className="flex items-center gap-2 px-4 py-2 rounded-full text-sm text-text-secondary bg-surface border border-surface-border hover:bg-surface-hover hover:text-text-primary hover:border-surface-border-light transition-colors"
                         >
-                          {copiedMessageId === message.id ? (
-                            <>
-                              <Check className="h-3.5 w-3.5 text-success" />
-                              Copied
-                            </>
-                          ) : (
-                            <>
-                              <Copy className="h-3.5 w-3.5" />
-                              Copy
-                            </>
-                          )}
-                        </Button>
-                        {message.sources && message.sources.length > 0 && (
+                          {suggestion}
+                          <ArrowRight className="h-3.5 w-3.5" />
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Messages */}
+              <div className="space-y-5">
+                {messages.map((message, index) => (
+                  <div
+                    key={message.id}
+                    className={cn(
+                      "animate-slide-up",
+                      message.role === "user" && "flex justify-end"
+                    )}
+                    style={{ animationDelay: `${Math.min(index * 30, 150)}ms` }}
+                  >
+                    <div
+                      className={cn(
+                        "max-w-[85%] rounded-2xl px-4 py-3",
+                        message.role === "user"
+                          ? "bg-accent text-white"
+                          : "bg-surface border border-surface-border"
+                      )}
+                    >
+                      {message.role === "user" ? (
+                        <p className="text-sm leading-relaxed">{message.content}</p>
+                      ) : (
+                        <AssistantContent
+                          content={message.content}
+                          onCitationClick={handleCitationClick}
+                        />
+                      )}
+
+                      {message.role === "assistant" && message.content && (
+                        <div className="flex items-center gap-1 mt-3 pt-3 border-t border-surface-border">
                           <Button
                             variant="ghost"
                             size="sm"
-                            className="h-7 text-xs text-text-muted"
-                            onClick={() => {
-                              setSelectedMessageSources(message.sources || []);
-                              setShowSources(true);
-                            }}
+                            className="h-7 text-xs text-text-muted hover:text-text-secondary"
+                            onClick={() => handleCopyMessage(message)}
                           >
-                            <FileCode className="h-3.5 w-3.5" />
-                            {message.sources.length} sources
+                            {copiedMessageId === message.id ? (
+                              <>
+                                <Check className="h-3.5 w-3.5 text-success" />
+                                Copied
+                              </>
+                            ) : (
+                              <>
+                                <Copy className="h-3.5 w-3.5" />
+                                Copy
+                              </>
+                            )}
                           </Button>
-                        )}
-                      </div>
-                    )}
+                          {message.sources && message.sources.length > 0 && (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="h-7 text-xs text-text-muted hover:text-text-secondary"
+                              onClick={() => {
+                                setSelectedMessageSources(message.sources || []);
+                                setShowSources(true);
+                              }}
+                            >
+                              <FileCode className="h-3.5 w-3.5" />
+                              {message.sources.length} sources
+                            </Button>
+                          )}
+                        </div>
+                      )}
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))}
 
-              {/* Loading */}
-              {isAsking && messages[messages.length - 1]?.content === "" && (
-                <div className="flex items-center gap-2 text-sm text-text-muted animate-fade-in">
-                  <div className="flex gap-1">
-                    <div className="h-2 w-2 rounded-full bg-text-muted animate-pulse" />
-                    <div className="h-2 w-2 rounded-full bg-text-muted animate-pulse" style={{ animationDelay: "150ms" }} />
-                    <div className="h-2 w-2 rounded-full bg-text-muted animate-pulse" style={{ animationDelay: "300ms" }} />
+                {/* Loading */}
+                {isAsking && messages[messages.length - 1]?.content === "" && (
+                  <div className="flex items-center gap-2 text-sm text-text-muted animate-fade-in">
+                    <div className="flex gap-1">
+                      <div className="h-2 w-2 rounded-full bg-text-muted animate-pulse" />
+                      <div className="h-2 w-2 rounded-full bg-text-muted animate-pulse" style={{ animationDelay: "150ms" }} />
+                      <div className="h-2 w-2 rounded-full bg-text-muted animate-pulse" style={{ animationDelay: "300ms" }} />
+                    </div>
+                    Thinking...
                   </div>
-                  Thinking...
-                </div>
-              )}
+                )}
+              </div>
+
+              <div ref={bottomRef} />
             </div>
+          </ScrollArea>
 
-            <div ref={bottomRef} />
+          {/* Input - aligned with chat content */}
+          <div className="border-t border-surface-border bg-bg">
+            <div className="max-w-3xl mx-auto px-6 py-4">
+              <form onSubmit={handleSubmit} className="flex gap-3">
+                <Input
+                  ref={inputRef}
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  placeholder={activeWorkspace ? "Ask about your codebase..." : "Select a workspace first"}
+                  disabled={isAsking || !activeWorkspace}
+                  className="flex-1 h-11"
+                />
+                <Button
+                  type="submit"
+                  disabled={isAsking || !input.trim() || !activeWorkspace}
+                  className="h-11 w-11 shrink-0"
+                >
+                  {isAsking ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Send className="h-4 w-4" />
+                  )}
+                </Button>
+              </form>
+            </div>
           </div>
-        </ScrollArea>
+        </div>
 
         {/* Sources Panel */}
         {showSources && selectedMessageSources.length > 0 && (
@@ -389,33 +416,6 @@ export function ChatArea() {
             }
           />
         )}
-      </div>
-
-      {/* Input */}
-      <div className="border-t border-surface-border p-4">
-        <form onSubmit={handleSubmit} className="max-w-3xl mx-auto">
-          <div className="flex gap-3">
-            <Input
-              ref={inputRef}
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              placeholder={activeWorkspace ? "Ask about your codebase..." : "Select a workspace first"}
-              disabled={isAsking || !activeWorkspace}
-              className="flex-1 h-12"
-            />
-            <Button
-              type="submit"
-              disabled={isAsking || !input.trim() || !activeWorkspace}
-              className="h-12 w-12 shrink-0"
-            >
-              {isAsking ? (
-                <Loader2 className="h-5 w-5 animate-spin" />
-              ) : (
-                <Send className="h-5 w-5" />
-              )}
-            </Button>
-          </div>
-        </form>
       </div>
     </div>
   );
@@ -485,14 +485,14 @@ function SourcesPanel({
   onSourceClick: (source: Source) => void;
 }) {
   return (
-    <div className="w-80 border-l border-surface-border bg-bg-secondary animate-slide-up">
-      <div className="flex items-center justify-between border-b border-surface-border px-4 py-3">
+    <div className="w-72 border-l border-surface-border bg-bg flex flex-col">
+      <div className="flex items-center justify-between border-b border-surface-border h-14 px-4">
         <h3 className="text-sm font-semibold text-text-primary">Sources</h3>
         <Button variant="ghost" size="icon-sm" onClick={onClose}>
           <X className="h-4 w-4" />
         </Button>
       </div>
-      <ScrollArea className="h-[calc(100%-49px)]">
+      <ScrollArea className="flex-1">
         <div className="p-3 space-y-2">
           {sources.map((source, index) => (
             <button
@@ -506,11 +506,11 @@ function SourcesPanel({
                   {source.filePath.split("/").pop()}
                 </span>
               </div>
-              <p className="text-xs text-text-muted">
+              <p className="text-xs text-text-muted pl-6">
                 Lines {source.startLine}-{source.endLine}
               </p>
               {source.score !== undefined && (
-                <div className="flex items-center gap-2 mt-2">
+                <div className="flex items-center gap-2 mt-2 pl-6">
                   <div className="flex-1 h-1 rounded-full bg-surface-border overflow-hidden">
                     <div
                       className="h-full rounded-full bg-accent"

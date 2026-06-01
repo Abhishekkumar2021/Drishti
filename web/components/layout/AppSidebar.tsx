@@ -116,12 +116,12 @@ export function AppSidebar() {
     <TooltipProvider delayDuration={0}>
       <aside className="flex h-full w-72 flex-col bg-bg-secondary border-r border-surface-border">
         {/* Header */}
-        <div className="flex items-center gap-3 px-5 py-4 border-b border-surface-border">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-accent">
-            <Layers className="h-5 w-5 text-white" />
+        <div className="flex items-center gap-3 h-14 px-4 border-b border-surface-border">
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-accent">
+            <Layers className="h-4 w-4 text-white" />
           </div>
           <div>
-            <h1 className="text-base font-semibold text-text-primary">Drishti</h1>
+            <h1 className="text-sm font-semibold text-text-primary">Drishti</h1>
             <p className="text-2xs text-text-muted">Code Intelligence</p>
           </div>
         </div>

@@ -97,12 +97,12 @@ export function CodeViewer() {
 
   if (!editorState) {
     return (
-      <div className="flex h-full w-96 flex-col items-center justify-center border-l border-surface-border bg-bg-secondary">
+      <div className="flex h-full w-[420px] flex-col items-center justify-center border-l border-surface-border bg-bg">
         <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-surface border border-surface-border mb-4">
           <Code2 className="h-7 w-7 text-text-muted" />
         </div>
         <h3 className="text-sm font-medium text-text-secondary">No file selected</h3>
-        <p className="mt-1 text-xs text-text-muted text-center max-w-[200px]">
+        <p className="mt-1.5 text-xs text-text-muted text-center max-w-[200px]">
           Click a citation in the chat to view source code
         </p>
       </div>
@@ -112,9 +112,9 @@ export function CodeViewer() {
   const fileName = editorState.filePath.split("/").pop();
 
   return (
-    <div className="flex h-full w-[480px] flex-col border-l border-surface-border bg-bg-secondary">
+    <div className="flex h-full w-[420px] flex-col border-l border-surface-border bg-bg">
       {/* Header */}
-      <header className="flex items-center justify-between border-b border-surface-border px-4 py-3">
+      <header className="flex items-center justify-between border-b border-surface-border h-14 px-4">
         <div className="flex items-center gap-3 min-w-0">
           <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-surface border border-surface-border">
             <FileCode className="h-4 w-4 text-accent" />
@@ -139,7 +139,7 @@ export function CodeViewer() {
       </header>
 
       {/* Info Bar */}
-      <div className="flex items-center gap-2 border-b border-surface-border bg-surface/50 px-4 py-2">
+      <div className="flex items-center gap-2 border-b border-surface-border bg-surface/30 px-4 py-2">
         <Badge variant="accent">
           L{editorState.highlightStart}-{editorState.highlightEnd}
         </Badge>
@@ -156,7 +156,7 @@ export function CodeViewer() {
           value={editorState.content}
           onMount={handleEditorMount}
           loading={
-            <div className="flex h-full items-center justify-center">
+            <div className="flex h-full items-center justify-center bg-bg">
               <div className="flex gap-1">
                 <div className="h-2 w-2 rounded-full bg-text-muted animate-pulse" />
                 <div className="h-2 w-2 rounded-full bg-text-muted animate-pulse" style={{ animationDelay: "150ms" }} />
@@ -187,7 +187,7 @@ export function CodeViewer() {
               indentation: true,
               highlightActiveIndentation: true,
             },
-            padding: { top: 16, bottom: 16 },
+            padding: { top: 12, bottom: 12 },
             smoothScrolling: true,
             cursorBlinking: "smooth",
           }}
