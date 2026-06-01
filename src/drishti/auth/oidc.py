@@ -133,7 +133,8 @@ class GoogleOIDCProvider(OIDCProvider):
                 },
             )
             response.raise_for_status()
-            return response.json()
+            result: dict[str, Any] = response.json()
+            return result
 
     async def get_user_info(self, access_token: str) -> AuthUser:
         async with httpx.AsyncClient() as client:
@@ -208,7 +209,8 @@ class GitHubOIDCProvider(OIDCProvider):
                 headers={"Accept": "application/json"},
             )
             response.raise_for_status()
-            return response.json()
+            result: dict[str, Any] = response.json()
+            return result
 
     async def get_user_info(self, access_token: str) -> AuthUser:
         async with httpx.AsyncClient() as client:

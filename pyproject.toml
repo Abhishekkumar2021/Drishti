@@ -309,6 +309,16 @@ disable_error_code = ["call-arg", "no-untyped-call", "import-untyped", "unused-i
 module = ["benchmarks.*"]
 ignore_errors = true
 
+[[tool.mypy.overrides]]
+module = [
+    "opentelemetry.*",
+]
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = ["drishti.auth.oidc"]
+disallow_any_generics = false
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 asyncio_mode = "auto"
