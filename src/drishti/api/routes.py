@@ -363,7 +363,7 @@ async def analyze_impact(
     if graph_client is None:
         raise DrishtiError(
             "Graph database is not enabled. Set NEO4J_ENABLED=true in environment.",
-            error_code="GRAPH_DISABLED",
+            code="GRAPH_DISABLED",
         )
 
     await graph_client.connect()
@@ -377,7 +377,7 @@ async def analyze_impact(
     if result is None:
         raise DrishtiError(
             f"No symbol found at {body.file_path}:{body.line_number}",
-            error_code="SYMBOL_NOT_FOUND",
+            code="SYMBOL_NOT_FOUND",
         )
 
     target = AffectedNode(
@@ -417,7 +417,7 @@ async def get_graph_stats(request: Request) -> GraphStatsResponse:
     if graph_client is None:
         raise DrishtiError(
             "Graph database is not enabled. Set NEO4J_ENABLED=true in environment.",
-            error_code="GRAPH_DISABLED",
+            code="GRAPH_DISABLED",
         )
 
     await graph_client.connect()

@@ -8,7 +8,7 @@ from __future__ import annotations
 
 import logging
 from pathlib import Path
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from drishti.graph.models import (
     ClassNode,
@@ -17,7 +17,7 @@ from drishti.graph.models import (
     MethodNode,
     RelationType,
 )
-from drishti.utils.language import detect_language
+from drishti.utils.language import LanguageRegistry
 
 if TYPE_CHECKING:
     from collections.abc import Iterator
@@ -57,7 +57,7 @@ class GraphBuilder:
         Returns:
             Statistics about nodes created.
         """
-        language = detect_language(file_path)
+        language = LanguageRegistry().detect(file_path) or "unknown"
         if language == "unknown":
             logger.debug("Skipping unknown language file: %s", file_path)
             return {"skipped": 1}
@@ -116,20 +116,22 @@ class GraphBuilder:
         Returns:
             Aggregate statistics.
         """
-        from drishti.ingestion.gitignore import should_ignore
+        from drishti.ingestion.gitignore import GitignoreMatcher
 
         if extensions is None:
             extensions = [".py", ".java", ".ts", ".tsx", ".js", ".jsx", ".go"]
 
         root = Path(directory)
         total_stats: dict[str, int] = {}
+        matcher = GitignoreMatcher(root)
 
         for file_path in root.rglob("*"):
             if not file_path.is_file():
                 continue
             if file_path.suffix not in extensions:
                 continue
-            if should_ignore(str(file_path), str(root)):
+            rel_path = file_path.relative_to(root).as_posix()
+            if matcher.is_ignored(rel_path):
                 continue
 
             try:
@@ -148,32 +150,47 @@ class GraphBuilder:
         try:
             from tree_sitter import Language, Parser
 
-            if language == "python":
-                import tree_sitter_python as ts_lang
-            elif language == "java":
-                import tree_sitter_java as ts_lang
-            elif language in ("typescript", "tsx"):
-                import tree_sitter_typescript as ts_lang
-            elif language in ("javascript", "jsx"):
-                import tree_sitter_javascript as ts_lang
-            elif language == "go":
-                import tree_sitter_go as ts_lang
-            else:
+            ts_module = self._get_tree_sitter_module(language)
+            if ts_module is None:
                 return None
 
-            lang = Language(ts_lang.language())
+            lang = Language(ts_module.language())
             parser = Parser(lang)
             return parser
         except ImportError:
             logger.warning("Tree-sitter language not available: %s", language)
             return None
 
+    def _get_tree_sitter_module(self, language: str) -> Any:
+        """Get the tree-sitter language module for the given language."""
+        if language == "python":
+            import tree_sitter_python
+
+            return tree_sitter_python
+        if language == "java":
+            import tree_sitter_java
+
+            return tree_sitter_java
+        if language in ("typescript", "tsx"):
+            import tree_sitter_typescript
+
+            return tree_sitter_typescript
+        if language in ("javascript", "jsx"):
+            import tree_sitter_javascript
+
+            return tree_sitter_javascript
+        if language == "go":
+            import tree_sitter_go
+
+            return tree_sitter_go
+        return None
+
     def _extract_package(self, file_path: str, language: str) -> str | None:
         """Extract package name from file path."""
         path = Path(file_path)
 
         if language == "python":
-            parts = []
+            parts: list[str] = []
             current = path.parent
             while current.name and (current / "__init__.py").exists():
                 parts.insert(0, current.name)
