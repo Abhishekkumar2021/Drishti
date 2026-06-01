@@ -126,9 +126,31 @@ docker-clean: ## Stop infrastructure and delete volumes
 seed: ## Index sample codebase for demo
 	uv run python scripts/seed.py
 
-benchmark: ## Run RAG evaluation benchmarks (EPIC-11 — not yet implemented)
-	@echo "Benchmark scripts are planned in EPIC-11. See benchmarks/README.md."
-	@exit 1
+benchmark: ## Run full RAG evaluation (requires running API)
+	@echo "🔬 Running Drishti RAG Evaluation..."
+	uv run python -m benchmarks.runner --strategy ast
+	@echo ""
+	@echo "📊 Results saved to benchmarks/results/"
+
+benchmark-quick: ## Run quick evaluation (10 questions)
+	uv run python -m benchmarks.runner --strategy ast --max-questions 10
+
+benchmark-retrieval: ## Run retrieval-only evaluation
+	uv run python -m benchmarks.eval_retrieval
+
+benchmark-generation: ## Run generation-only evaluation
+	uv run python -m benchmarks.eval_generation
+
+benchmark-compare: ## Compare AST vs Naive chunking (requires both reports)
+	@echo "Comparing evaluation reports..."
+	@if ls benchmarks/results/eval_ast_*.json 1>/dev/null 2>&1 && ls benchmarks/results/eval_naive_*.json 1>/dev/null 2>&1; then \
+		uv run python -m benchmarks.compare \
+			--ast-report "$$(ls -t benchmarks/results/eval_ast_*.json | head -1)" \
+			--naive-report "$$(ls -t benchmarks/results/eval_naive_*.json | head -1)"; \
+	else \
+		echo "❌ Missing evaluation reports. Run 'make benchmark' with both strategies first."; \
+		exit 1; \
+	fi
 
 # ═══════════════════════════════════════
 # Pre-Commit Workflow
