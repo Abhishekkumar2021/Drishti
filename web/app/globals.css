@@ -8,18 +8,143 @@
   color-scheme: dark;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 body {
-  @apply bg-surface text-slate-100 antialiased;
+  @apply bg-background text-text-primary antialiased;
+  background-image: 
+    radial-gradient(at 40% 20%, rgba(139, 92, 246, 0.08) 0px, transparent 50%),
+    radial-gradient(at 80% 0%, rgba(59, 130, 246, 0.06) 0px, transparent 50%),
+    radial-gradient(at 0% 50%, rgba(139, 92, 246, 0.06) 0px, transparent 50%),
+    radial-gradient(at 100% 100%, rgba(59, 130, 246, 0.04) 0px, transparent 50%);
+  background-attachment: fixed;
+}
+
+@layer base {
+  * {
+    @apply border-surface-border;
+  }
+
+  ::selection {
+    @apply bg-accent/30 text-white;
+  }
+}
+
+@layer components {
+  .glass {
+    @apply bg-surface backdrop-blur-xl border border-surface-border-light shadow-glass;
+    background-image: linear-gradient(135deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0) 100%);
+  }
+
+  .glass-subtle {
+    @apply bg-surface/40 backdrop-blur-md border border-surface-border/50;
+  }
+
+  .glass-solid {
+    @apply bg-surface-solid/90 backdrop-blur-lg border border-surface-border shadow-glass-sm;
+  }
+
+  .glass-card {
+    @apply glass rounded-2xl p-4 transition-all duration-300;
+  }
+
+  .glass-card:hover {
+    @apply border-surface-border-light shadow-glow-sm;
+  }
+
+  .glow-accent {
+    @apply shadow-glow;
+  }
+
+  .text-gradient {
+    @apply bg-gradient-to-r from-accent-light via-primary-light to-accent bg-clip-text text-transparent;
+  }
+
+  .border-gradient {
+    position: relative;
+  }
+
+  .border-gradient::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.5), rgba(59, 130, 246, 0.3), rgba(139, 92, 246, 0.2));
+    -webkit-mask: 
+      linear-gradient(#fff 0 0) content-box,
+      linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+  }
+
+  .input-glass {
+    @apply w-full rounded-xl bg-surface-raised/50 px-4 py-3 text-sm text-text-primary 
+           placeholder:text-text-muted border border-surface-border/50 
+           focus:border-accent/50 focus:outline-none focus:ring-2 focus:ring-accent/20
+           transition-all duration-200 backdrop-blur-sm;
+  }
+
+  .btn-primary {
+    @apply inline-flex items-center justify-center rounded-xl px-4 py-2.5 text-sm font-medium
+           bg-gradient-to-r from-accent to-primary text-white
+           hover:from-accent-light hover:to-primary-light
+           focus:outline-none focus:ring-2 focus:ring-accent/50 focus:ring-offset-2 focus:ring-offset-background
+           transition-all duration-200 shadow-glow-sm hover:shadow-glow
+           disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-none;
+  }
+
+  .btn-secondary {
+    @apply inline-flex items-center justify-center rounded-xl px-4 py-2.5 text-sm font-medium
+           bg-surface-raised/80 text-text-secondary border border-surface-border/50
+           hover:bg-surface-elevated hover:text-text-primary hover:border-surface-border-light
+           focus:outline-none focus:ring-2 focus:ring-accent/30
+           transition-all duration-200 backdrop-blur-sm;
+  }
+
+  .btn-ghost {
+    @apply inline-flex items-center justify-center rounded-lg px-3 py-2 text-sm font-medium
+           text-text-tertiary hover:text-text-primary hover:bg-surface-raised/50
+           focus:outline-none focus:ring-2 focus:ring-accent/20
+           transition-all duration-200;
+  }
+}
+
+@layer utilities {
+  .animate-in {
+    animation: fade-in 0.3s ease-out, slide-up 0.3s ease-out;
+  }
+  
+  .animate-out {
+    animation: fade-out 0.3s ease-out;
+  }
+
+  .scrollbar-thin {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(71, 85, 105, 0.5) transparent;
+  }
+
+  .scrollbar-none {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .scrollbar-none::-webkit-scrollbar {
+    display: none;
+  }
 }
 
 * {
   scrollbar-width: thin;
-  scrollbar-color: #1e2937 transparent;
+  scrollbar-color: rgba(71, 85, 105, 0.5) transparent;
 }
 
 *::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
 }
 
 *::-webkit-scrollbar-track {
@@ -27,24 +152,24 @@ body {
 }
 
 *::-webkit-scrollbar-thumb {
-  background-color: #1e2937;
-  border-radius: 4px;
+  background-color: rgba(71, 85, 105, 0.5);
+  border-radius: 3px;
 }
 
 *::-webkit-scrollbar-thumb:hover {
-  background-color: #2d3a4f;
+  background-color: rgba(71, 85, 105, 0.7);
 }
 
 .hljs {
-  @apply rounded-lg bg-surface-raised p-3 text-sm;
+  @apply rounded-xl bg-surface-solid/80 p-4 text-sm backdrop-blur-sm border border-surface-border/30;
 }
 
 .prose pre {
-  @apply bg-surface-raised border border-surface-border;
+  @apply bg-surface-solid/80 border border-surface-border/30 rounded-xl backdrop-blur-sm;
 }
 
 .prose code:not(pre code) {
-  @apply bg-surface-raised px-1.5 py-0.5 rounded text-accent-light text-sm;
+  @apply bg-accent-muted px-2 py-1 rounded-lg text-accent-light text-sm font-medium;
 }
 
 .prose code:not(pre code)::before,
@@ -52,12 +177,58 @@ body {
   content: none;
 }
 
-@layer utilities {
-  .animate-in {
-    animation: fade-in 0.2s ease-out;
+.prose a {
+  @apply text-accent-light hover:text-accent transition-colors no-underline hover:underline;
+}
+
+.prose strong {
+  @apply text-text-primary font-semibold;
+}
+
+.prose h1, .prose h2, .prose h3, .prose h4 {
+  @apply text-text-primary font-semibold;
+}
+
+.prose ul, .prose ol {
+  @apply text-text-secondary;
+}
+
+.prose blockquote {
+  @apply border-l-accent/50 bg-surface-raised/30 rounded-r-lg py-1;
+}
+
+input[type="range"] {
+  @apply appearance-none bg-transparent cursor-pointer;
+}
+
+input[type="range"]::-webkit-slider-track {
+  @apply h-2 rounded-full bg-surface-raised;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  @apply appearance-none w-4 h-4 rounded-full bg-accent shadow-glow-sm cursor-pointer
+         -mt-1 transition-all hover:scale-110;
+}
+
+input[type="range"]::-moz-range-track {
+  @apply h-2 rounded-full bg-surface-raised;
+}
+
+input[type="range"]::-moz-range-thumb {
+  @apply w-4 h-4 rounded-full bg-accent shadow-glow-sm cursor-pointer border-none
+         transition-all hover:scale-110;
+}
+
+@keyframes gradient-shift {
+  0%, 100% {
+    background-position: 0% 50%;
   }
-  
-  .animate-out {
-    animation: fade-out 0.2s ease-out;
+  50% {
+    background-position: 100% 50%;
   }
+}
+
+.animate-gradient {
+  background-size: 200% 200%;
+  animation: gradient-shift 8s ease infinite;
 }

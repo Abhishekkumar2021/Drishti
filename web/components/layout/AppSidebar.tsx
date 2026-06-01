@@ -9,15 +9,26 @@ import {
   FolderOpen,
   Brain,
   Upload,
-  MoreHorizontal,
   Pencil,
   Check,
   X,
+  Sparkles,
+  ChevronRight,
+  Zap,
+  Database,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Badge } from "@/components/ui/badge";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   Tooltip,
   TooltipContent,
@@ -101,45 +112,62 @@ export function AppSidebar() {
 
   return (
     <TooltipProvider delayDuration={0}>
-      <aside className="flex h-full w-64 flex-col border-r border-surface-border bg-surface-raised">
-        <div className="flex items-center justify-between border-b border-surface-border p-4">
-          <div>
-            <h1 className="text-lg font-semibold text-white">Drishti</h1>
-            <p className="text-xs text-slate-500">दृष्टि — Code RAG</p>
+      <aside className="flex h-full w-72 flex-col glass-solid border-r-0">
+        {/* Logo Header */}
+        <div className="relative overflow-hidden border-b border-surface-border/30 p-5">
+          <div className="absolute inset-0 bg-gradient-to-br from-accent/10 via-transparent to-primary/5" />
+          <div className="relative flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-accent to-primary shadow-glow-sm">
+              <Sparkles className="h-5 w-5 text-white" />
+            </div>
+            <div>
+              <h1 className="text-lg font-bold text-gradient">Drishti</h1>
+              <p className="text-xs text-text-muted">दृष्टि — Code Intelligence</p>
+            </div>
           </div>
         </div>
 
-        <div className="border-b border-surface-border p-2">
+        {/* Workspace Selector */}
+        <div className="border-b border-surface-border/30 p-3">
           <Dialog open={showNewWorkspace} onOpenChange={setShowNewWorkspace}>
-            <div className="flex gap-1">
-              <select
+            <div className="flex gap-2">
+              <Select
                 value={activeWorkspaceId || ""}
-                onChange={(e) => setActiveWorkspace(e.target.value || null)}
-                className="flex-1 rounded-lg border border-surface-border bg-surface px-3 py-2 text-sm text-slate-100 focus:border-accent focus:outline-none"
+                onValueChange={(value) => setActiveWorkspace(value || null)}
               >
-                <option value="">Select workspace...</option>
-                {workspaces.map((w) => (
-                  <option key={w.id} value={w.id}>
-                    {w.name}
-                  </option>
-                ))}
-              </select>
+                <SelectTrigger className="flex-1">
+                  <SelectValue placeholder="Select workspace..." />
+                </SelectTrigger>
+                <SelectContent>
+                  {workspaces.map((w) => (
+                    <SelectItem key={w.id} value={w.id}>
+                      <div className="flex items-center gap-2">
+                        <Database className="h-3.5 w-3.5 text-accent" />
+                        {w.name}
+                      </div>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
               <DialogTrigger asChild>
-                <Button variant="ghost" size="icon">
+                <Button variant="outline" size="icon">
                   <Plus className="h-4 w-4" />
                 </Button>
               </DialogTrigger>
             </div>
+
             <DialogContent>
               <DialogHeader>
-                <DialogTitle>New Workspace</DialogTitle>
+                <DialogTitle>Create Workspace</DialogTitle>
                 <DialogDescription>
-                  Create a new workspace to index and query a codebase.
+                  Add a new codebase to index and query with AI.
                 </DialogDescription>
               </DialogHeader>
               <div className="space-y-4 py-4">
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-slate-200">Name</label>
+                  <label className="text-sm font-medium text-text-secondary">
+                    Workspace Name
+                  </label>
                   <Input
                     placeholder="My Project"
                     value={newWorkspaceName}
@@ -147,101 +175,84 @@ export function AppSidebar() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-slate-200">
+                  <label className="text-sm font-medium text-text-secondary">
                     Repository Path
                   </label>
                   <Input
                     placeholder="/path/to/repository"
                     value={newWorkspacePath}
                     onChange={(e) => setNewWorkspacePath(e.target.value)}
+                    icon={<FolderOpen className="h-4 w-4" />}
                   />
                 </div>
               </div>
               <DialogFooter>
-                <Button variant="outline" onClick={() => setShowNewWorkspace(false)}>
+                <Button variant="secondary" onClick={() => setShowNewWorkspace(false)}>
                   Cancel
                 </Button>
-                <Button onClick={handleCreateWorkspace}>Create</Button>
+                <Button onClick={handleCreateWorkspace}>
+                  <Zap className="mr-2 h-4 w-4" />
+                  Create
+                </Button>
               </DialogFooter>
             </DialogContent>
           </Dialog>
         </div>
 
-        <div className="flex border-b border-surface-border">
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <button
-                onClick={() => setActiveTab("threads")}
-                className={cn(
-                  "flex-1 p-3 transition-colors",
-                  activeTab === "threads"
-                    ? "border-b-2 border-accent text-accent"
-                    : "text-slate-400 hover:text-slate-200"
-                )}
-              >
-                <MessageSquare className="mx-auto h-5 w-5" />
-              </button>
-            </TooltipTrigger>
-            <TooltipContent side="bottom">Threads</TooltipContent>
-          </Tooltip>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <button
-                onClick={() => setActiveTab("memory")}
-                className={cn(
-                  "flex-1 p-3 transition-colors",
-                  activeTab === "memory"
-                    ? "border-b-2 border-accent text-accent"
-                    : "text-slate-400 hover:text-slate-200"
-                )}
-              >
-                <Brain className="mx-auto h-5 w-5" />
-              </button>
-            </TooltipTrigger>
-            <TooltipContent side="bottom">Memory</TooltipContent>
-          </Tooltip>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <button
-                onClick={() => setActiveTab("settings")}
-                className={cn(
-                  "flex-1 p-3 transition-colors",
-                  activeTab === "settings"
-                    ? "border-b-2 border-accent text-accent"
-                    : "text-slate-400 hover:text-slate-200"
-                )}
-              >
-                <Settings className="mx-auto h-5 w-5" />
-              </button>
-            </TooltipTrigger>
-            <TooltipContent side="bottom">Settings</TooltipContent>
-          </Tooltip>
+        {/* Tab Navigation */}
+        <div className="flex border-b border-surface-border/30">
+          {[
+            { id: "threads" as const, icon: MessageSquare, label: "Chats" },
+            { id: "memory" as const, icon: Brain, label: "Memory" },
+            { id: "settings" as const, icon: Settings, label: "Settings" },
+          ].map((tab) => (
+            <Tooltip key={tab.id}>
+              <TooltipTrigger asChild>
+                <button
+                  onClick={() => setActiveTab(tab.id)}
+                  className={cn(
+                    "flex-1 p-3.5 transition-all duration-200 relative",
+                    activeTab === tab.id
+                      ? "text-accent"
+                      : "text-text-muted hover:text-text-secondary"
+                  )}
+                >
+                  <tab.icon className="mx-auto h-5 w-5" />
+                  {activeTab === tab.id && (
+                    <div className="absolute bottom-0 left-1/2 -translate-x-1/2 h-0.5 w-8 rounded-full bg-gradient-to-r from-accent to-primary" />
+                  )}
+                </button>
+              </TooltipTrigger>
+              <TooltipContent side="bottom">{tab.label}</TooltipContent>
+            </Tooltip>
+          ))}
         </div>
 
+        {/* Content Area */}
         <ScrollArea className="flex-1">
           {activeTab === "threads" && (
-            <div className="p-2">
+            <div className="p-3 space-y-2">
               <Button
                 onClick={handleNewThread}
                 disabled={!activeWorkspaceId}
-                className="mb-2 w-full justify-start"
-                variant="outline"
+                className="w-full justify-start"
+                variant="secondary"
               >
                 <Plus className="mr-2 h-4 w-4" />
                 New Chat
               </Button>
 
-              <div className="space-y-1">
+              <div className="space-y-1 pt-2">
                 {workspaceThreads
                   .sort((a, b) => b.updatedAt - a.updatedAt)
                   .map((thread) => (
                     <div
                       key={thread.id}
                       className={cn(
-                        "group flex items-center gap-2 rounded-lg px-3 py-2 text-sm transition-colors",
+                        "group flex items-center gap-2 rounded-xl px-3 py-2.5 transition-all duration-200",
                         activeThreadId === thread.id
-                          ? "bg-accent/20 text-slate-100"
-                          : "text-slate-400 hover:bg-surface hover:text-slate-200"
+                          ? "bg-accent-muted border border-accent/20 text-text-primary"
+                          : "text-text-tertiary hover:bg-surface-raised/50 hover:text-text-secondary border border-transparent"
                       )}
                     >
                       {editingThreadId === thread.id ? (
@@ -257,17 +268,15 @@ export function AppSidebar() {
                             }}
                           />
                           <Button
-                            size="icon"
+                            size="icon-sm"
                             variant="ghost"
-                            className="h-6 w-6"
                             onClick={() => handleRenameThread(thread.id)}
                           >
                             <Check className="h-3 w-3" />
                           </Button>
                           <Button
-                            size="icon"
+                            size="icon-sm"
                             variant="ghost"
-                            className="h-6 w-6"
                             onClick={() => setEditingThreadId(null)}
                           >
                             <X className="h-3 w-3" />
@@ -277,13 +286,13 @@ export function AppSidebar() {
                         <>
                           <button
                             onClick={() => setActiveThread(thread.id)}
-                            className="flex-1 truncate text-left"
+                            className="flex-1 truncate text-left text-sm"
                           >
                             {thread.title}
                           </button>
-                          <div className="hidden gap-1 group-hover:flex">
+                          <div className="flex gap-0.5 opacity-0 transition-opacity group-hover:opacity-100">
                             <Button
-                              size="icon"
+                              size="icon-sm"
                               variant="ghost"
                               className="h-6 w-6"
                               onClick={() => {
@@ -294,9 +303,9 @@ export function AppSidebar() {
                               <Pencil className="h-3 w-3" />
                             </Button>
                             <Button
-                              size="icon"
+                              size="icon-sm"
                               variant="ghost"
-                              className="h-6 w-6 text-red-400 hover:text-red-300"
+                              className="h-6 w-6 text-danger hover:text-danger hover:bg-danger-muted"
                               onClick={() => deleteThread(thread.id)}
                             >
                               <Trash2 className="h-3 w-3" />
@@ -309,14 +318,31 @@ export function AppSidebar() {
               </div>
 
               {workspaceThreads.length === 0 && activeWorkspaceId && (
-                <p className="mt-4 px-3 text-center text-xs text-slate-500">
-                  No conversations yet. Start a new chat!
-                </p>
+                <div className="flex flex-col items-center py-8 text-center">
+                  <div className="rounded-full bg-surface-raised p-3 mb-3">
+                    <MessageSquare className="h-5 w-5 text-text-muted" />
+                  </div>
+                  <p className="text-xs text-text-muted">
+                    No conversations yet
+                  </p>
+                  <p className="text-xs text-text-muted/70 mt-1">
+                    Start a new chat to begin
+                  </p>
+                </div>
               )}
+              
               {!activeWorkspaceId && (
-                <p className="mt-4 px-3 text-center text-xs text-slate-500">
-                  Select or create a workspace to start chatting.
-                </p>
+                <div className="flex flex-col items-center py-8 text-center">
+                  <div className="rounded-full bg-accent-muted p-3 mb-3">
+                    <Database className="h-5 w-5 text-accent" />
+                  </div>
+                  <p className="text-xs text-text-muted">
+                    Select a workspace
+                  </p>
+                  <p className="text-xs text-text-muted/70 mt-1">
+                    Create or select a workspace to start
+                  </p>
+                </div>
               )}
             </div>
           )}
@@ -325,16 +351,31 @@ export function AppSidebar() {
           {activeTab === "settings" && <SettingsPanel />}
         </ScrollArea>
 
+        {/* Workspace Info Footer */}
         {activeWorkspace && (
-          <div className="border-t border-surface-border p-3">
-            <div className="flex items-center gap-2 text-xs text-slate-500">
-              <FolderOpen className="h-4 w-4" />
-              <span className="truncate">{activeWorkspace.repoPath}</span>
+          <div className="border-t border-surface-border/30 p-3 bg-surface-raised/30">
+            <div className="flex items-center gap-2 text-xs">
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-accent-muted">
+                <FolderOpen className="h-4 w-4 text-accent" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="truncate font-medium text-text-secondary">
+                  {activeWorkspace.name}
+                </p>
+                <p className="truncate text-text-muted text-[10px]">
+                  {activeWorkspace.repoPath}
+                </p>
+              </div>
             </div>
             {activeWorkspace.fileCount && (
-              <p className="mt-1 text-xs text-slate-600">
-                {activeWorkspace.fileCount} files, {activeWorkspace.chunkCount} chunks
-              </p>
+              <div className="flex gap-2 mt-2">
+                <Badge variant="secondary" className="text-[10px]">
+                  {activeWorkspace.fileCount} files
+                </Badge>
+                <Badge variant="secondary" className="text-[10px]">
+                  {activeWorkspace.chunkCount} chunks
+                </Badge>
+              </div>
             )}
           </div>
         )}
@@ -344,7 +385,7 @@ export function AppSidebar() {
 }
 
 function MemoryPanel() {
-  const { memories, addMemory, updateMemory, deleteMemory } = useAppStore();
+  const { memories, addMemory, deleteMemory } = useAppStore();
   const [newFact, setNewFact] = useState("");
 
   const handleAddFact = () => {
@@ -359,9 +400,9 @@ function MemoryPanel() {
   };
 
   return (
-    <div className="p-3 space-y-3">
+    <div className="p-3 space-y-4">
       <div className="space-y-2">
-        <label className="text-xs font-medium uppercase tracking-wide text-slate-500">
+        <label className="text-xs font-semibold uppercase tracking-wider text-text-muted">
           Add Memory
         </label>
         <div className="flex gap-2">
@@ -369,40 +410,58 @@ function MemoryPanel() {
             value={newFact}
             onChange={(e) => setNewFact(e.target.value)}
             placeholder="I prefer TypeScript..."
-            className="flex-1 text-xs"
+            className="flex-1 text-sm"
             onKeyDown={(e) => e.key === "Enter" && handleAddFact()}
           />
           <Button size="sm" onClick={handleAddFact}>
-            Add
+            <Plus className="h-4 w-4" />
           </Button>
         </div>
+        <p className="text-[10px] text-text-muted">
+          Memories help the AI understand your preferences and context.
+        </p>
       </div>
 
       <div className="space-y-2">
-        <label className="text-xs font-medium uppercase tracking-wide text-slate-500">
-          Stored Facts ({memories.length})
-        </label>
-        {memories.map((fact) => (
-          <div
-            key={fact.id}
-            className="group flex items-start gap-2 rounded-lg bg-surface p-2 text-xs"
-          >
-            <Brain className="mt-0.5 h-3 w-3 shrink-0 text-accent" />
-            <p className="flex-1 text-slate-300">{fact.content}</p>
-            <Button
-              size="icon"
-              variant="ghost"
-              className="h-5 w-5 shrink-0 opacity-0 group-hover:opacity-100"
-              onClick={() => deleteMemory(fact.id)}
+        <div className="flex items-center justify-between">
+          <label className="text-xs font-semibold uppercase tracking-wider text-text-muted">
+            Stored Memories
+          </label>
+          <Badge variant="outline">{memories.length}</Badge>
+        </div>
+        
+        <div className="space-y-2">
+          {memories.map((fact) => (
+            <div
+              key={fact.id}
+              className="group flex items-start gap-2 rounded-xl bg-surface-raised/50 p-3 border border-surface-border/30 transition-all hover:border-surface-border-light"
             >
-              <Trash2 className="h-3 w-3 text-red-400" />
-            </Button>
-          </div>
-        ))}
+              <div className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-md bg-accent-muted">
+                <Brain className="h-3 w-3 text-accent" />
+              </div>
+              <p className="flex-1 text-sm text-text-secondary">{fact.content}</p>
+              <Button
+                size="icon-sm"
+                variant="ghost"
+                className="h-6 w-6 shrink-0 opacity-0 group-hover:opacity-100 text-danger hover:text-danger hover:bg-danger-muted"
+                onClick={() => deleteMemory(fact.id)}
+              >
+                <Trash2 className="h-3 w-3" />
+              </Button>
+            </div>
+          ))}
+        </div>
+
         {memories.length === 0 && (
-          <p className="text-center text-xs text-slate-600">
-            No memories stored yet. Add facts the assistant should remember.
-          </p>
+          <div className="flex flex-col items-center py-6 text-center">
+            <div className="rounded-full bg-surface-raised p-3 mb-3">
+              <Brain className="h-5 w-5 text-text-muted" />
+            </div>
+            <p className="text-xs text-text-muted">No memories yet</p>
+            <p className="text-xs text-text-muted/70 mt-1">
+              Add facts for personalized responses
+            </p>
+          </div>
         )}
       </div>
     </div>
@@ -417,7 +476,7 @@ function SettingsPanel() {
   const handleIndex = async () => {
     if (!activeWorkspace) return;
     setIsIndexing(true);
-    setIngestStatus("Indexing...");
+    setIngestStatus("Indexing repository...");
     
     try {
       const response = await fetch(
@@ -441,7 +500,7 @@ function SettingsPanel() {
         chunkCount: result.total_chunks,
       });
       
-      setIngestStatus(`Indexed ${result.total_chunks || 0} chunks from ${result.files_indexed || result.total_files || 0} files`);
+      setIngestStatus(`Indexed ${result.total_chunks || 0} chunks`);
     } catch (error) {
       setIngestStatus(error instanceof Error ? error.message : "Indexing failed");
     } finally {
@@ -450,26 +509,45 @@ function SettingsPanel() {
   };
 
   return (
-    <div className="space-y-4 p-3">
+    <div className="space-y-5 p-3">
       <div className="space-y-2">
-        <label className="text-xs font-medium uppercase tracking-wide text-slate-500">
+        <label className="text-xs font-semibold uppercase tracking-wider text-text-muted">
           Model Provider
         </label>
-        <select
+        <Select
           value={settings.modelProvider}
-          onChange={(e) =>
-            setSettings({ modelProvider: e.target.value as typeof settings.modelProvider })
+          onValueChange={(value) =>
+            setSettings({ modelProvider: value as typeof settings.modelProvider })
           }
-          className="w-full rounded-lg border border-surface-border bg-surface px-3 py-2 text-sm text-slate-100 focus:border-accent focus:outline-none"
         >
-          <option value="anthropic">Anthropic (Claude)</option>
-          <option value="openai">OpenAI (GPT)</option>
-          <option value="ollama">Ollama (Local)</option>
-        </select>
+          <SelectTrigger>
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="anthropic">
+              <div className="flex items-center gap-2">
+                <Sparkles className="h-3.5 w-3.5 text-accent" />
+                Anthropic (Claude)
+              </div>
+            </SelectItem>
+            <SelectItem value="openai">
+              <div className="flex items-center gap-2">
+                <Zap className="h-3.5 w-3.5 text-success" />
+                OpenAI (GPT)
+              </div>
+            </SelectItem>
+            <SelectItem value="ollama">
+              <div className="flex items-center gap-2">
+                <Database className="h-3.5 w-3.5 text-primary" />
+                Ollama (Local)
+              </div>
+            </SelectItem>
+          </SelectContent>
+        </Select>
       </div>
 
       <div className="space-y-2">
-        <label className="text-xs font-medium uppercase tracking-wide text-slate-500">
+        <label className="text-xs font-semibold uppercase tracking-wider text-text-muted">
           Model
         </label>
         <Input
@@ -479,10 +557,15 @@ function SettingsPanel() {
         />
       </div>
 
-      <div className="space-y-2">
-        <label className="text-xs font-medium uppercase tracking-wide text-slate-500">
-          Temperature: {settings.temperature}
-        </label>
+      <div className="space-y-3">
+        <div className="flex items-center justify-between">
+          <label className="text-xs font-semibold uppercase tracking-wider text-text-muted">
+            Temperature
+          </label>
+          <Badge variant="outline" className="font-mono">
+            {settings.temperature.toFixed(1)}
+          </Badge>
+        </div>
         <input
           type="range"
           min="0"
@@ -490,32 +573,49 @@ function SettingsPanel() {
           step="0.1"
           value={settings.temperature}
           onChange={(e) => setSettings({ temperature: parseFloat(e.target.value) })}
-          className="w-full accent-accent"
+          className="w-full"
         />
+        <div className="flex justify-between text-[10px] text-text-muted">
+          <span>Precise</span>
+          <span>Creative</span>
+        </div>
       </div>
 
       {activeWorkspace && (
-        <div className="space-y-2 border-t border-surface-border pt-4">
-          <label className="text-xs font-medium uppercase tracking-wide text-slate-500">
-            Indexing
+        <div className="space-y-3 border-t border-surface-border/30 pt-4">
+          <label className="text-xs font-semibold uppercase tracking-wider text-text-muted">
+            Repository Indexing
           </label>
           <Button
             onClick={handleIndex}
             disabled={isIndexing}
             className="w-full"
-            variant="outline"
+            variant={isIndexing ? "secondary" : "default"}
           >
-            <Upload className="mr-2 h-4 w-4" />
-            {isIndexing ? "Indexing..." : "Index Repository"}
+            {isIndexing ? (
+              <>
+                <div className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white mr-2" />
+                Indexing...
+              </>
+            ) : (
+              <>
+                <Upload className="mr-2 h-4 w-4" />
+                Index Repository
+              </>
+            )}
           </Button>
           {ingestStatus && (
-            <p className="text-xs text-slate-500">{ingestStatus}</p>
+            <div className="rounded-lg bg-surface-raised/50 p-2 text-xs text-text-tertiary border border-surface-border/30">
+              {ingestStatus}
+            </div>
           )}
         </div>
       )}
 
-      <div className="border-t border-surface-border pt-4 text-xs text-slate-600">
-        <p>API: {process.env.NEXT_PUBLIC_DRISHTI_API_URL || "http://localhost:8000"}</p>
+      <div className="border-t border-surface-border/30 pt-4 text-[10px] text-text-muted">
+        <p>
+          API: {process.env.NEXT_PUBLIC_DRISHTI_API_URL || "http://localhost:8000"}
+        </p>
       </div>
     </div>
   );
