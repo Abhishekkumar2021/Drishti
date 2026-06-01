@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-import pytest
-
 from drishti.graph.models import (
     ClassNode,
     DependencyEdge,
