@@ -9,7 +9,7 @@ from typing import Literal
 
 from drishti.ingestion.documents.paths import is_openapi_spec_path
 
-ContentKind = Literal["code", "markdown", "pdf", "openapi", "unknown"]
+ContentKind = Literal["code", "markdown", "pdf", "openapi", "image", "unknown"]
 DetectionMethod = Literal["extension", "magic_bytes", "content_sniff", "path_heuristic"]
 
 _PDF_MAGIC = b"%PDF-"
@@ -82,7 +82,7 @@ class ContentRouter:
 
         if path_language and extension in self._parser_extensions:
             kind: ContentKind = "code"
-            if path_language in {"markdown", "pdf", "openapi"}:
+            if path_language in {"markdown", "pdf", "openapi", "image"}:
                 kind = path_language  # type: ignore[assignment]
             return FileClassification(
                 kind=kind,
@@ -137,6 +137,46 @@ def _classify_magic(content: bytes) -> FileClassification | None:
             kind="code",
             language="python",
             effective_extension=".py",
+            detection_method="magic_bytes",
+            confidence=0.95,
+        )
+    if sample.startswith(b"\x89PNG\r\n\x1a\n"):
+        return FileClassification(
+            kind="image",
+            language=None,
+            effective_extension=".png",
+            detection_method="magic_bytes",
+            confidence=0.99,
+        )
+    if sample.startswith(b"\xff\xd8\xff"):
+        return FileClassification(
+            kind="image",
+            language=None,
+            effective_extension=".jpg",
+            detection_method="magic_bytes",
+            confidence=0.99,
+        )
+    if sample.startswith(b"GIF87a") or sample.startswith(b"GIF89a"):
+        return FileClassification(
+            kind="image",
+            language=None,
+            effective_extension=".gif",
+            detection_method="magic_bytes",
+            confidence=0.99,
+        )
+    if sample.startswith(b"RIFF") and sample[8:12] == b"WEBP":
+        return FileClassification(
+            kind="image",
+            language=None,
+            effective_extension=".webp",
+            detection_method="magic_bytes",
+            confidence=0.99,
+        )
+    if b"<svg" in sample.lower()[:256]:
+        return FileClassification(
+            kind="image",
+            language=None,
+            effective_extension=".svg",
             detection_method="magic_bytes",
             confidence=0.95,
         )

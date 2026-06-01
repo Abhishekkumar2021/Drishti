@@ -20,12 +20,12 @@ This file is the living source of truth for the current build status of Drishti.
 | Component | Total Points | Completed | Progress % | Status |
 |-----------|--------------|-----------|------------|--------|
 | **Phase 1: Foundation** | 55 | 55 | 100.0% | 🟩 Completed |
-| **Phase 2: Ingestion** | 131 | 89 | 67.9% | 🟨 In Progress |
+| **Phase 2: Ingestion** | 131 | 131 | 100.0% | 🟩 Completed |
 | **Phase 3: Core Search & RAG** | 131 | 131 | 100.0% | 🟩 Completed |
 | **Phase 4: Advanced Features** | 89 | 81 | 91.0% | 🟨 In Progress |
 | **Phase 5: Evaluation** | 34 | 34 | 100.0% | 🟩 Completed |
 | **Phase 6: Release** | 21 | 0 | 0.0% | 🔮 Planned |
-| **Total Project** | **461** | **390** | **84.6%** | **🟨 In Progress** |
+| **Total Project** | **461** | **432** | **93.7%** | **🟨 In Progress** |
 
 ---
 
@@ -36,13 +36,13 @@ xychart-beta
     title "Phase completion (%)"
     x-axis ["P1 Foundation", "P2 Ingestion", "P3 Search & RAG", "P4 UI & Platform", "P5 Evaluation", "P6 Release"]
     y-axis "Percent" 0 --> 100
-    bar [100, 68, 100, 91, 100, 0]
+    bar [100, 100, 100, 91, 100, 0]
 ```
 
 | Phase | Points done | Status |
 |-------|-------------|--------|
 | Phase 1: Foundation | 55 / 55 | Completed |
-| Phase 2: Ingestion | 89 / 131 | In progress (EPIC-04 vision deferred) |
+| Phase 2: Ingestion | 131 / 131 | Completed |
 | Phase 3: Search & RAG | 131 / 131 | Completed |
 | Phase 4: UI & Platform | 81 / 89 | In progress (EPIC-10) |
 | Phase 5: Evaluation | 34 / 34 | Completed |
@@ -93,12 +93,12 @@ xychart-beta
   * [x] **US-03.10**: Repository git walker (incremental indexing via diffs)
 
 #### EPIC-04: Document Ingestion Pipeline (Priority: P1)
-* **Points**: 42 | **Status**: 🟨 In Progress (~81% — vision deferred)
+* **Points**: 42 | **Status**: 🟩 Completed (100%)
 * **Stories**:
   * [x] **US-04.01**: PDF layout-aware parser (PyMuPDF) — `src/drishti/ingestion/documents/pdf.py`
   * [x] **US-04.02**: PDF table structure extraction (markdown tables in PDF parser)
   * [x] **US-04.03**: Markdown header hierarchy parser — `src/drishti/ingestion/documents/markdown.py`
-  * [ ] **US-04.04**: Multi-modal image analysis (Claude Vision API)
+  * [x] **US-04.04**: Multi-modal image analysis (Claude Vision API) — `src/drishti/ingestion/documents/image.py`
   * [x] **US-04.05**: OpenAPI spec endpoint parser — `src/drishti/ingestion/documents/openapi.py`
 
 #### EPIC-05: Embedding & Vector Storage (Priority: P0)
