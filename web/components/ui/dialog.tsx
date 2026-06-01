@@ -6,11 +6,8 @@ import { X } from "lucide-react";
 import { cn } from "@/lib/cn";
 
 const Dialog = DialogPrimitive.Root;
-
 const DialogTrigger = DialogPrimitive.Trigger;
-
 const DialogPortal = DialogPrimitive.Portal;
-
 const DialogClose = DialogPrimitive.Close;
 
 const DialogOverlay = React.forwardRef<
@@ -20,7 +17,7 @@ const DialogOverlay = React.forwardRef<
   <DialogPrimitive.Overlay
     ref={ref}
     className={cn(
-      "fixed inset-0 z-50 bg-background/80 backdrop-blur-md",
+      "fixed inset-0 z-50 bg-black/60 backdrop-blur-sm",
       "data-[state=open]:animate-fade-in data-[state=closed]:animate-fade-out",
       className
     )}
@@ -38,16 +35,16 @@ const DialogContent = React.forwardRef<
     <DialogPrimitive.Content
       ref={ref}
       className={cn(
-        "fixed left-[50%] top-[50%] z-50 w-full max-w-lg translate-x-[-50%] translate-y-[-50%]",
-        "glass rounded-2xl p-6 shadow-glass",
-        "data-[state=open]:animate-scale-in data-[state=closed]:animate-scale-out",
+        "fixed left-[50%] top-[50%] z-50 w-full max-w-md translate-x-[-50%] translate-y-[-50%]",
+        "bg-bg-secondary border border-surface-border rounded-2xl p-6 shadow-large",
+        "data-[state=open]:animate-scale-in data-[state=closed]:animate-fade-out",
         "focus:outline-none",
         className
       )}
       {...props}
     >
       {children}
-      <DialogPrimitive.Close className="absolute right-4 top-4 rounded-lg p-1 text-text-muted opacity-70 transition-all hover:bg-surface-raised hover:text-text-primary hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-accent/50">
+      <DialogPrimitive.Close className="absolute right-4 top-4 rounded-lg p-1.5 text-text-muted transition-colors hover:bg-surface hover:text-text-primary focus:outline-none">
         <X className="h-4 w-4" />
         <span className="sr-only">Close</span>
       </DialogPrimitive.Close>
@@ -60,10 +57,7 @@ const DialogHeader = ({
   className,
   ...props
 }: React.HTMLAttributes<HTMLDivElement>) => (
-  <div
-    className={cn("flex flex-col space-y-2 text-center sm:text-left", className)}
-    {...props}
-  />
+  <div className={cn("flex flex-col gap-1.5", className)} {...props} />
 );
 DialogHeader.displayName = "DialogHeader";
 
@@ -72,10 +66,7 @@ const DialogFooter = ({
   ...props
 }: React.HTMLAttributes<HTMLDivElement>) => (
   <div
-    className={cn(
-      "flex flex-col-reverse gap-2 pt-4 sm:flex-row sm:justify-end",
-      className
-    )}
+    className={cn("flex gap-3 pt-6 justify-end", className)}
     {...props}
   />
 );
@@ -87,10 +78,7 @@ const DialogTitle = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <DialogPrimitive.Title
     ref={ref}
-    className={cn(
-      "text-xl font-semibold leading-none tracking-tight text-text-primary",
-      className
-    )}
+    className={cn("text-lg font-semibold text-text-primary", className)}
     {...props}
   />
 ));
