@@ -378,31 +378,29 @@ export function ChatArea() {
             </div>
           </ScrollArea>
 
-          {/* Input - aligned with chat content */}
-          <div className="border-t border-surface-border bg-bg">
-            <div className="max-w-3xl mx-auto px-6 py-4">
-              <form onSubmit={handleSubmit} className="flex gap-3">
-                <Input
-                  ref={inputRef}
-                  value={input}
-                  onChange={(e) => setInput(e.target.value)}
-                  placeholder={activeWorkspace ? "Ask about your codebase..." : "Select a workspace first"}
-                  disabled={isAsking || !activeWorkspace}
-                  className="flex-1 h-11"
-                />
-                <Button
-                  type="submit"
-                  disabled={isAsking || !input.trim() || !activeWorkspace}
-                  className="h-11 w-11 shrink-0"
-                >
-                  {isAsking ? (
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                  ) : (
-                    <Send className="h-4 w-4" />
-                  )}
-                </Button>
-              </form>
-            </div>
+          {/* Input - full width */}
+          <div className="border-t border-surface-border bg-bg shrink-0">
+            <form onSubmit={handleSubmit} className="flex gap-3 px-6 py-4">
+              <Input
+                ref={inputRef}
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                placeholder={activeWorkspace ? "Ask about your codebase..." : "Select a workspace first"}
+                disabled={isAsking || !activeWorkspace}
+                className="flex-1 h-11"
+              />
+              <Button
+                type="submit"
+                disabled={isAsking || !input.trim() || !activeWorkspace}
+                className="h-11 w-11 shrink-0"
+              >
+                {isAsking ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Send className="h-4 w-4" />
+                )}
+              </Button>
+            </form>
           </div>
         </div>
 
