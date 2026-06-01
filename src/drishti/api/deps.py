@@ -15,6 +15,7 @@ if TYPE_CHECKING:
     from qdrant_client import QdrantClient
 
     from drishti.generation.pipeline import RAGPipeline
+    from drishti.graph.client import GraphClient
     from drishti.search.pipeline import HybridSearchPipeline
     from drishti.services.platform_service import PlatformService
 
@@ -81,3 +82,22 @@ def get_query_cache(request: Request) -> QueryCache:
         msg = "Query cache is not initialized"
         raise RuntimeError(msg)
     return cast("QueryCache", cache)
+
+
+def get_graph_client(request: Request) -> GraphClient | None:
+    """Return the Neo4j graph client if enabled."""
+    settings = get_settings()
+    if not settings.neo4j_enabled:
+        return None
+
+    client = getattr(request.app.state, "graph_client", None)
+    if client is None:
+        from drishti.graph.client import GraphClient
+
+        client = GraphClient(
+            uri=settings.neo4j_uri,
+            user=settings.neo4j_user,
+            password=settings.neo4j_password,
+        )
+        request.app.state.graph_client = client
+    return cast("GraphClient", client)
