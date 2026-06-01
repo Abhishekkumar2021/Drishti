@@ -214,7 +214,12 @@ xychart-beta
   * [x] **US-16.05**: Audit log — `services/audit_log.py`
 
 #### EPIC-17: UI parity (Priority: P1)
-* **Points**: 21 | **Status**: 🔮 Planned (0%)
+* **Points**: 21 | **Status**: 🟩 Completed (100%)
+* **Stories**:
+  * [x] **US-17.01**: Conversation sidebar — `web/components/layout/AppSidebar.tsx`
+  * [x] **US-17.03**: Memory panel — `web/components/layout/AppSidebar.tsx`
+  * [x] **US-17.04**: Source panel — `web/components/layout/ChatArea.tsx`
+  * [x] **US-17.05**: Settings — `web/components/layout/AppSidebar.tsx`
 
 ---
 
