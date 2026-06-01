@@ -114,3 +114,40 @@ class SourceReadResponse(BaseModel):
     content: str
     language: str | None = None
     line_count: int = 0
+
+
+class AffectedNode(BaseModel):
+    """A node affected by a code change."""
+
+    id: str
+    name: str
+    node_type: str
+    file_path: str
+    start_line: int | None = None
+    end_line: int | None = None
+
+
+class ImpactAnalysisResponse(BaseModel):
+    """Response for impact analysis query."""
+
+    target: AffectedNode = Field(description="The node being analyzed")
+    affected_count: int = Field(description="Total number of affected nodes")
+    affected_nodes: list[AffectedNode] = Field(
+        default_factory=list,
+        description="Nodes that would be affected by changes",
+    )
+    dependency_paths: list[list[str]] = Field(
+        default_factory=list,
+        description="Paths from target to each affected node",
+    )
+    impact_summary: dict[str, int] = Field(
+        default_factory=dict,
+        description="Count of affected nodes by type",
+    )
+
+
+class GraphStatsResponse(BaseModel):
+    """Graph database statistics."""
+
+    nodes: dict[str, int] = Field(description="Node counts by type")
+    total_nodes: int = Field(description="Total number of nodes")

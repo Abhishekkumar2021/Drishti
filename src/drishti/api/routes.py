@@ -15,6 +15,7 @@ from drishti.agent.runner import AgentRunner
 from drishti.api.deps import (
     get_agent_runner,
     get_app_settings,
+    get_graph_client,
     get_platform_service,
     get_query_cache,
     get_search_pipeline,
@@ -25,8 +26,11 @@ from drishti.api.mappers import (
     search_hit_to_item,
 )
 from drishti.api.responses import (
+    AffectedNode,
     AskResponse,
     CitationItem,
+    GraphStatsResponse,
+    ImpactAnalysisResponse,
     IngestResponse,
     SearchResponse,
     SearchResultItem,
@@ -35,6 +39,7 @@ from drishti.api.responses import (
 from drishti.api.schemas import (
     AskRequest,
     ChatMessage,
+    ImpactAnalysisRequest,
     IngestionRequest,
     SearchRequest,
     SourceReadRequest,
@@ -341,4 +346,84 @@ async def read_source_file(
         content=content,
         language=language,
         line_count=line_count,
+    )
+
+
+@router.post("/impact-analysis", response_model=ImpactAnalysisResponse)
+async def analyze_impact(
+    body: ImpactAnalysisRequest,
+    request: Request,
+) -> ImpactAnalysisResponse:
+    """Analyze the dependency impact of changing a symbol at a given position.
+
+    Returns a tree of all nodes that would be affected by modifying the
+    class, method, or function at the specified file and line number.
+    """
+    graph_client = get_graph_client(request)
+    if graph_client is None:
+        raise DrishtiError(
+            "Graph database is not enabled. Set NEO4J_ENABLED=true in environment.",
+            error_code="GRAPH_DISABLED",
+        )
+
+    await graph_client.connect()
+
+    result = await graph_client.impact_analysis(
+        file_path=body.file_path,
+        line_number=body.line_number,
+        max_depth=body.max_depth,
+    )
+
+    if result is None:
+        raise DrishtiError(
+            f"No symbol found at {body.file_path}:{body.line_number}",
+            error_code="SYMBOL_NOT_FOUND",
+        )
+
+    target = AffectedNode(
+        id=result.target_node.id,
+        name=result.target_node.name,
+        node_type=type(result.target_node).__name__,
+        file_path=result.target_node.file_path,
+        start_line=result.target_node.start_line,
+        end_line=result.target_node.end_line,
+    )
+
+    affected = [
+        AffectedNode(
+            id=node.id,
+            name=node.name,
+            node_type=type(node).__name__,
+            file_path=node.file_path,
+            start_line=node.start_line,
+            end_line=node.end_line,
+        )
+        for node in result.affected_nodes
+    ]
+
+    return ImpactAnalysisResponse(
+        target=target,
+        affected_count=result.total_affected,
+        affected_nodes=affected,
+        dependency_paths=result.dependency_paths,
+        impact_summary=result.impact_summary,
+    )
+
+
+@router.get("/graph/stats", response_model=GraphStatsResponse)
+async def get_graph_stats(request: Request) -> GraphStatsResponse:
+    """Get statistics about the dependency graph."""
+    graph_client = get_graph_client(request)
+    if graph_client is None:
+        raise DrishtiError(
+            "Graph database is not enabled. Set NEO4J_ENABLED=true in environment.",
+            error_code="GRAPH_DISABLED",
+        )
+
+    await graph_client.connect()
+    stats = await graph_client.get_stats()
+
+    return GraphStatsResponse(
+        nodes=stats,
+        total_nodes=sum(stats.values()),
     )

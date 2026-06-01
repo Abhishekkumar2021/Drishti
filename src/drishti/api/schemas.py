@@ -218,3 +218,24 @@ class SourceReadRequest(BaseModel):
             return resolve_repo_path(self.repo_path, allowed_roots=allowed_roots)
         except PathValidationError as exc:
             raise ValueError(str(exc)) from exc
+
+
+class ImpactAnalysisRequest(BaseModel):
+    """Request body for impact analysis endpoint."""
+
+    file_path: str = Field(
+        ...,
+        min_length=1,
+        description="Path to the source file",
+    )
+    line_number: int = Field(
+        ...,
+        ge=1,
+        description="Line number in the file (1-indexed)",
+    )
+    max_depth: int = Field(
+        default=10,
+        ge=1,
+        le=50,
+        description="Maximum depth for dependency traversal",
+    )

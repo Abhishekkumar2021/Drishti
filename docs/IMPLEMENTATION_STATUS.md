@@ -22,10 +22,10 @@ This file is the living source of truth for the current build status of Drishti.
 | **Phase 1: Foundation** | 55 | 55 | 100.0% | 🟩 Completed |
 | **Phase 2: Ingestion** | 131 | 89 | 67.9% | 🟨 In Progress |
 | **Phase 3: Core Search & RAG** | 131 | 131 | 100.0% | 🟩 Completed |
-| **Phase 4: Advanced Features** | 89 | 47 | 52.8% | 🟨 In Progress |
+| **Phase 4: Advanced Features** | 89 | 81 | 91.0% | 🟨 In Progress |
 | **Phase 5: Evaluation** | 34 | 34 | 100.0% | 🟩 Completed |
 | **Phase 6: Release** | 21 | 0 | 0.0% | 🔮 Planned |
-| **Total Project** | **461** | **356** | **77.2%** | **🟨 In Progress** |
+| **Total Project** | **461** | **390** | **84.6%** | **🟨 In Progress** |
 
 ---
 
@@ -36,7 +36,7 @@ xychart-beta
     title "Phase completion (%)"
     x-axis ["P1 Foundation", "P2 Ingestion", "P3 Search & RAG", "P4 UI & Platform", "P5 Evaluation", "P6 Release"]
     y-axis "Percent" 0 --> 100
-    bar [100, 68, 100, 53, 100, 0]
+    bar [100, 68, 100, 91, 100, 0]
 ```
 
 | Phase | Points done | Status |
@@ -44,7 +44,7 @@ xychart-beta
 | Phase 1: Foundation | 55 / 55 | Completed |
 | Phase 2: Ingestion | 89 / 131 | In progress (EPIC-04 vision deferred) |
 | Phase 3: Search & RAG | 131 / 131 | Completed |
-| Phase 4: UI & Platform | 47 / 89 | In progress (EPIC-13–17) |
+| Phase 4: UI & Platform | 81 / 89 | In progress (EPIC-10) |
 | Phase 5: Evaluation | 34 / 34 | Completed |
 | Phase 6: Release | 0 / 21 | Planned |
 
@@ -143,12 +143,12 @@ xychart-beta
 ### Phase 4: UI & Graph DB (Epics 09–10)
 
 #### EPIC-09: Dependency Graph & Impact Analysis (Priority: P2)
-* **Points**: 34 | **Status**: 🔮 Planned (0%)
+* **Points**: 34 | **Status**: 🟩 Completed (100%)
 * **Stories**:
-  * [ ] **US-09.01**: Neo4j database setup & schema definition
-  * [ ] **US-09.02**: Graph builder (node creation for methods, files, packages)
-  * [ ] **US-09.03**: Dependency tracing algorithm
-  * [ ] **US-09.04**: Change impact analysis endpoint (`/api/v1/impact-analysis`)
+  * [x] **US-09.01**: Neo4j database setup & schema definition — `docker-compose.yml`, `src/drishti/config.py`
+  * [x] **US-09.02**: Graph builder (node creation for methods, files, packages) — `src/drishti/graph/builder.py`
+  * [x] **US-09.03**: Dependency tracing algorithm — `src/drishti/graph/client.py`
+  * [x] **US-09.04**: Change impact analysis endpoint (`/api/v1/impact-analysis`) — `src/drishti/api/routes.py`
 
 #### EPIC-10: Frontend UI (Priority: P1)
 * **Points**: 55 | **Status**: 🟩 Completed (US-10.05 deferred to EPIC-09)
