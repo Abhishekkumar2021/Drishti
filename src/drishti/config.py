@@ -108,7 +108,7 @@ class Settings(BaseSettings):
     # ─── Application ─────────────────────────────
     debug: bool = False
     log_level: str = "INFO"
-    api_host: str = "0.0.0.0"  # noqa: S104
+    api_host: str = "0.0.0.0"
     api_port: int = 8000
     api_token: str = ""
     expose_openapi_docs: bool = True

@@ -258,12 +258,13 @@ class AuditLogService:
                 conditions.append("timestamp <= :until")
                 params["until"] = until
 
+            # Query is parameterized via :placeholders and params dict
             query = f"""
                 SELECT * FROM audit_events
                 WHERE {' AND '.join(conditions)}
                 ORDER BY timestamp DESC
                 LIMIT :limit
-            """
+            """  # nosec B608 - conditions use :placeholders not string interpolation
 
             result = await self._session.execute(text(query), params)
             rows = result.fetchall()
