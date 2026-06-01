@@ -261,7 +261,7 @@ class AuditLogService:
             # Query is parameterized via :placeholders and params dict
             query = f"""
                 SELECT * FROM audit_events
-                WHERE {' AND '.join(conditions)}
+                WHERE {" AND ".join(conditions)}
                 ORDER BY timestamp DESC
                 LIMIT :limit
             """  # nosec B608 - conditions use :placeholders not string interpolation
