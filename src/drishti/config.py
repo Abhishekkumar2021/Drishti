@@ -96,6 +96,15 @@ class Settings(BaseSettings):
     neo4j_password: str = ""
     neo4j_enabled: bool = False
 
+    # ─── Authentication (US-16.01) ────────────────
+    jwt_secret_key: str = ""
+    jwt_access_token_expire_minutes: int = 30
+    google_client_id: str = ""
+    google_client_secret: str = ""
+    github_client_id: str = ""
+    github_client_secret: str = ""
+    oidc_callback_base_url: str = ""
+
     # ─── Application ─────────────────────────────
     debug: bool = False
     log_level: str = "INFO"
