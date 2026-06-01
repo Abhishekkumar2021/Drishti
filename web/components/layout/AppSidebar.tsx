@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import {
   Plus,
   MessageSquare,
@@ -76,6 +76,11 @@ export function AppSidebar({ isOpen = true, onToggle }: AppSidebarProps) {
   const [newWorkspacePath, setNewWorkspacePath] = useState("");
   const [showNewWorkspace, setShowNewWorkspace] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const {
     workspaces,
@@ -299,7 +304,7 @@ export function AppSidebar({ isOpen = true, onToggle }: AppSidebarProps) {
           </ScrollArea>
 
           {/* Footer */}
-          {activeWorkspace && (
+          {mounted && activeWorkspace && (
             <WorkspaceFooter workspace={activeWorkspace} />
           )}
         </aside>
