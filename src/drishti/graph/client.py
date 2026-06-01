@@ -35,7 +35,7 @@ class GraphClient:
         self,
         uri: str = "bolt://localhost:7687",
         user: str = "neo4j",
-        password: str = "",
+        password: str = "",  # nosec B107 - empty default is intentional, real password from env
     ) -> None:
         """Initialize the Neo4j client.
 
