@@ -160,27 +160,27 @@ export function AppSidebar({ isOpen = true, onToggle }: AppSidebarProps) {
 
         <aside
           className={cn(
-            "flex h-full w-72 flex-col bg-bg-secondary border-r border-surface-border",
+            "flex h-full w-72 flex-col bg-bg-secondary border-r border-surface-border overflow-hidden",
             "fixed lg:relative inset-y-0 left-0 z-40",
             "transition-transform duration-200 lg:translate-x-0",
             isOpen ? "translate-x-0" : "-translate-x-full"
           )}
         >
           {/* Header */}
-          <div className="flex items-center justify-between h-14 px-4 border-b border-surface-border">
-            <div className="flex items-center gap-3">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-accent">
+          <div className="flex items-center justify-between h-14 px-4 border-b border-surface-border shrink-0 overflow-hidden">
+            <div className="flex items-center gap-3 min-w-0">
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-accent shrink-0">
                 <Layers className="h-4 w-4 text-white" />
               </div>
-              <div>
-                <h1 className="text-sm font-semibold text-text-primary">Drishti</h1>
-                <p className="text-2xs text-text-muted">Code Intelligence</p>
+              <div className="min-w-0">
+                <h1 className="text-sm font-semibold text-text-primary truncate">Drishti</h1>
+                <p className="text-2xs text-text-muted truncate">Code Intelligence</p>
               </div>
             </div>
             <Button
               variant="ghost"
               size="icon-sm"
-              className="lg:hidden"
+              className="lg:hidden shrink-0"
               onClick={onToggle}
             >
               <ChevronLeft className="h-4 w-4" />
@@ -190,20 +190,20 @@ export function AppSidebar({ isOpen = true, onToggle }: AppSidebarProps) {
           {/* Workspace Selector */}
           <div className="px-3 py-3 border-b border-surface-border">
             <Dialog open={showNewWorkspace} onOpenChange={setShowNewWorkspace}>
-              <div className="flex gap-2">
+              <div className="flex gap-2 overflow-hidden">
                 <Select
                   value={activeWorkspaceId || ""}
                   onValueChange={(value) => setActiveWorkspace(value || null)}
                 >
-                  <SelectTrigger className="flex-1 h-9">
+                  <SelectTrigger className="flex-1 h-9 min-w-0">
                     <SelectValue placeholder="Select workspace..." />
                   </SelectTrigger>
                   <SelectContent>
                     {workspaces.map((w) => (
                       <SelectItem key={w.id} value={w.id}>
-                        <span className="flex items-center gap-2">
-                          <FolderOpen className="h-3.5 w-3.5 text-text-muted" />
-                          {w.name}
+                        <span className="flex items-center gap-2 truncate">
+                          <FolderOpen className="h-3.5 w-3.5 text-text-muted shrink-0" />
+                          <span className="truncate">{w.name}</span>
                         </span>
                       </SelectItem>
                     ))}
@@ -369,28 +369,28 @@ function ThreadsPanel({
             <div
               key={thread.id}
               className={cn(
-                "group flex items-center gap-2 rounded-lg px-3 py-2 transition-colors cursor-pointer",
+                "group flex items-center gap-2 rounded-lg px-3 py-2 transition-colors cursor-pointer overflow-hidden",
                 activeThreadId === thread.id
                   ? "bg-surface text-text-primary"
                   : "text-text-secondary hover:bg-surface/50 hover:text-text-primary"
               )}
             >
               {editingThreadId === thread.id ? (
-                <div className="flex flex-1 items-center gap-1">
+                <div className="flex flex-1 items-center gap-1 min-w-0">
                   <Input
                     value={editingTitle}
                     onChange={(e) => setEditingTitle(e.target.value)}
-                    className="h-7 text-sm"
+                    className="h-7 text-sm flex-1 min-w-0"
                     autoFocus
                     onKeyDown={(e) => {
                       if (e.key === "Enter") onRenameThread(thread.id);
                       if (e.key === "Escape") setEditingThreadId(null);
                     }}
                   />
-                  <Button size="icon-sm" variant="ghost" onClick={() => onRenameThread(thread.id)}>
+                  <Button size="icon-sm" variant="ghost" className="shrink-0" onClick={() => onRenameThread(thread.id)}>
                     <Check className="h-3 w-3" />
                   </Button>
-                  <Button size="icon-sm" variant="ghost" onClick={() => setEditingThreadId(null)}>
+                  <Button size="icon-sm" variant="ghost" className="shrink-0" onClick={() => setEditingThreadId(null)}>
                     <X className="h-3 w-3" />
                   </Button>
                 </div>
@@ -399,11 +399,12 @@ function ThreadsPanel({
                   <MessageSquare className="h-4 w-4 shrink-0 text-text-muted" />
                   <button
                     onClick={() => onSelectThread(thread.id)}
-                    className="flex-1 truncate text-left text-sm"
+                    className="flex-1 min-w-0 truncate text-left text-sm"
+                    title={thread.title}
                   >
                     {thread.title}
                   </button>
-                  <div className="flex gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <div className="flex gap-0.5 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
                     <Button
                       size="icon-sm"
                       variant="ghost"
@@ -453,13 +454,16 @@ function GraphPanel() {
   const [graphData, setGraphData] = useState<{ nodes: number; edges: number } | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
+  const workspaceId = activeWorkspace?.id;
+  const workspaceRepoPath = activeWorkspace?.repoPath;
+
   useEffect(() => {
     const loadStats = async () => {
-      if (!activeWorkspace) return;
+      if (!workspaceRepoPath) return;
       setIsLoading(true);
       try {
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_DRISHTI_API_URL || "http://localhost:8000"}/api/v1/graph/stats?repo_root=${encodeURIComponent(activeWorkspace.repoPath)}`
+          `${process.env.NEXT_PUBLIC_DRISHTI_API_URL || "http://localhost:8000"}/api/v1/graph/stats?repo_root=${encodeURIComponent(workspaceRepoPath)}`
         );
         if (response.ok) {
           const data = await response.json();
@@ -473,7 +477,7 @@ function GraphPanel() {
     };
 
     loadStats();
-  }, [activeWorkspace?.id, activeWorkspace?.repoPath]);
+  }, [workspaceId, workspaceRepoPath]);
 
   if (!activeWorkspace) {
     return (
@@ -527,17 +531,17 @@ function GraphPanel() {
       <div className="pt-4 border-t border-surface-border space-y-2">
         <p className="text-xs font-medium text-text-muted uppercase tracking-wider">Features</p>
         <ul className="space-y-2 text-sm text-text-tertiary">
-          <li className="flex items-center gap-2">
-            <GitBranch className="h-3.5 w-3.5 text-accent" />
-            Import/Export relationships
+          <li className="flex items-center gap-2 overflow-hidden">
+            <GitBranch className="h-3.5 w-3.5 text-accent shrink-0" />
+            <span className="truncate">Import/Export relationships</span>
           </li>
-          <li className="flex items-center gap-2">
-            <FileText className="h-3.5 w-3.5 text-accent" />
-            Function call graphs
+          <li className="flex items-center gap-2 overflow-hidden">
+            <FileText className="h-3.5 w-3.5 text-accent shrink-0" />
+            <span className="truncate">Function call graphs</span>
           </li>
-          <li className="flex items-center gap-2">
-            <Database className="h-3.5 w-3.5 text-accent" />
-            Class hierarchies
+          <li className="flex items-center gap-2 overflow-hidden">
+            <Database className="h-3.5 w-3.5 text-accent shrink-0" />
+            <span className="truncate">Class hierarchies</span>
           </li>
         </ul>
       </div>
@@ -592,10 +596,10 @@ function MemoryPanel() {
           {memories.map((fact) => (
             <div
               key={fact.id}
-              className="group flex items-start gap-2 rounded-lg bg-surface p-3 border border-surface-border"
+              className="group flex items-start gap-2 rounded-lg bg-surface p-3 border border-surface-border overflow-hidden"
             >
               <Brain className="h-4 w-4 shrink-0 text-accent mt-0.5" />
-              <p className="flex-1 text-sm text-text-secondary">{fact.content}</p>
+              <p className="flex-1 min-w-0 text-sm text-text-secondary break-words">{fact.content}</p>
               <Button
                 size="icon-sm"
                 variant="ghost"
@@ -815,24 +819,24 @@ function SettingsPanel() {
 
 function WorkspaceFooter({ workspace }: { workspace: { id: string; name: string; repoPath: string; fileCount?: number; chunkCount?: number; indexedAt?: number } }) {
   return (
-    <div className="border-t border-surface-border p-3">
-      <div className="flex items-center gap-3">
-        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-surface">
+    <div className="border-t border-surface-border p-3 shrink-0">
+      <div className="flex items-center gap-3 overflow-hidden">
+        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-surface shrink-0">
           <FolderOpen className="h-4 w-4 text-text-muted" />
         </div>
-        <div className="flex-1 min-w-0">
+        <div className="flex-1 min-w-0 overflow-hidden">
           <p className="text-sm font-medium text-text-primary truncate">
             {workspace.name}
           </p>
-          <p className="text-2xs text-text-muted truncate">
+          <p className="text-2xs text-text-muted truncate" title={workspace.repoPath}>
             {workspace.repoPath}
           </p>
         </div>
       </div>
-      {workspace.fileCount && (
-        <div className="flex gap-2 mt-2">
-          <Badge variant="default">{workspace.fileCount} files</Badge>
-          <Badge variant="default">{workspace.chunkCount} chunks</Badge>
+      {workspace.fileCount !== undefined && (
+        <div className="flex gap-2 mt-2 flex-wrap">
+          <Badge variant="default" className="text-xs">{workspace.fileCount} files</Badge>
+          <Badge variant="default" className="text-xs">{workspace.chunkCount || 0} chunks</Badge>
         </div>
       )}
     </div>

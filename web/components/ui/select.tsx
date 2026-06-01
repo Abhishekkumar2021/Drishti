@@ -16,20 +16,20 @@ const SelectTrigger = React.forwardRef<
   <SelectPrimitive.Trigger
     ref={ref}
     className={cn(
-      "flex h-11 w-full items-center justify-between rounded-xl px-4 py-2.5 text-sm",
+      "flex h-11 w-full items-center justify-between gap-2 rounded-xl px-4 py-2.5 text-sm",
       "bg-surface text-text-primary border border-surface-border",
       "placeholder:text-text-muted",
       "focus:border-surface-border-light focus:outline-none focus:ring-1 focus:ring-surface-border-light",
       "disabled:cursor-not-allowed disabled:opacity-50",
       "transition-all duration-150",
-      "[&>span]:line-clamp-1",
+      "[&>span]:truncate [&>span]:flex-1 [&>span]:min-w-0 [&>span]:text-left",
       className
     )}
     {...props}
   >
     {children}
     <SelectPrimitive.Icon asChild>
-      <ChevronDown className="h-4 w-4 text-text-muted" />
+      <ChevronDown className="h-4 w-4 shrink-0 text-text-muted" />
     </SelectPrimitive.Icon>
   </SelectPrimitive.Trigger>
 ));
@@ -91,16 +91,17 @@ const SelectItem = React.forwardRef<
       "focus:bg-surface focus:text-text-primary",
       "data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
       "transition-colors duration-100",
+      "[&>span]:truncate [&>span]:min-w-0",
       className
     )}
     {...props}
   >
-    <span className="absolute right-3 flex h-4 w-4 items-center justify-center">
+    <span className="absolute right-3 flex h-4 w-4 items-center justify-center shrink-0">
       <SelectPrimitive.ItemIndicator>
         <Check className="h-4 w-4 text-accent" />
       </SelectPrimitive.ItemIndicator>
     </span>
-    <SelectPrimitive.ItemText>{children}</SelectPrimitive.ItemText>
+    <SelectPrimitive.ItemText className="truncate">{children}</SelectPrimitive.ItemText>
   </SelectPrimitive.Item>
 ));
 SelectItem.displayName = SelectPrimitive.Item.displayName;
