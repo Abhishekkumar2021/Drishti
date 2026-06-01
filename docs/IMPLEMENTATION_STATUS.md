@@ -204,13 +204,14 @@ xychart-beta
   * [x] Conversations use Postgres when `DATABASE_URL` set (Redis store disabled)
 
 #### EPIC-16: Auth, RBAC, observability (Priority: P1)
-* **Points**: 21 | **Status**: 🟨 In Progress (~35%)
+* **Points**: 21 | **Status**: 🟩 Completed (100%)
 * **Stories**:
   * [x] Structured JSON logging (structlog) — `observability/logging.py`
   * [x] Request ID + log correlation — `middleware/request_id.py`, `logging_context.py`
   * [x] Health probes for Postgres + MinIO
-  * [ ] OIDC / enterprise SSO
-  * [ ] OpenTelemetry traces
+  * [x] **US-16.01**: OIDC authentication (Google, GitHub) — `auth/oidc.py`, `auth/jwt_utils.py`
+  * [x] **US-16.04**: OpenTelemetry traces — `observability/tracing.py`
+  * [x] **US-16.05**: Audit log — `services/audit_log.py`
 
 #### EPIC-17: UI parity (Priority: P1)
 * **Points**: 21 | **Status**: 🔮 Planned (0%)

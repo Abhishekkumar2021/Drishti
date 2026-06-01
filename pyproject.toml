@@ -82,6 +82,9 @@ dependencies = [
 
     # Graph Database (EPIC-09)
     "neo4j>=5.27.0",
+
+    # Authentication (EPIC-16)
+    "PyJWT>=2.8.0",
 ]
 
 [project.optional-dependencies]
@@ -104,6 +107,14 @@ eval = [
     "ragas>=0.2.0",
     "datasets>=3.1.0",
     "pandas>=2.2.0",
+]
+
+otel = [
+    "opentelemetry-api>=1.24.0",
+    "opentelemetry-sdk>=1.24.0",
+    "opentelemetry-instrumentation-fastapi>=0.45b0",
+    "opentelemetry-instrumentation-httpx>=0.45b0",
+    "opentelemetry-exporter-otlp-proto-grpc>=1.24.0",
 ]
 
 [project.urls]
@@ -196,6 +207,9 @@ ignore = [
 "src/drishti/services/query_cache.py" = ["TC003", "D102", "D107"]
 "src/drishti/middleware/rate_limit.py" = ["TC003"]
 "src/drishti/middleware/*.py" = ["TC002", "TC003", "D102", "D107"]
+"src/drishti/auth/*.py" = ["TC003", "D102", "D105", "D107"]
+"src/drishti/observability/tracing.py" = ["TC003", "D102", "D105", "D107"]
+"src/drishti/services/audit_log.py" = ["TC003", "D102", "D107", "W293"]
 "src/drishti/services/health.py" = ["TC001"]
 "src/drishti/db/*.py" = ["TC001", "TC003"]
 "src/drishti/observability/*.py" = ["TC003", "ANN401"]
